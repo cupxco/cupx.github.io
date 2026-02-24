@@ -1,0 +1,189 @@
+<!DOCTYPE html>      
+<html lang="en">      
+<head>      
+  <meta charset="UTF-8">      
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">      
+      
+  <title>Contact | CupX Corporation</title>      
+      
+  <meta name="description" content="Contact CupX Corporation for queries, support, or business opportunities." />      
+      
+  <style>      
+    body {      
+      margin: 0;      
+      font-family: Arial, Helvetica, sans-serif;      
+      background: #0f172a;      
+      color: #e5e7eb;      
+    }      
+      
+    header {      
+      background: #020617;      
+      padding: 16px 20px;      
+      display: flex;      
+      justify-content: space-between;      
+      align-items: center;      
+    }      
+      
+    header a {      
+      color: #38bdf8;      
+      text-decoration: none;      
+      font-size: 14px;      
+    }      
+      
+    main {      
+      max-width: 900px;      
+      margin: auto;      
+      padding: 40px 20px;      
+    }      
+      
+    h1 {      
+      text-align: center;      
+      margin-bottom: 10px;      
+    }      
+      
+    p.subtitle {      
+      text-align: center;      
+      opacity: 0.85;      
+      margin-bottom: 40px;      
+    }      
+      
+    .contact-grid {      
+      display: grid;      
+      grid-template-columns: 1fr;      
+      gap: 30px;      
+    }      
+      
+    .box {      
+      background: #020617;      
+      padding: 20px;      
+      border-radius: 8px;      
+    }      
+      
+    .box h2 {      
+      margin-top: 0;      
+      margin-bottom: 15px;      
+      font-size: 18px;      
+    }      
+      
+    .info p {      
+      margin: 8px 0;      
+      font-size: 14px;      
+    }      
+      
+    .info a {      
+      color: #38bdf8;      
+      text-decoration: none;      
+    }      
+      
+    form input,      
+    form textarea {      
+      width: 100%;      
+      padding: 10px;      
+      margin-bottom: 12px;      
+      border-radius: 4px;      
+      border: none;      
+      font-size: 14px;      
+      box-sizing: border-box;      
+    }      
+      
+    form textarea {      
+      resize: vertical;      
+      min-height: 100px;      
+    }      
+      
+    form button {      
+      background: #38bdf8;      
+      color: #020617;      
+      border: none;      
+      padding: 10px 16px;      
+      border-radius: 4px;      
+      font-size: 15px;      
+      font-weight: bold;      
+      cursor: pointer;      
+    }      
+      
+    form button:hover {      
+      background: #0ea5e9;      
+    }      
+      
+    .note {      
+      margin-top: 10px;      
+      font-size: 12px;      
+      opacity: 0.7;      
+    }      
+      
+    footer {      
+      text-align: center;      
+      padding: 20px;      
+      font-size: 13px;      
+      background: #020617;      
+      opacity: 0.8;      
+      margin-top: 40px;      
+    }      
+      
+    @media (min-width: 768px) {      
+      .contact-grid {      
+        grid-template-columns: 1fr 1fr;      
+      }      
+    }      
+  </style>      
+</head>      
+      
+<body>      
+      
+<header>      
+  <strong>CupX Corporation</strong>      
+  <a href="index.html">← Back to Home</a>      
+</header>      
+      
+<main>      
+  <h1>Contact Us</h1>      
+  <p class="subtitle">      
+    Have a question, feedback, or business inquiry? Reach out to CupX.      
+  </p>      
+      
+  <div class="contact-grid">      
+      
+    <!-- Contact Information -->      
+    <div class="box info">      
+      <h2>Contact Information</h2>      
+      <p>Email: <a href="mailto:info@cupx.in">info@cupx.in</a></p>      
+      <p>Support: <a href="mailto:support@cupx.in">support@cupx.in</a></p>      
+      <p>Business: <a href="mailto:business@cupx.in">business@cupx.in</a></p>      
+      
+      <p>Instagram: <a href="https://instagram.com/cupxcarp" target="_blank">@cupxcarp</a></p>      
+      <p>X (Twitter): <a href="https://x.com/cupxc" target="_blank">@cupxc</a></p>      
+      
+      <p class="note">      
+        CupX is a student-led, online-first initiative.      
+      </p>      
+    </div>      
+      
+    <!-- Contact Form -->      
+    <div class="box">      
+      <h2>Send a Message</h2>      
+      
+      <form action="https://formspree.io/f/meelvzde" method="POST">
+        
+        <input type="hidden" name="_subject" value="New Message from CupX Website">
+        
+        <input type="text" name="name" placeholder="Your Name" required>
+        
+        <input type="email" name="email" placeholder="Your Email" required>
+        
+        <textarea name="message" placeholder="Your Message" required></textarea>
+      
+        <button type="submit">Send Message</button>
+      </form>      
+      
+    </div>      
+      
+  </div>      
+</main>      
+      
+<footer>      
+  © 2026 CupX Corporation · All rights reserved      
+</footer>      
+      
+</body>      
+        </html>
