@@ -1,0 +1,42 @@
+<svg width="820" height="420" viewBox="0 0 820 420" xmlns="http://www.w3.org/2000/svg">
+
+  <defs>
+    <linearGradient id="gradC" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#22C55E"/>
+    </linearGradient>
+
+    <linearGradient id="gradXText" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F97316"/>
+      <stop offset="100%" stop-color="#EF4444"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Symbol -->
+  <path d="M310 100
+           A130 130 0 1 0 310 320"
+        stroke="url(#gradC)"
+        stroke-width="55"
+        fill="none"
+        stroke-linecap="round"/>
+
+  <path d="M191 165 L281 255"
+        stroke="url(#gradXText)"
+        stroke-width="55"
+        stroke-linecap="round"/>
+
+  <path d="M281 165 L191 255"
+        stroke="url(#gradXText)"
+        stroke-width="55"
+        stroke-linecap="round"/>
+
+  <!-- CARP placed immediately after symbol -->
+  <text x="338" y="250"
+        font-family="Poppins, Arial, sans-serif"
+        font-size="120"
+        font-weight="700"
+        fill="url(#gradXText)">
+    CARP
+  </text>
+
+</svg>
