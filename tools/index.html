@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Tools | CupX Corporation</title>
+
+  <link rel="icon" type="image/png" href="/favicon.png">
+
+  <meta name="description" content="Explore tools built by CupX Corporation including calculator, attendance system, and JSON builder.">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: #0f172a;
+      color: #e5e7eb;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background-color: #020617;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    header a {
+      color: #38bdf8;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: auto;
+      padding: 60px 20px;
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 32px;
+      margin-bottom: 40px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 25px;
+    }
+
+    .card {
+      background-color: #020617;
+      padding: 25px;
+      border-radius: 10px;
+      transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card h3 {
+      margin-top: 0;
+    }
+
+    .btn {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 8px 14px;
+      background: #38bdf8;
+      color: #020617;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 13px;
+      background-color: #020617;
+      opacity: 0.8;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>CupX Tools</h1>
+  <a href="/">← Back to Home</a>
+</header>
+
+<main>
+
+  <h2>Available Tools</h2>
+
+  <div class="cards">
+
+    <div class="card">
+      <h3>Calculator</h3>
+      <p>Simple and fast web-based calculator.</p>
+      <a href="calculator.html" class="btn">Open Calculator</a>
+    </div>
+
+    <div class="card">
+      <h3>Attendance System</h3>
+      <p>Basic attendance record system for demonstration purposes.</p>
+      <a href="attendance.html" class="btn">Open Attendance</a>
+    </div>
+
+    <div class="card">
+      <h3>JSON Builder</h3>
+      <p>Create structured JSON files dynamically using guided input.</p>
+      <a href="json.html" class="btn">Open JSON Builder</a>
+    </div>
+
+  </div>
+
+</main>
+
+<footer>
+  © 2026 CupX Corporation · All rights reserved
+</footer>
+
+</body>
+</html>
