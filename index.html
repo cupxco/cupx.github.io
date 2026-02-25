@@ -3,22 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CupX Corporation | Student Tech & Academic Projects</title>
 
-  <title>CupX Corporation | Student Tech Tools & Projects (by faisalcpp)</title>
-
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="/favicon.png">
 
-  <!-- SEO META -->
-  <meta name="description" content="CupX Corporation is a student-led technology initiative building practical tools like calculators, attendance systems, and JSON builders while learning computer science." />
-  <meta name="keywords" content="CupX, CupX Corporation, student tech projects, calculator tool, attendance system, JSON builder, CSE projects, Faisal Muzaffar, faisal muzaffar, student startup" />
-  <meta name="author" content="CupX Corporation" />
-
-  <!-- Social Preview -->
-  <meta property="og:title" content="CupX Corporation" />
-  <meta property="og:description" content="Student-built tech tools and software projects by CupX Corporation." />
-  <meta property="og:url" content="https://cupx.in" />
-  <meta property="og:type" content="website" />
+  <meta name="description" content="CupX Corporation is a student-led initiative building academic systems and practical software tools.">
+  <meta name="keywords" content="CupX, academic projects, KMCLU library, student tech, Faisal Muzaffar">
+  <meta name="author" content="CupX Corporation">
 
   <style>
     body {
@@ -34,6 +25,7 @@
       align-items: center;
       padding: 16px 20px;
       background-color: #020617;
+      position: relative;
     }
 
     header h1 {
@@ -41,14 +33,35 @@
       font-size: 22px;
     }
 
-    nav a {
+    /* Hamburger */
+    .menu-btn {
+      font-size: 22px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: #e5e7eb;
+    }
+
+    .menu {
+      display: none;
+      flex-direction: column;
+      position: absolute;
+      right: 20px;
+      top: 60px;
+      background: #020617;
+      padding: 15px;
+      border-radius: 8px;
+      min-width: 180px;
+    }
+
+    .menu a {
       color: #e5e7eb;
       text-decoration: none;
-      margin-left: 15px;
+      padding: 8px 0;
       font-size: 14px;
     }
 
-    nav a:hover {
+    .menu a:hover {
       color: #38bdf8;
     }
 
@@ -76,7 +89,7 @@
 
     .cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 25px;
       margin-top: 40px;
     }
@@ -92,10 +105,6 @@
       transform: translateY(-5px);
     }
 
-    .card h3 {
-      margin-top: 0;
-    }
-
     .btn {
       display: inline-block;
       margin-top: 12px;
@@ -107,20 +116,12 @@
       font-weight: bold;
     }
 
-    .btn:hover {
-      opacity: 0.9;
-    }
-
     footer {
       text-align: center;
       padding: 20px;
       font-size: 13px;
       background-color: #020617;
       opacity: 0.8;
-    }
-
-    a {
-      color: #38bdf8;
     }
   </style>
 </head>
@@ -129,80 +130,51 @@
 
 <header>
   <h1>CupX</h1>
-  <nav>
-    <a href="https://auth.cupx.in">SignIn/Up</a>
-    <a href="#tools">Tools</a>
-    <a href="contact.html">Contact</a>
-    <a href="#about">About</a>
-  </nav>
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+
+  <div class="menu" id="menu">
+    <a href="https://auth.cupx.in">SignIn / Up</a>
+    <a href="/tools/">Tools</a>
+    <a href="/about/">About</a>
+    <a href="/contact/">Contact</a>
+  </div>
 </header>
 
 <section class="hero">
-  <h2>CupX Corporation – Student Software Projects</h2>
+  <h2>CupX Corporation – Academic & Software Projects</h2>
   <p>
-    CupX Corporation is a student-led technology initiative focused on building
-    practical tools and real-world software projects while learning computer science.
+    A student-led initiative building real academic systems and practical software tools
+    through hands-on implementation.
   </p>
 </section>
 
-<section id="tools">
-  <h2>Student Tools & Projects</h2>
+<section>
+  <h2>Academic Projects</h2>
 
   <div class="cards">
 
     <div class="card">
-      <h3>Calculator</h3>
+      <h3>KMCLU Library Management System</h3>
       <p>
-        A fast and simple web-based calculator built for quick computations.
+        A live academic library system featuring structured book records,
+        department categorization, and searchable database integration.
       </p>
-      <a href="calculator.html" class="btn">
-        Open Calculator
-      </a>
-    </div>
-
-    <div class="card">
-      <h3>Attendance System</h3>
-      <p>
-        A basic attendance record system designed for learning and demonstration.
-      </p>
-      <a href="attendance.html" class="btn">
-        Open Attendance
-      </a>
-    </div>
-
-    <div class="card">
-      <h3>JSON Builder</h3>
-      <p>
-        Create structured JSON files dynamically by defining custom fields and entries.
-        Ideal for testing and structured data creation.
-      </p>
-      <a href="json.html" class="btn">
-        Open JSON Builder
-      </a>
+      <a href="https://library.kmclu.cupx.in" class="btn">Visit Live System</a>
     </div>
 
   </div>
-</section>
-
-<section id="contact">
-  <h2>Contact</h2>
-  <p>Email: <a href="mailto:info@cupx.in">info@cupx.in</a></p>
-  <p>Instagram: <a href="https://instagram.com/cupxcarp" target="_blank">@cupxcarp</a></p>
-  <p>X (Twitter): <a href="https://x.com/cupxc" target="_blank">@cupxc</a></p>
-</section>
-
-<section id="about">
-  <h2>About CupX</h2>
-  <p>
-    CupX Corporation was created as a learning-first initiative to explore
-    real-world software development through hands-on projects.
-    It represents experimentation, growth, and practical skill-building in technology.
-  </p>
 </section>
 
 <footer>
   © 2026 CupX Corporation · All rights reserved
 </footer>
 
+<script>
+  function toggleMenu() {
+    const menu = document.getElementById("menu");
+    menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+  }
+</script>
+
 </body>
-  </html>
+</html>
