@@ -3,11 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CupX Corporation | Software Solutions & Digital Systems</title>
 
-  <link rel="icon" type="image/png" href="/favicon.png">
+  <title>Sign Up | CupX Corporation</title>
 
-  <meta name="description" content="CupX Corporation builds scalable software systems, web platforms, and digital infrastructure for modern organizations.">
+  <meta name="description" content="Sign up for CupX Corporation. Page currently under development.">
 
   <style>
     body {
@@ -15,154 +14,79 @@
       font-family: Arial, Helvetica, sans-serif;
       background-color: #0f172a;
       color: #e5e7eb;
-      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
 
-    /* HEADER */
+    /* Header (same as tools) */
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 16px 22px;
+      padding: 16px 20px;
       background-color: #020617;
     }
 
     header h1 {
       margin: 0;
       font-size: 22px;
-      font-weight: 600;
     }
 
-    .menu-btn {
-      font-size: 30px;
-      cursor: pointer;
-      background: none;
-      border: none;
-      color: #e5e7eb;
+    header a {
+      color: #38bdf8;
+      text-decoration: none;
+      font-size: 14px;
     }
 
-    /* RIGHT PANEL */
-    .overlay {
-      position: fixed;
-      top: 0;
-      right: -100%;
-      width: 66%;
-      height: 100vh;
-      background: #020617;
-      padding: 40px 25px;
-      box-sizing: border-box;
-      transition: right 0.3s ease;
+    header a:hover {
+      opacity: 0.9;
+    }
+
+    main {
+      flex: 1;
       display: flex;
-      flex-direction: column;
-      gap: 22px;
-      z-index: 1000;
-    }
-
-    .overlay.active {
-      right: 0;
-    }
-
-    .overlay a {
-      color: #e5e7eb;
-      text-decoration: none;
-      font-size: 18px;
-    }
-
-    .overlay a:hover {
-      color: #38bdf8;
-    }
-
-    /* HERO */
-    section {
-      padding: 80px 20px;
-      max-width: 1100px;
-      margin: auto;
-    }
-
-    .hero {
+      justify-content: center;
+      align-items: center;
+      padding: 60px 20px;
       text-align: center;
-    }
-
-    .hero h2 {
-      font-size: 36px;
-      margin-bottom: 15px;
-    }
-
-    .hero p {
-      font-size: 16px;
-      opacity: 0.85;
-      max-width: 720px;
-      margin: auto;
-      line-height: 1.6;
-    }
-
-    .hero .cta {
-      margin-top: 28px;
-    }
-
-    .btn {
-      display: inline-block;
-      padding: 10px 18px;
-      background: #38bdf8;
-      color: #020617;
-      border-radius: 6px;
-      text-decoration: none;
-      font-weight: bold;
-      margin: 8px;
-    }
-
-    .btn.secondary {
-      background: transparent;
-      border: 1px solid #38bdf8;
-      color: #38bdf8;
-    }
-
-    /* SERVICES */
-    .services {
-      margin-top: 60px;
-    }
-
-    .services h2 {
-      text-align: center;
-      margin-bottom: 40px;
-      font-size: 28px;
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 25px;
     }
 
     .card {
       background-color: #020617;
-      padding: 25px;
-      border-radius: 10px;
-      transition: transform 0.2s ease;
+      padding: 40px;
+      border-radius: 12px;
+      max-width: 500px;
+      width: 100%;
     }
 
-    .card:hover {
-      transform: translateY(-6px);
-    }
-
-    .card h3 {
+    .card h2 {
       margin-top: 0;
-      margin-bottom: 10px;
+      font-size: 28px;
+      margin-bottom: 15px;
     }
 
     .card p {
-      font-size: 14px;
       opacity: 0.85;
       line-height: 1.6;
     }
 
+    .badge {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 8px 14px;
+      border-radius: 6px;
+      background-color: #334155;
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
     footer {
       text-align: center;
-      padding: 22px;
+      padding: 20px;
       font-size: 13px;
       background-color: #020617;
       opacity: 0.8;
-      margin-top: 60px;
     }
   </style>
 </head>
@@ -170,76 +94,24 @@
 <body>
 
 <header>
-  <h1>CupX Corporation</h1>
-  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+  <h1>CupX Sign Up</h1>
+  <a href="/">← Back to Home</a>
 </header>
 
-<!-- Slide Menu -->
-<div class="overlay" id="overlay">
-  <a href="javascript:void(0)" onclick="toggleMenu()">Close ✕</a>
-  <a href="/services/">Services</a>
-  <a href="/products/">Products</a>
-  <a href="/tools/">Tools</a>
-  <a href="/about/">About</a>
-  <a href="/contact/">Contact</a>
-</div>
-
-<section class="hero">
-  <h2>Engineering Scalable Software for Modern Businesses</h2>
-  <p>
-    CupX Corporation designs and develops robust digital platforms,
-    custom enterprise systems, and intelligent web applications.
-    We focus on performance, security, and long-term scalability.
-  </p>
-
-  <div class="cta">
-    <a href="/contact/" class="btn">Start a Project</a>
-    <a href="/products/" class="btn secondary">Explore Products</a>
+<main>
+  <div class="card">
+    <h2>Sign Up Page</h2>
+    <p>
+      This feature is currently under development.
+      Account creation will be available in a future update.
+    </p>
+    <div class="badge">Under Development</div>
   </div>
-</section>
-
-<section class="services">
-  <h2>Core Services</h2>
-
-  <div class="cards">
-
-    <div class="card">
-      <h3>Custom Software Development</h3>
-      <p>
-        End-to-end development of scalable web applications,
-        dashboards, and enterprise systems tailored to business needs.
-      </p>
-    </div>
-
-    <div class="card">
-      <h3>System Architecture & Infrastructure</h3>
-      <p>
-        Secure backend systems, optimized database structures,
-        and reliable cloud-ready deployments.
-      </p>
-    </div>
-
-    <div class="card">
-      <h3>Automation & Digital Transformation</h3>
-      <p>
-        Workflow automation, internal tools, and digital platforms
-        that increase operational efficiency.
-      </p>
-    </div>
-
-  </div>
-</section>
+</main>
 
 <footer>
   © 2026 CupX Corporation · All rights reserved
 </footer>
-
-<script>
-  function toggleMenu() {
-    const overlay = document.getElementById("overlay");
-    overlay.classList.toggle("active");
-  }
-</script>
 
 </body>
 </html>
