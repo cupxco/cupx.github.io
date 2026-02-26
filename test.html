@@ -8,8 +8,6 @@
   <link rel="icon" type="image/png" href="/favicon.png">
 
   <meta name="description" content="CupX Corporation is a student-led initiative building academic systems and practical software tools.">
-  <meta name="keywords" content="CupX, academic projects, KMCLU library, student tech">
-  <meta name="author" content="CupX Corporation">
 
   <style>
     body {
@@ -17,77 +15,72 @@
       font-family: Arial, Helvetica, sans-serif;
       background-color: #0f172a;
       color: #e5e7eb;
+      overflow-x: hidden;
     }
 
-    /* HEADER */
+    /* HEADER (same style as tools) */
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 20px;
+      padding: 16px 20px;
       background-color: #020617;
-      position: relative;
     }
 
-    .logo-area {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .logo-area svg {
-      height: 34px;
-      width: auto;
-    }
-
-    .brand-name {
-      font-size: 20px;
-      font-weight: 600;
+    header h1 {
       margin: 0;
+      font-size: 22px;
     }
 
+    /* Hamburger */
     .menu-btn {
-      font-size: 24px;
+      font-size: 30px;
       cursor: pointer;
       background: none;
       border: none;
       color: #e5e7eb;
     }
 
-    .menu {
-      display: none;
-      flex-direction: column;
-      position: absolute;
-      right: 20px;
-      top: 55px;
+    /* Overlay */
+    .overlay {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 66%;
+      height: 100vh;
       background: #020617;
-      padding: 15px;
-      border-radius: 8px;
-      min-width: 180px;
+      padding: 40px 25px;
+      box-sizing: border-box;
+      transition: right 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      z-index: 1000;
     }
 
-    .menu a {
+    .overlay a {
       color: #e5e7eb;
       text-decoration: none;
-      padding: 8px 0;
-      font-size: 14px;
+      font-size: 18px;
     }
 
-    .menu a:hover {
+    .overlay a:hover {
       color: #38bdf8;
+    }
+
+    .overlay.active {
+      right: 0;
     }
 
     /* HERO */
     section {
-      padding: 50px 20px;
+      padding: 60px 20px;
       max-width: 1000px;
       margin: auto;
     }
 
     .hero {
       text-align: center;
-      padding-top: 40px;
-      padding-bottom: 40px;
     }
 
     .hero h2 {
@@ -138,6 +131,7 @@
       font-size: 13px;
       background-color: #020617;
       opacity: 0.8;
+      margin-top: 40px;
     }
   </style>
 </head>
@@ -145,59 +139,18 @@
 <body>
 
 <header>
-  <div class="logo-area">
-
-    <!-- SVG Logo (Scaled Properly) -->
-    <svg viewBox="0 0 820 420" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="gradC" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#2563EB"/>
-          <stop offset="100%" stop-color="#22C55E"/>
-        </linearGradient>
-
-        <linearGradient id="gradXText" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#F97316"/>
-          <stop offset="100%" stop-color="#EF4444"/>
-        </linearGradient>
-      </defs>
-
-      <path d="M310 100 A130 130 0 1 0 310 320"
-            stroke="url(#gradC)"
-            stroke-width="55"
-            fill="none"
-            stroke-linecap="round"/>
-
-      <path d="M191 165 L281 255"
-            stroke="url(#gradXText)"
-            stroke-width="55"
-            stroke-linecap="round"/>
-
-      <path d="M281 165 L191 255"
-            stroke="url(#gradXText)"
-            stroke-width="55"
-            stroke-linecap="round"/>
-
-      <text x="338" y="250"
-            font-family="Poppins, Arial, sans-serif"
-            font-size="120"
-            font-weight="700"
-            fill="url(#gradXText)">
-        CARP
-      </text>
-    </svg>
-
-    <h1 class="brand-name">CupX</h1>
-  </div>
-
+  <h1>CupX Corporation</h1>
   <button class="menu-btn" onclick="toggleMenu()">☰</button>
-
-  <div class="menu" id="menu">
-    <a href="https://auth.cupx.in">SignIn / Up</a>
-    <a href="/tools/">Tools</a>
-    <a href="/about/">About</a>
-    <a href="/contact/">Contact</a>
-  </div>
 </header>
+
+<!-- Right Slide Panel -->
+<div class="overlay" id="overlay">
+  <a href="javascript:void(0)" onclick="toggleMenu()">Close ✕</a>
+  <a href="https://auth.cupx.in">Sign In / Sign Up</a>
+  <a href="/tools/">Tools</a>
+  <a href="/about/">About</a>
+  <a href="/contact/">Contact</a>
+</div>
 
 <section class="hero">
   <h2>CupX Corporation – Academic & Software Projects</h2>
@@ -228,8 +181,8 @@
 
 <script>
   function toggleMenu() {
-    const menu = document.getElementById("menu");
-    menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+    const overlay = document.getElementById("overlay");
+    overlay.classList.toggle("active");
   }
 </script>
 
