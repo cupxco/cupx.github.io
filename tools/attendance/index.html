@@ -12,16 +12,22 @@
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
-      background: #0f172a;
+      background-color: #0f172a;
       color: #e5e7eb;
     }
 
+    /* Header (identical to tools page) */
     header {
-      padding: 16px 20px;
-      background: #020617;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding: 16px 20px;
+      background-color: #020617;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 22px;
     }
 
     header a {
@@ -30,27 +36,32 @@
       font-size: 14px;
     }
 
+    header a:hover {
+      opacity: 0.9;
+    }
+
     main {
-      max-width: 900px;
+      max-width: 1000px;
       margin: auto;
-      padding: 40px 20px;
+      padding: 60px 20px;
     }
 
-    h1 {
+    h2 {
       text-align: center;
-      margin-bottom: 10px;
+      font-size: 32px;
+      margin-bottom: 15px;
     }
 
-    p {
+    p.subtitle {
       text-align: center;
       opacity: 0.85;
-      margin-bottom: 30px;
+      margin-bottom: 40px;
     }
 
     .form-box {
-      background: #020617;
-      padding: 20px;
-      border-radius: 8px;
+      background-color: #020617;
+      padding: 25px;
+      border-radius: 10px;
       margin-bottom: 30px;
     }
 
@@ -58,25 +69,30 @@
       width: 100%;
       padding: 10px;
       margin-bottom: 12px;
-      border-radius: 4px;
+      border-radius: 5px;
       border: none;
       font-size: 14px;
+      box-sizing: border-box;
     }
 
     button {
       background: #38bdf8;
+      color: #020617;
       font-weight: bold;
       cursor: pointer;
+      transition: opacity 0.2s ease;
     }
 
     button:hover {
-      background: #0ea5e9;
+      opacity: 0.9;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      background: #020617;
+      background-color: #020617;
+      border-radius: 10px;
+      overflow: hidden;
     }
 
     th, td {
@@ -87,7 +103,7 @@
     }
 
     th {
-      background: #020617;
+      background-color: #020617;
     }
 
     .present {
@@ -99,19 +115,29 @@
       color: #ef4444;
       font-weight: bold;
     }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 13px;
+      background-color: #020617;
+      opacity: 0.8;
+      margin-top: 40px;
+    }
   </style>
 </head>
 
 <body>
 
 <header>
-  <strong>CupX Attendance</strong>
-  <a href="/tools/">← Back to Home</a>
+  <h1>CupX Attendance System</h1>
+  <a href="/tools/">← Back to Tools</a>
 </header>
 
 <main>
-  <h1>Attendance System</h1>
-  <p>Simple attendance record tool by CupX Corporation</p>
+
+  <h2>Attendance System</h2>
+  <p class="subtitle">Simple attendance record tool by CupX Corporation</p>
 
   <div class="form-box">
     <input type="text" id="name" placeholder="Student Name">
@@ -136,7 +162,12 @@
     </thead>
     <tbody id="records"></tbody>
   </table>
+
 </main>
+
+<footer>
+  © 2026 CupX Corporation · All rights reserved
+</footer>
 
 <script>
   let records = JSON.parse(localStorage.getItem("attendance")) || [];
