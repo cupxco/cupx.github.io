@@ -6,7 +6,7 @@
 
 <title>Attendance System | CupX Corporation</title>
 
-<meta name="description" content="Simple attendance record system built by CupX Corporation for learning and demonstration." />
+<meta name="description" content="Professional attendance system built by CupX Corporation." />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -38,7 +38,7 @@ header a {
 }
 
 main {
-  max-width: 1000px;
+  max-width: 1100px;
   margin: auto;
   padding: 60px 20px;
 }
@@ -46,13 +46,13 @@ main {
 h2 {
   text-align: center;
   font-size: 32px;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 p.subtitle {
   text-align: center;
   opacity: 0.85;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
 }
 
 .form-box {
@@ -77,10 +77,6 @@ button {
   color: #020617;
   font-weight: bold;
   cursor: pointer;
-}
-
-button:hover {
-  opacity: 0.9;
 }
 
 .action-row {
@@ -108,15 +104,13 @@ th, td {
   font-size: 14px;
 }
 
-.present {
-  color: #22c55e;
-  font-weight: bold;
+th {
+  background: #1e40af;
+  color: white;
 }
 
-.absent {
-  color: #ef4444;
-  font-weight: bold;
-}
+.present { color: #22c55e; font-weight: bold; }
+.absent { color: #ef4444; font-weight: bold; }
 
 footer {
   text-align: center;
@@ -138,10 +132,11 @@ footer {
 
 <main>
 
-<h2>Attendance System</h2>
-<p class="subtitle">Simple attendance record tool by CupX Corporation</p>
+<h2>CupX Attendance System</h2>
+<p class="subtitle">Professional Attendance Record Tool</p>
 
 <div class="form-box">
+  <input type="text" id="attendanceTitle" placeholder="Attendance Title (Max 40 characters)">
   <input type="text" id="name" placeholder="Student Name">
   <input type="text" id="roll" placeholder="Roll Number">
 
@@ -154,27 +149,28 @@ footer {
 </div>
 
 <div class="action-row">
-  <button onclick="exportCSV()">Export Excel</button>
+  <button onclick="exportExcel()">Export Excel</button>
   <button onclick="exportPDF()">Export PDF</button>
   <button onclick="clearAll()">Clear All</button>
 </div>
 
 <table>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Roll</th>
-      <th>Status</th>
-      <th>Date</th>
-    </tr>
-  </thead>
-  <tbody id="records"></tbody>
+<thead>
+<tr>
+<th>Sr. No</th>
+<th>Name</th>
+<th>Roll</th>
+<th>Status</th>
+<th>Date</th>
+</tr>
+</thead>
+<tbody id="records"></tbody>
 </table>
 
 </main>
 
 <footer>
-  © 2026 CupX Corporation · All rights reserved
+© 2026 CupX Corporation · All rights reserved
 </footer>
 
 <script>
@@ -184,9 +180,10 @@ function render() {
   const table = document.getElementById("records");
   table.innerHTML = "";
 
-  records.forEach(r => {
+  records.forEach((r, index) => {
     table.innerHTML += `
       <tr>
+        <td>${index + 1}</td>
         <td>${escapeHTML(r.name)}</td>
         <td>${escapeHTML(r.roll)}</td>
         <td class="${r.status === 'Present' ? 'present' : 'absent'}">
@@ -199,6 +196,7 @@ function render() {
 }
 
 function addAttendance() {
+  const title = document.getElementById("attendanceTitle").value.trim().slice(0,40);
   const name = document.getElementById("name").value.trim();
   const roll = document.getElementById("roll").value.trim();
   const status = document.getElementById("status").value;
@@ -209,6 +207,7 @@ function addAttendance() {
   }
 
   const record = {
+    title,
     name,
     roll,
     status,
@@ -225,47 +224,127 @@ function addAttendance() {
 }
 
 function clearAll() {
-  if (confirm("Are you sure you want to delete all records?")) {
+  if (confirm("Delete all records?")) {
     records = [];
     localStorage.removeItem("attendance");
     render();
   }
 }
 
-function exportCSV() {
+/* PROFESSIONAL EXCEL EXPORT */
+function exportExcel() {
   if (records.length === 0) {
     alert("No data to export.");
     return;
   }
 
-  let csv = "Name,Roll,Status,Date\n";
-  records.forEach(r => {
-    csv += `"${r.name}","${r.roll}","${r.status}","${r.date}"\n`;
+  const title = records[0]?.title || "";
+
+  let html = `
+  <html>
+  <head>
+  <meta charset="UTF-8">
+  </head>
+  <body>
+  <table border="1" style="border-collapse:collapse;">
+
+  <!-- Main Heading -->
+  <tr>
+    <td colspan="5" style="
+      background:#2f5fb3;
+      color:white;
+      font-size:22px;
+      font-weight:bold;
+      text-align:center;
+      height:45px;
+    ">
+      CupX Attendance System
+    </td>
+  </tr>
+
+  <!-- Attendance Title -->
+  <tr>
+    <td colspan="5" style="
+      background:#2f5fb3;
+      color:white;
+      text-align:center;
+      font-weight:600;
+    ">
+      ${title}
+    </td>
+  </tr>
+
+  <!-- Column Headers -->
+  <tr style="background:#2f5fb3;color:white;font-weight:bold;text-align:center;">
+    <td>Sr. No</td>
+    <td>Name</td>
+    <td>Roll</td>
+    <td>Status</td>
+    <td>Date</td>
+  </tr>
+  `;
+
+  records.forEach((r, i) => {
+    html += `
+    <tr>
+      <td>${i + 1}</td>
+      <td>${r.name}</td>
+      <td>${r.roll}</td>
+      <td>${r.status}</td>
+      <td>${r.date}</td>
+    </tr>
+    `;
   });
 
-  const blob = new Blob([csv], { type: "text/csv" });
+  html += `
+  </table>
+  </body>
+  </html>
+  `;
+
+  const blob = new Blob([html], {
+    type: "application/vnd.ms-excel"
+  });
+
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
-  link.download = "attendance_records.csv";
+  link.download = "attendance.xls";
   link.click();
-}
-
-function exportPDF() {
-  if (records.length === 0) {
-    alert("No data to export.");
-    return;
   }
+
+/* PROFESSIONAL PDF EXPORT */
+function exportPDF() {
+  if (records.length === 0) return alert("No data to export.");
 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
 
-  let y = 10;
-  records.forEach(r => {
-    doc.text(`${r.name} | ${r.roll} | ${r.status} | ${r.date}`, 10, y);
+  const title = records[0]?.title || "";
+  const pageHeight = doc.internal.pageSize.height;
+  let y = 20;
+
+  function addHeader() {
+    doc.setFontSize(18);
+    doc.text("CupX Attendance System", 105, 10, {align:"center"});
+    doc.setFontSize(12);
+    doc.text(title, 105, 18, {align:"center"});
+    y = 30;
+  }
+
+  addHeader();
+
+  doc.setFontSize(11);
+
+  records.forEach((r,i) => {
+    if (y > pageHeight - 10) {
+      doc.addPage();
+      addHeader();
+    }
+    doc.text(`${i+1}. ${r.name} | ${r.roll} | ${r.status} | ${r.date}`, 10, y);
     y += 8;
   });
 
-  doc.save("attendance_records.pdf");
+  doc.save("attendance.pdf");
 }
 
 function escapeHTML(str) {
