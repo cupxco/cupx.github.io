@@ -1,200 +1,342 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Calculator | CupX Corporation</title>
+<title>CupX Attendance | CupX Corporation</title>
 
-  <meta name="description" content="Simple and clean calculator built by CupX Corporation." />
+<meta name="description" content="CupX Attendance system built by CupX Corporation." />
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background-color: #0f172a;
-      color: #e5e7eb;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
-    /* Header (same as Tools page) */
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 20px;
-      background-color: #020617;
-    }
+<style>
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#0f172a;
+  color:#e5e7eb;
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+}
 
-    header h1 {
-      margin: 0;
-      font-size: 22px;
-    }
+/* HEADER */
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:16px 24px;
+  background:#020617;
+}
+header h1{margin:0;font-size:22px;}
+header a{
+  color:#38bdf8;
+  text-decoration:none;
+  font-size:14px;
+}
 
-    header a {
-      color: #38bdf8;
-      text-decoration: none;
-      font-size: 14px;
-    }
+/* MAIN WRAPPER */
+main{
+  flex:1;
+  display:flex;
+  justify-content:center;
+  padding:60px 20px;
+}
 
-    header a:hover {
-      opacity: 0.9;
-    }
+.container{
+  width:100%;
+  max-width:1050px;
+}
 
-    main {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 60px 20px;
-    }
+/* TITLE */
+.section-title{
+  text-align:center;
+  font-size:30px;
+  margin-bottom:6px;
+}
+.subtitle{
+  text-align:center;
+  opacity:0.8;
+  margin-bottom:35px;
+}
 
-    .calculator {
-      width: 100%;
-      max-width: 320px;
-      background: #020617;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-    }
+/* FORM */
+.form-box{
+  background:#020617;
+  padding:25px;
+  border-radius:12px;
+  margin-bottom:25px;
+  box-shadow:0 15px 40px rgba(0,0,0,0.5);
+}
 
-    .display {
-      width: 100%;
-      height: 55px;
-      margin-bottom: 15px;
-      padding: 10px;
-      font-size: 22px;
-      text-align: right;
-      border: none;
-      border-radius: 6px;
-      background: #020617;
-      color: #ffffff;
-      box-sizing: border-box;
-    }
+input,select,button{
+  width:100%;
+  padding:12px;
+  margin-bottom:14px;
+  border-radius:8px;
+  border:none;
+  font-size:14px;
+  box-sizing:border-box;
+}
 
-    .buttons {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-    }
+input,select{
+  background:#e5e7eb;
+  color:#020617;
+}
 
-    button {
-      height: 48px;
-      font-size: 16px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      background: #1e293b;
-      color: #ffffff;
-      transition: opacity 0.2s ease;
-    }
+button{
+  background:#38bdf8;
+  color:#020617;
+  font-weight:bold;
+  cursor:pointer;
+}
+button:hover{opacity:0.9;}
 
-    button:hover {
-      opacity: 0.9;
-    }
+/* ACTION BUTTON ROW */
+.action-row{
+  display:flex;
+  gap:15px;
+  margin-bottom:25px;
+}
+.action-row button{
+  flex:1;
+}
 
-    .operator {
-      background: #334155;
-    }
+/* TABLE */
+.table-wrapper{
+  background:#020617;
+  border-radius:12px;
+  overflow:hidden;
+}
 
-    .equal {
-      background: #38bdf8;
-      color: #020617;
-      font-weight: bold;
-    }
+table{
+  width:100%;
+  border-collapse:collapse;
+}
 
-    .clear {
-      background: #ef4444;
-      font-weight: bold;
-    }
+th{
+  background:#0f172a;
+  font-weight:bold;
+}
 
-    .back {
-      background: #475569;
-    }
+th,td{
+  padding:14px;
+  border-bottom:1px solid #1e293b;
+  text-align:center;
+  font-size:14px;
+}
 
-    .wide {
-      grid-column: span 2;
-    }
+.present{color:#22c55e;font-weight:bold;}
+.absent{color:#ef4444;font-weight:bold;}
 
-    footer {
-      text-align: center;
-      padding: 20px;
-      font-size: 13px;
-      background-color: #020617;
-      opacity: 0.8;
-      margin-top: auto;
-    }
-  </style>
+.delete-btn{
+  background:#ef4444;
+  color:white;
+  padding:6px 10px;
+  border-radius:6px;
+  font-size:12px;
+  cursor:pointer;
+}
+
+/* FOOTER */
+footer{
+  text-align:center;
+  padding:20px;
+  font-size:13px;
+  background:#020617;
+  opacity:0.8;
+  margin-top:auto;
+}
+</style>
 </head>
 
 <body>
 
 <header>
-  <h1>CupX Calculator</h1>
+  <h1>CupX Attendance</h1>
   <a href="/tools/">← Back to Tools</a>
 </header>
 
 <main>
-  <div class="calculator">
+<div class="container">
 
-    <input type="text" id="display" class="display" readonly>
+<h2 class="section-title">Attendance System</h2>
+<p class="subtitle">Simple attendance record tool by CupX Corporation</p>
 
-    <div class="buttons">
-      <button class="clear wide" onclick="clearDisplay()">C</button>
-      <button class="back" onclick="backspace()">⌫</button>
-      <button class="operator" onclick="add('/')">÷</button>
+<div class="form-box">
+  <input type="text" id="sessionName" placeholder="Attendance Session Name">
+  <input type="text" id="name" placeholder="Student Name">
+  <input type="text" id="roll" placeholder="Roll Number">
+  <select id="status">
+    <option value="Present">Present</option>
+    <option value="Absent">Absent</option>
+  </select>
+  <button id="addBtn">Add Record</button>
+</div>
 
-      <button onclick="add('7')">7</button>
-      <button onclick="add('8')">8</button>
-      <button onclick="add('9')">9</button>
-      <button class="operator" onclick="add('*')">×</button>
+<div class="action-row">
+  <button onclick="exportExcel()">Export Excel</button>
+  <button onclick="exportPDF()">Export PDF</button>
+  <button onclick="clearAll()">Clear All</button>
+</div>
 
-      <button onclick="add('4')">4</button>
-      <button onclick="add('5')">5</button>
-      <button onclick="add('6')">6</button>
-      <button class="operator" onclick="add('-')">−</button>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr>
+  <th>Sr. No</th>
+  <th>Name</th>
+  <th>Roll</th>
+  <th>Status</th>
+  <th>Date</th>
+  <th>Action</th>
+</tr>
+</thead>
+<tbody id="records"></tbody>
+</table>
+</div>
 
-      <button onclick="add('1')">1</button>
-      <button onclick="add('2')">2</button>
-      <button onclick="add('3')">3</button>
-      <button class="operator" onclick="add('+')">+</button>
-
-      <button class="wide" onclick="add('0')">0</button>
-      <button onclick="add('.')">.</button>
-      <button class="equal" onclick="calculate()">=</button>
-    </div>
-
-  </div>
+</div>
 </main>
 
 <footer>
-  © 2026 CupX Corporation · All rights reserved
+© 2026 CupX Corporation · All rights reserved
 </footer>
 
 <script>
-  const display = document.getElementById("display");
+let records=JSON.parse(localStorage.getItem("attendance"))||[];
 
-  function add(value) {
-    display.value += value;
-  }
+const nameInput=document.getElementById("name");
+const rollInput=document.getElementById("roll");
+const statusInput=document.getElementById("status");
 
-  function clearDisplay() {
-    display.value = "";
-  }
+/* Enter Flow */
+nameInput.addEventListener("keydown",e=>{
+  if(e.key==="Enter"){e.preventDefault();rollInput.focus();}
+});
+rollInput.addEventListener("keydown",e=>{
+  if(e.key==="Enter"){e.preventDefault();statusInput.focus();}
+});
+statusInput.addEventListener("keydown",e=>{
+  if(e.key==="Enter"){e.preventDefault();addAttendance();}
+});
 
-  function backspace() {
-    display.value = display.value.slice(0, -1);
-  }
+function render(){
+  const table=document.getElementById("records");
+  table.innerHTML="";
+  records.forEach((r,i)=>{
+    table.innerHTML+=`
+    <tr>
+      <td>${i+1}</td>
+      <td>${escapeHTML(r.name)}</td>
+      <td>${escapeHTML(r.roll)}</td>
+      <td class="${r.status==="Present"?"present":"absent"}">${r.status}</td>
+      <td>${r.date}</td>
+      <td><button class="delete-btn" onclick="deleteOne(${i})">Delete</button></td>
+    </tr>`;
+  });
+}
 
-  function calculate() {
-    try {
-      display.value = eval(display.value);
-    } catch {
-      display.value = "Error";
+function addAttendance(){
+  const name=nameInput.value.trim();
+  const roll=rollInput.value.trim();
+  const status=statusInput.value;
+  if(!name||!roll)return alert("Fill all fields");
+
+  records.push({name,roll,status,date:new Date().toLocaleDateString()});
+  localStorage.setItem("attendance",JSON.stringify(records));
+
+  nameInput.value="";
+  rollInput.value="";
+  nameInput.focus();
+  render();
+}
+document.getElementById("addBtn").onclick=addAttendance;
+
+function deleteOne(i){
+  records.splice(i,1);
+  localStorage.setItem("attendance",JSON.stringify(records));
+  render();
+}
+
+function clearAll(){
+  if(!confirm("Delete all records?"))return;
+  records=[];
+  localStorage.removeItem("attendance");
+  render();
+}
+
+/* PDF */
+function exportPDF(){
+  if(records.length===0)return alert("No data");
+
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF();
+  const sessionName=document.getElementById("sessionName").value||"Attendance Record";
+
+  doc.autoTable({
+    head:[["Sr No","Name","Roll","Status","Date"]],
+    body:records.map((r,i)=>[i+1,r.name,r.roll,r.status,r.date]),
+    startY:40,
+    theme:"grid",
+    headStyles:{fillColor:[56,189,248]},
+    styles:{halign:"center"},
+    didParseCell:data=>{
+      if(data.column.index===3){
+        if(data.cell.raw==="Present")data.cell.styles.textColor=[34,197,94];
+        if(data.cell.raw==="Absent")data.cell.styles.textColor=[239,68,68];
+      }
+    },
+    didDrawPage:()=>{
+      doc.setFont(undefined,"bold");
+      doc.setTextColor(56,189,248);
+      doc.setFontSize(20);
+      doc.text("CupX Attendance System",105,15,{align:"center"});
+      doc.setFontSize(14);
+      doc.text(sessionName,105,25,{align:"center"});
     }
-  }
+  });
+
+  doc.save("attendance_records.pdf");
+}
+
+/* Excel same */
+function exportExcel(){
+  if(records.length===0)return alert("No data");
+  const sessionName=document.getElementById("sessionName").value||"Attendance Record";
+
+  const wsData=[
+    ["CupX Attendance System"],
+    [sessionName],
+    ["Sr No","Name","Roll No","Status","Date"]
+  ];
+  records.forEach((r,i)=>wsData.push([i+1,r.name,r.roll,r.status,r.date]));
+
+  const ws=XLSX.utils.aoa_to_sheet(wsData);
+  ws["!merges"]=[
+    {s:{r:0,c:0},e:{r:0,c:4}},
+    {s:{r:1,c:0},e:{r:1,c:4}}
+  ];
+  ws["!cols"]=[
+    {wch:6},{wch:20},{wch:12},{wch:12},{wch:14}
+  ];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"Attendance");
+  XLSX.writeFile(wb,"attendance_records.xlsx");
+}
+
+function escapeHTML(str){
+  return String(str)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;");
+}
+
+render();
 </script>
 
 </body>
