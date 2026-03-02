@@ -4,151 +4,117 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>CupX Attendance | CupX Corporation</title>
-
-<meta name="description" content="CupX Attendance system built by CupX Corporation." />
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<title>Calculator | CupX Corporation</title>
 
 <style>
-body{
-  margin:0;
-  font-family:Arial,Helvetica,sans-serif;
-  background:#0f172a;
-  color:#e5e7eb;
-  display:flex;
-  flex-direction:column;
-  min-height:100vh;
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #0f172a;
+  color: #e5e7eb;
 }
 
 /* HEADER */
-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:16px 24px;
-  background:#020617;
-}
-header h1{margin:0;font-size:22px;}
-header a{
-  color:#38bdf8;
-  text-decoration:none;
-  font-size:14px;
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background-color: #020617;
 }
 
-/* MAIN WRAPPER */
-main{
-  flex:1;
-  display:flex;
-  justify-content:center;
-  padding:60px 20px;
+header h1 {
+  margin: 0;
+  font-size: 22px;
 }
 
-.container{
-  width:100%;
-  max-width:1050px;
+header a {
+  color: #38bdf8;
+  text-decoration: none;
+  font-size: 14px;
 }
 
-/* TITLE */
-.section-title{
-  text-align:center;
-  font-size:30px;
-  margin-bottom:6px;
-}
-.subtitle{
-  text-align:center;
-  opacity:0.8;
-  margin-bottom:35px;
+/* MAIN */
+main {
+  max-width: 420px;
+  margin: 60px auto;
+  padding: 20px;
 }
 
-/* FORM */
-.form-box{
-  background:#020617;
-  padding:25px;
-  border-radius:12px;
-  margin-bottom:25px;
-  box-shadow:0 15px 40px rgba(0,0,0,0.5);
+.calculator {
+  background: #020617;
+  padding: 20px;
+  border-radius: 18px;
 }
 
-input,select,button{
-  width:100%;
-  padding:12px;
-  margin-bottom:14px;
-  border-radius:8px;
-  border:none;
-  font-size:14px;
-  box-sizing:border-box;
+.display {
+  width: 100%;
+  height: 65px;
+  font-size: 22px;
+  padding: 15px;
+  border-radius: 10px;
+  border: none;
+  text-align: right;
+  background: #0f172a;
+  color: white;
+  margin-bottom: 15px;
+  box-sizing: border-box;
 }
 
-input,select{
-  background:#e5e7eb;
-  color:#020617;
+/* Top control row */
+.top-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 15px;
 }
 
-button{
-  background:#38bdf8;
-  color:#020617;
-  font-weight:bold;
-  cursor:pointer;
-}
-button:hover{opacity:0.9;}
-
-/* ACTION BUTTON ROW */
-.action-row{
-  display:flex;
-  gap:15px;
-  margin-bottom:25px;
-}
-.action-row button{
-  flex:1;
+.clear-btn {
+  background: #ef4444;
+  color: white;
+  font-weight: bold;
 }
 
-/* TABLE */
-.table-wrapper{
-  background:#020617;
-  border-radius:12px;
-  overflow:hidden;
+.mode-btn {
+  background: #38bdf8;
+  color: #020617;
+  font-weight: bold;
 }
 
-table{
-  width:100%;
-  border-collapse:collapse;
+/* Buttons */
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
 }
 
-th{
-  background:#0f172a;
-  font-weight:bold;
+button {
+  padding: 14px;
+  font-size: 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background: #1e293b;
+  color: white;
 }
 
-th,td{
-  padding:14px;
-  border-bottom:1px solid #1e293b;
-  text-align:center;
-  font-size:14px;
+button:hover {
+  background: #334155;
 }
 
-.present{color:#22c55e;font-weight:bold;}
-.absent{color:#ef4444;font-weight:bold;}
-
-.delete-btn{
-  background:#ef4444;
-  color:white;
-  padding:6px 10px;
-  border-radius:6px;
-  font-size:12px;
-  cursor:pointer;
+.operator {
+  background: #38bdf8;
+  color: #020617;
+  font-weight: bold;
 }
 
-/* FOOTER */
-footer{
-  text-align:center;
-  padding:20px;
-  font-size:13px;
-  background:#020617;
-  opacity:0.8;
-  margin-top:auto;
+footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 13px;
+  background-color: #020617;
+  opacity: 0.8;
+  margin-top: 40px;
 }
 </style>
 </head>
@@ -156,50 +122,27 @@ footer{
 <body>
 
 <header>
-  <h1>CupX Attendance</h1>
+  <h1>Calculator</h1>
   <a href="/tools/">← Back to Tools</a>
 </header>
 
 <main>
-<div class="container">
 
-<h2 class="section-title">Attendance System</h2>
-<p class="subtitle">Simple attendance record tool by CupX Corporation</p>
+<div class="calculator">
 
-<div class="form-box">
-  <input type="text" id="sessionName" placeholder="Attendance Session Name">
-  <input type="text" id="name" placeholder="Student Name">
-  <input type="text" id="roll" placeholder="Roll Number">
-  <select id="status">
-    <option value="Present">Present</option>
-    <option value="Absent">Absent</option>
-  </select>
-  <button id="addBtn">Add Record</button>
+<input type="text" id="display" class="display" readonly>
+
+<div class="top-controls">
+  <button class="clear-btn" onclick="clearAll()">Clear</button>
+  <button class="mode-btn" onclick="toggleMode()" id="modeText">
+    Scientific
+  </button>
 </div>
 
-<div class="action-row">
-  <button onclick="exportExcel()">Export Excel</button>
-  <button onclick="exportPDF()">Export PDF</button>
-  <button onclick="clearAll()">Clear All</button>
-</div>
-
-<div class="table-wrapper">
-<table>
-<thead>
-<tr>
-  <th>Sr. No</th>
-  <th>Name</th>
-  <th>Roll</th>
-  <th>Status</th>
-  <th>Date</th>
-  <th>Action</th>
-</tr>
-</thead>
-<tbody id="records"></tbody>
-</table>
-</div>
+<div class="buttons" id="buttons"></div>
 
 </div>
+
 </main>
 
 <footer>
@@ -207,136 +150,90 @@ footer{
 </footer>
 
 <script>
-let records=JSON.parse(localStorage.getItem("attendance"))||[];
+let scientific = false;
 
-const nameInput=document.getElementById("name");
-const rollInput=document.getElementById("roll");
-const statusInput=document.getElementById("status");
+const basicButtons = [
+  "7","8","9","/",
+  "4","5","6","*",
+  "1","2","3","-",
+  "0",".","=","+"
+];
 
-/* Enter Flow */
-nameInput.addEventListener("keydown",e=>{
-  if(e.key==="Enter"){e.preventDefault();rollInput.focus();}
-});
-rollInput.addEventListener("keydown",e=>{
-  if(e.key==="Enter"){e.preventDefault();statusInput.focus();}
-});
-statusInput.addEventListener("keydown",e=>{
-  if(e.key==="Enter"){e.preventDefault();addAttendance();}
-});
+const scientificButtons = [
+  "sin","cos","tan","log",
+  "ln","√","x²","^",
+  "π","(",")","/",
+  "7","8","9","*",
+  "4","5","6","-",
+  "1","2","3","+",
+  "0",".","="
+];
 
-function render(){
-  const table=document.getElementById("records");
-  table.innerHTML="";
-  records.forEach((r,i)=>{
-    table.innerHTML+=`
-    <tr>
-      <td>${i+1}</td>
-      <td>${escapeHTML(r.name)}</td>
-      <td>${escapeHTML(r.roll)}</td>
-      <td class="${r.status==="Present"?"present":"absent"}">${r.status}</td>
-      <td>${r.date}</td>
-      <td><button class="delete-btn" onclick="deleteOne(${i})">Delete</button></td>
-    </tr>`;
-  });
-}
+function renderButtons() {
+  const container = document.getElementById("buttons");
+  container.innerHTML = "";
 
-function addAttendance(){
-  const name=nameInput.value.trim();
-  const roll=rollInput.value.trim();
-  const status=statusInput.value;
-  if(!name||!roll)return alert("Fill all fields");
+  const btns = scientific ? scientificButtons : basicButtons;
 
-  records.push({name,roll,status,date:new Date().toLocaleDateString()});
-  localStorage.setItem("attendance",JSON.stringify(records));
+  btns.forEach(text => {
+    const btn = document.createElement("button");
+    btn.innerText = text;
 
-  nameInput.value="";
-  rollInput.value="";
-  nameInput.focus();
-  render();
-}
-document.getElementById("addBtn").onclick=addAttendance;
-
-function deleteOne(i){
-  records.splice(i,1);
-  localStorage.setItem("attendance",JSON.stringify(records));
-  render();
-}
-
-function clearAll(){
-  if(!confirm("Delete all records?"))return;
-  records=[];
-  localStorage.removeItem("attendance");
-  render();
-}
-
-/* PDF */
-function exportPDF(){
-  if(records.length===0)return alert("No data");
-
-  const {jsPDF}=window.jspdf;
-  const doc=new jsPDF();
-  const sessionName=document.getElementById("sessionName").value||"Attendance Record";
-
-  doc.autoTable({
-    head:[["Sr No","Name","Roll","Status","Date"]],
-    body:records.map((r,i)=>[i+1,r.name,r.roll,r.status,r.date]),
-    startY:40,
-    theme:"grid",
-    headStyles:{fillColor:[56,189,248]},
-    styles:{halign:"center"},
-    didParseCell:data=>{
-      if(data.column.index===3){
-        if(data.cell.raw==="Present")data.cell.styles.textColor=[34,197,94];
-        if(data.cell.raw==="Absent")data.cell.styles.textColor=[239,68,68];
-      }
-    },
-    didDrawPage:()=>{
-      doc.setFont(undefined,"bold");
-      doc.setTextColor(56,189,248);
-      doc.setFontSize(20);
-      doc.text("CupX Attendance System",105,15,{align:"center"});
-      doc.setFontSize(14);
-      doc.text(sessionName,105,25,{align:"center"});
+    if(["+","-","*","/","="].includes(text)) {
+      btn.classList.add("operator");
     }
+
+    btn.onclick = () => handleInput(text);
+    container.appendChild(btn);
   });
-
-  doc.save("attendance_records.pdf");
 }
 
-/* Excel same */
-function exportExcel(){
-  if(records.length===0)return alert("No data");
-  const sessionName=document.getElementById("sessionName").value||"Attendance Record";
-
-  const wsData=[
-    ["CupX Attendance System"],
-    [sessionName],
-    ["Sr No","Name","Roll No","Status","Date"]
-  ];
-  records.forEach((r,i)=>wsData.push([i+1,r.name,r.roll,r.status,r.date]));
-
-  const ws=XLSX.utils.aoa_to_sheet(wsData);
-  ws["!merges"]=[
-    {s:{r:0,c:0},e:{r:0,c:4}},
-    {s:{r:1,c:0},e:{r:1,c:4}}
-  ];
-  ws["!cols"]=[
-    {wch:6},{wch:20},{wch:12},{wch:12},{wch:14}
-  ];
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,"Attendance");
-  XLSX.writeFile(wb,"attendance_records.xlsx");
+function toggleMode() {
+  scientific = !scientific;
+  document.getElementById("modeText").innerText =
+    scientific ? "Basic" : "Scientific";
+  renderButtons();
 }
 
-function escapeHTML(str){
-  return String(str)
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;");
+function clearAll() {
+  document.getElementById("display").value = "";
 }
 
-render();
+function handleInput(value) {
+  const display = document.getElementById("display");
+
+  if (value === "=") {
+    try {
+      display.value = calculate(display.value);
+    } catch {
+      display.value = "Error";
+    }
+    return;
+  }
+
+  if (value === "π") value = "Math.PI";
+  if (value === "√") value = "Math.sqrt(";
+  if (value === "x²") value = "**2";
+  if (value === "^") value = "**";
+  if (value === "sin") value = "sin(";
+  if (value === "cos") value = "cos(";
+  if (value === "tan") value = "tan(";
+  if (value === "log") value = "log10(";
+  if (value === "ln") value = "Math.log(";
+
+  display.value += value;
+}
+
+function calculate(expr) {
+  function sin(x){ return Math.sin(x * Math.PI/180); }
+  function cos(x){ return Math.cos(x * Math.PI/180); }
+  function tan(x){ return Math.tan(x * Math.PI/180); }
+  function log10(x){ return Math.log10(x); }
+
+  return eval(expr);
+}
+
+renderButtons();
 </script>
 
 </body>
