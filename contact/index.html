@@ -208,7 +208,7 @@ footer{
 <script>
 // ─── CONFIG ──────────────────────────────────────────────
 // Replace with your actual Cloudflare Worker URL after deployment
-const WORKER_URL = "https://cupx-otp.cupxco.workers.dev";
+const WORKER_URL = "https://cupx-otp.YOUR_SUBDOMAIN.workers.dev";
 // ─────────────────────────────────────────────────────────
 
 const form        = document.getElementById("contactForm");
@@ -226,9 +226,32 @@ function setStatus(msg, type) {
   status.className = "note " + type;
 }
 
+// ── Lock email field after OTP is sent ───────────────────
+const emailInput = document.getElementById("email");
+
+function resetVerification() {
+  verified = false;
+  verifiedToken.value = "";
+  submitBtn.disabled = true;
+  otpRow.style.display = "none";
+  document.getElementById("otpInput").value = "";
+  verifyBtn.innerText = "Verify";
+  verifyBtn.disabled = false;
+  emailInput.readOnly = false;
+  emailInput.style.opacity = "1";
+  setStatus("", "");
+}
+
+// If user somehow edits email after OTP sent, reset everything
+emailInput.addEventListener("input", () => {
+  if (otpRow.style.display === "flex" || verified) {
+    resetVerification();
+  }
+});
+
 // ── STEP 1: Send OTP ──────────────────────────────────────
 verifyBtn.addEventListener("click", async () => {
-  const email = document.getElementById("email").value.trim();
+  const email = emailInput.value.trim();
 
   if (!email) {
     setStatus("Enter your email first.", "error");
@@ -237,6 +260,10 @@ verifyBtn.addEventListener("click", async () => {
 
   verifyBtn.disabled = true;
   setStatus("Sending OTP...", "");
+
+  // Lock the email field so it can't be changed after OTP is sent
+  emailInput.readOnly = true;
+  emailInput.style.opacity = "0.6";
 
   // Start 40-second countdown
   let timeLeft = 40;
@@ -266,6 +293,8 @@ verifyBtn.addEventListener("click", async () => {
     } else {
       setStatus("Failed to send OTP. Try again.", "error");
       clearInterval(timer);
+      emailInput.readOnly = false;
+      emailInput.style.opacity = "1";
       verifyBtn.disabled = false;
       verifyBtn.innerText = "Verify";
     }
@@ -273,6 +302,8 @@ verifyBtn.addEventListener("click", async () => {
   } catch (err) {
     setStatus("Network error. Try again.", "error");
     clearInterval(timer);
+    emailInput.readOnly = false;
+    emailInput.style.opacity = "1";
     verifyBtn.disabled = false;
     verifyBtn.innerText = "Verify";
   }
@@ -280,7 +311,7 @@ verifyBtn.addEventListener("click", async () => {
 
 // ── STEP 2: Verify OTP ───────────────────────────────────
 confirmBtn.addEventListener("click", async () => {
-  const email = document.getElementById("email").value.trim();
+  const email = emailInput.value.trim(); // always use locked value
   const otp   = document.getElementById("otpInput").value.trim();
 
   if (!otp || otp.length !== 6) {
@@ -342,12 +373,7 @@ form.addEventListener("submit", async function (e) {
     if (response.ok) {
       setStatus("Message sent successfully!", "success");
       form.reset();
-      submitBtn.disabled = true;
-      verified = false;
-      verifiedToken.value = "";
-      otpRow.style.display = "none";
-      verifyBtn.innerText = "Verify";
-      verifyBtn.disabled = false;
+      resetVerification();
     } else {
       setStatus("Something went wrong. Try again.", "error");
       submitBtn.disabled = false;
