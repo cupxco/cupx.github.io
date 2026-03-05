@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LLM Council | CupX Corporation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #05080f;
+  --surface: #0a0f1e;
+  --surface2: #0f172a;
+  --border: rgba(56,189,248,0.12);
+  --accent: #38bdf8;
+  --accent-dim: rgba(56,189,248,0.15);
+  --llama-c: #fb923c;
+  --gemma-c: #4ade80;
+  --mixtral-c: #a78bfa;
+  --chair-c: #38bdf8;
+  --text: #e2e8f0;
+  --muted: #475569;
+  --muted2: #64748b;
+  --danger: #f87171;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Syne',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(56,189,248,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(167,139,250,0.04) 0%, transparent 50%);
+  pointer-events:none;z-index:0;
+}
+nav{
+  position:sticky;top:0;z-index:200;
+  background:rgba(5,8,15,0.92);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;
+  justify-content:space-between;
+  padding:12px 24px;
+}
+.brand{font-size:17px;font-weight:800;color:var(--accent);text-decoration:none;letter-spacing:.06em;}
+.brand span{color:var(--text);}
+.back-btn{
+  font-family:'Space Mono',monospace;font-size:11px;
+  color:var(--muted2);text-decoration:none;
+  border:1px solid var(--border);padding:5px 14px;border-radius:4px;
+  transition:.2s;
+}
+.back-btn:hover{color:var(--accent);border-color:var(--accent);}
+main{position:relative;z-index:1;max-width:940px;margin:0 auto;padding:36px 18px 100px;}
+.hdr{text-align:center;margin-bottom:44px;}
+.hdr-badge{
+  display:inline-block;font-family:'Space Mono',monospace;
+  font-size:10px;letter-spacing:.18em;color:var(--accent);
+  border:1px solid var(--border);padding:4px 14px;border-radius:20px;
+  background:var(--accent-dim);margin-bottom:14px;
+}
+.hdr h1{font-size:clamp(30px,5vw,52px);font-weight:800;line-height:1.05;margin-bottom:10px;}
+.hdr h1 em{font-style:normal;color:var(--accent);}
+.hdr p{font-size:14px;color:var(--muted2);max-width:500px;margin:0 auto;line-height:1.7;}
+.setup-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:24px;margin-bottom:24px;
+}
+.section-label{
+  font-family:'Space Mono',monospace;font-size:10px;
+  letter-spacing:.15em;color:var(--muted2);text-transform:uppercase;
+  margin-bottom:14px;display:flex;align-items:center;gap:8px;
+}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.keys-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:560px){.keys-row{grid-template-columns:1fr;}}
+.field label{
+  display:block;font-family:'Space Mono',monospace;
+  font-size:10px;color:var(--muted2);margin-bottom:5px;letter-spacing:.05em;
+}
+.field input{
+  width:100%;background:var(--bg);border:1px solid var(--border);
+  border-radius:6px;padding:9px 12px;
+  font-family:'Space Mono',monospace;font-size:12px;
+  color:var(--text);outline:none;transition:.2s;
+}
+.field input:focus{border-color:var(--accent);}
+.field input::placeholder{color:var(--muted);}
+.key-note{
+  font-family:'Space Mono',monospace;font-size:10px;
+  color:var(--muted);margin-top:10px;line-height:1.6;
+}
+.key-note a{color:var(--accent);text-decoration:none;}
+.key-note a:hover{text-decoration:underline;}
+.query-wrap{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:20px;margin-bottom:28px;
+  transition:.2s;
+}
+.query-wrap:focus-within{border-color:rgba(56,189,248,0.35);}
+textarea#q{
+  width:100%;background:transparent;border:none;outline:none;
+  color:var(--text);font-family:'Syne',sans-serif;font-size:15px;
+  resize:none;line-height:1.7;min-height:70px;
+}
+textarea#q::placeholder{color:var(--muted);}
+.query-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:12px;padding-top:12px;border-top:1px solid var(--border);
+  flex-wrap:wrap;gap:10px;
+}
+.model-tags{display:flex;gap:7px;flex-wrap:wrap;}
+.tag{
+  font-family:'Space Mono',monospace;font-size:9px;
+  letter-spacing:.06em;padding:3px 9px;border-radius:20px;border:1px solid;
+}
+.t-l{color:var(--llama-c);border-color:var(--llama-c);background:rgba(251,146,60,.07);}
+.t-g{color:var(--gemma-c);border-color:var(--gemma-c);background:rgba(74,222,128,.07);}
+.t-m{color:var(--mixtral-c);border-color:var(--mixtral-c);background:rgba(167,139,250,.07);}
+.t-c{color:var(--chair-c);border-color:var(--chair-c);background:rgba(56,189,248,.07);}
+#run-btn{
+  background:var(--accent);color:var(--bg);border:none;
+  border-radius:8px;padding:10px 26px;
+  font-family:'Syne',sans-serif;font-size:14px;font-weight:700;
+  cursor:pointer;transition:.2s;white-space:nowrap;
+}
+#run-btn:hover{background:#7dd3fc;transform:translateY(-1px);}
+#run-btn:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+#err{
+  display:none;
+  background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);
+  border-radius:8px;padding:12px 16px;
+  color:#fca5a5;font-family:'Space Mono',monospace;font-size:11px;
+  margin-bottom:20px;
+}
+
+/* ══ FLOW VISUALIZER ══ */
+#flow-section{display:none;margin-bottom:40px;}
+.flow-title{
+  font-family:'Space Mono',monospace;font-size:10px;
+  letter-spacing:.18em;color:var(--muted2);text-transform:uppercase;
+  margin-bottom:16px;text-align:center;
+}
+.flow-canvas{
+  position:relative;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:28px 12px 20px;
+  overflow:hidden;
+}
+.flow-canvas::before{
+  content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(56,189,248,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56,189,248,.025) 1px, transparent 1px);
+  background-size:28px 28px;
+  pointer-events:none;
+}
+
+/* Node row */
+.node-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+  position:relative;
+  z-index:2;
+}
+.node-group{display:flex;flex-direction:column;gap:10px;align-items:center;}
+
+.f-node{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.f-circle{
+  width:52px;height:52px;border-radius:50%;
+  border:2px solid var(--border);
+  background:var(--surface2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;
+  transition:border-color .3s, box-shadow .3s, transform .2s;
+  position:relative;z-index:2;
+}
+.f-lbl{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.06em;color:var(--muted2);text-transform:uppercase;text-align:center;}
+.f-status{font-family:'Space Mono',monospace;font-size:8px;color:var(--muted);text-align:center;height:12px;}
+
+/* Arrow connector */
+.f-arrow-box{
+  flex:1;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;min-width:24px;
+}
+.f-arrow-box svg{width:100%;max-width:80px;}
+.arrow-line{stroke:var(--border);stroke-width:1.5;fill:none;transition:stroke .4s;}
+.arrow-head{stroke:var(--border);stroke-width:1.5;fill:none;stroke-linecap:round;transition:stroke .4s;}
+.f-arrow-box.active .arrow-line,
+.f-arrow-box.active .arrow-head{
+  stroke:var(--accent);stroke-width:2;
+  filter:drop-shadow(0 0 4px rgba(56,189,248,.6));
+}
+.f-arrow-box.done .arrow-line,
+.f-arrow-box.done .arrow-head{stroke:rgba(74,222,128,.5);}
+
+/* Node state classes */
+.f-circle.sending{
+  border-color:var(--accent);
+  box-shadow:0 0 0 4px rgba(56,189,248,.1),0 0 18px rgba(56,189,248,.25);
+  animation:npulse .85s ease-in-out infinite;
+}
+.f-circle.thinking{
+  border-color:rgba(56,189,248,.4);
+  animation:nthink 1.4s linear infinite;
+}
+.f-circle.done-node{
+  border-color:var(--gemma-c);
+  box-shadow:0 0 14px rgba(74,222,128,.22);
+}
+.f-circle.reviewing{
+  border-color:var(--mixtral-c);
+  animation:npulse .9s ease-in-out infinite;
+}
+.f-circle.chair-active{
+  border-color:var(--chair-c);
+  box-shadow:0 0 0 6px rgba(56,189,248,.1),0 0 28px rgba(56,189,248,.35);
+  animation:npulse .7s ease-in-out infinite;
+}
+.f-circle.chair-done{
+  border-color:var(--chair-c);
+  box-shadow:0 0 22px rgba(56,189,248,.35);
+}
+@keyframes npulse{0%,100%{transform:scale(1);}50%{transform:scale(1.07);}}
+@keyframes nthink{
+  0%{box-shadow:0 0 8px rgba(56,189,248,.15);}
+  25%{box-shadow:4px 0 12px rgba(251,146,60,.25);}
+  50%{box-shadow:0 4px 12px rgba(167,139,250,.25);}
+  75%{box-shadow:-4px 0 12px rgba(74,222,128,.25);}
+  100%{box-shadow:0 0 8px rgba(56,189,248,.15);}
+}
+
+/* Packet */
+.packet{
+  position:absolute;
+  width:9px;height:9px;border-radius:50%;
+  pointer-events:none;
+  z-index:20;opacity:0;
+  transform:translate(-50%,-50%);
+}
+@keyframes fly{
+  0%{opacity:1;transform:translate(calc(-50% + var(--sx)),calc(-50% + var(--sy))) scale(1);}
+  70%{opacity:.9;transform:translate(calc(-50% + var(--ex)),calc(-50% + var(--ey))) scale(1.4);}
+  100%{opacity:0;transform:translate(calc(-50% + var(--ex)),calc(-50% + var(--ey))) scale(.3);}
+}
+.packet.go{animation:fly .65s cubic-bezier(.4,0,.2,1) forwards;}
+
+/* Stage progress bar */
+.stage-bar{
+  display:flex;gap:0;margin-top:16px;
+  border:1px solid var(--border);border-radius:8px;overflow:hidden;
+}
+.sbar-step{
+  flex:1;padding:9px 6px;text-align:center;
+  font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.06em;
+  color:var(--muted);background:var(--surface2);
+  border-right:1px solid var(--border);transition:all .3s;
+}
+.sbar-step:last-child{border-right:none;}
+.sbar-step.active{color:var(--accent);background:rgba(56,189,248,.07);}
+.sbar-step.active::after{
+  content:'';display:block;height:2px;background:var(--accent);
+  margin-top:5px;animation:barpulse .9s ease-in-out infinite;
+}
+.sbar-step.complete{color:var(--gemma-c);background:rgba(74,222,128,.05);}
+@keyframes barpulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+/* Log */
+.log-feed{
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:8px;padding:12px 14px;margin-top:14px;
+  height:110px;overflow-y:auto;
+  font-family:'Space Mono',monospace;font-size:10px;
+  color:var(--muted2);line-height:1.9;
+}
+.log-feed::-webkit-scrollbar{width:3px;}
+.log-feed::-webkit-scrollbar-thumb{background:var(--border);}
+.le{display:block;animation:lein .2s ease;}
+.le .ts{color:var(--muted);margin-right:8px;}
+.le.info .msg{color:var(--muted2);}
+.le.send .msg{color:var(--accent);}
+.le.recv .msg{color:var(--gemma-c);}
+.le.chair .msg{color:var(--chair-c);}
+.le.err .msg{color:var(--danger);}
+@keyframes lein{from{opacity:0;transform:translateX(-5px);}to{opacity:1;transform:none;}}
+
+/* ══ RESULTS ══ */
+#results-section{display:none;}
+.stage-block{margin-bottom:38px;}
+.stage-hdr{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.stage-hdr h2{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted2);white-space:nowrap;}
+.stage-line{flex:1;height:1px;background:var(--border);}
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
+.tab{
+  font-family:'Space Mono',monospace;font-size:10px;
+  padding:6px 14px;border-radius:6px;
+  border:1px solid var(--border);background:var(--surface);
+  color:var(--muted2);cursor:pointer;transition:.2s;
+}
+.tab.tl.on{color:var(--llama-c);border-color:var(--llama-c);background:rgba(251,146,60,.08);}
+.tab.tg.on{color:var(--gemma-c);border-color:var(--gemma-c);background:rgba(74,222,128,.08);}
+.tab.tm.on{color:var(--mixtral-c);border-color:var(--mixtral-c);background:rgba(167,139,250,.08);}
+.panel{display:none;animation:fdup .3s ease;}
+.panel.on{display:block;}
+@keyframes fdup{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+.response-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;}
+.rc-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.rc-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.rc-name{font-weight:700;font-size:13px;}
+.rc-model{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-left:auto;}
+.rc-body{font-size:14px;line-height:1.85;color:#cbd5e1;white-space:pre-wrap;}
+.reviews-grid{display:grid;gap:10px;}
+.review-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:15px 18px;}
+.rv-lbl{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:7px;}
+.rv-body{font-size:13px;line-height:1.75;color:#94a3b8;white-space:pre-wrap;}
+.chairman-card{
+  background:linear-gradient(135deg,rgba(56,189,248,.07),rgba(129,140,248,.04));
+  border:1px solid rgba(56,189,248,.28);
+  border-radius:16px;padding:30px;
+  position:relative;overflow:hidden;
+}
+.chairman-card::before{
+  content:'';position:absolute;top:-60px;right:-60px;
+  width:200px;height:200px;
+  background:radial-gradient(circle,rgba(56,189,248,.1),transparent 70%);
+  pointer-events:none;
+}
+.ch-hdr{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(56,189,248,.15);}
+.ch-icon{width:34px;height:34px;border-radius:8px;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.25);display:flex;align-items:center;justify-content:center;font-size:17px;}
+.ch-title{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--chair-c);letter-spacing:.08em;}
+.ch-model{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-left:auto;}
+.ch-body{font-size:15px;line-height:1.9;color:var(--text);white-space:pre-wrap;}
+.typing::after{content:'▋';animation:blink .7s step-end infinite;color:var(--accent);margin-left:2px;font-size:.8em;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="brand" href="/">Cup<span>X</span></a>
+  <a class="back-btn" href="/">← Home</a>
+</nav>
+
+<main>
+
+  <div class="hdr">
+    <div class="hdr-badge">EXPERIMENTAL · KARPATHY COUNCIL</div>
+    <h1>LLM <em>Council</em></h1>
+    <p>Watch your question travel through three AI models, get peer‑reviewed, then synthesized into one verdict by the Chairman — live, in real time.</p>
+  </div>
+
+  <div class="setup-card">
+    <div class="section-label">API Keys — used only in your browser, never stored</div>
+    <div class="keys-row">
+      <div class="field">
+        <label>GROQ KEY — Council Members (Free)</label>
+        <input type="password" id="groq-key" placeholder="gsk_..." autocomplete="off"/>
+      </div>
+      <div class="field">
+        <label>GOOGLE AI STUDIO KEY — Chairman (Free)</label>
+        <input type="password" id="google-key" placeholder="AIza..." autocomplete="off"/>
+      </div>
+    </div>
+    <p class="key-note">
+      Get free Groq key → <a href="https://console.groq.com" target="_blank">console.groq.com</a>
+      &nbsp;·&nbsp; Get free Google key → <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a>
+    </p>
+  </div>
+
+  <div class="query-wrap">
+    <textarea id="q" placeholder="Ask the council anything… e.g. 'Is nuclear energy the future of power?' or 'What is the best way to learn to code?'" rows="3"></textarea>
+    <div class="query-bar">
+      <div class="model-tags">
+        <span class="tag t-l">🦙 LLaMA 3.3</span>
+        <span class="tag t-g">💎 Gemma 2</span>
+        <span class="tag t-m">🌀 Mixtral</span>
+        <span class="tag t-c">★ Gemini Flash</span>
+      </div>
+      <button id="run-btn" onclick="startCouncil()">Convene Council</button>
+    </div>
+  </div>
+
+  <div id="err"></div>
+
+  <!-- ══ FLOW VISUALIZER ══ -->
+  <div id="flow-section">
+    <div class="flow-title">Live Data Flow</div>
+    <div class="flow-canvas" id="flow-canvas">
+
+      <div class="node-row">
+
+        <!-- YOU -->
+        <div class="f-node">
+          <div class="f-circle" id="nc-user">👤</div>
+          <div class="f-lbl">You</div>
+          <div class="f-status" id="ns-user"></div>
+        </div>
+
+        <!-- Arrow 1 -->
+        <div class="f-arrow-box" id="arr1">
+          <svg viewBox="0 0 60 20" preserveAspectRatio="none">
+            <line x1="2" y1="10" x2="50" y2="10" class="arrow-line" id="al1"/>
+            <polyline points="42,4 52,10 42,16" class="arrow-head" id="ah1"/>
+          </svg>
+        </div>
+
+        <!-- COUNCIL (3 stacked) -->
+        <div class="node-group">
+          <div class="f-node">
+            <div class="f-circle" id="nc-llama">🦙</div>
+            <div class="f-lbl" style="color:var(--llama-c)">LLaMA 3.3</div>
+            <div class="f-status" id="ns-llama"></div>
+          </div>
+          <div class="f-node">
+            <div class="f-circle" id="nc-gemma">💎</div>
+            <div class="f-lbl" style="color:var(--gemma-c)">Gemma 2</div>
+            <div class="f-status" id="ns-gemma"></div>
+          </div>
+          <div class="f-node">
+            <div class="f-circle" id="nc-mixtral">🌀</div>
+            <div class="f-lbl" style="color:var(--mixtral-c)">Mixtral</div>
+            <div class="f-status" id="ns-mixtral"></div>
+          </div>
+        </div>
+
+        <!-- Arrow 2 -->
+        <div class="f-arrow-box" id="arr2">
+          <svg viewBox="0 0 60 20" preserveAspectRatio="none">
+            <line x1="2" y1="10" x2="50" y2="10" class="arrow-line" id="al2"/>
+            <polyline points="42,4 52,10 42,16" class="arrow-head" id="ah2"/>
+          </svg>
+        </div>
+
+        <!-- REVIEW (3 stacked) -->
+        <div class="node-group">
+          <div class="f-node">
+            <div class="f-circle" id="nc-rl">🦙</div>
+            <div class="f-lbl" style="color:var(--llama-c)">Review</div>
+            <div class="f-status" id="ns-rl"></div>
+          </div>
+          <div class="f-node">
+            <div class="f-circle" id="nc-rg">💎</div>
+            <div class="f-lbl" style="color:var(--gemma-c)">Review</div>
+            <div class="f-status" id="ns-rg"></div>
+          </div>
+          <div class="f-node">
+            <div class="f-circle" id="nc-rm">🌀</div>
+            <div class="f-lbl" style="color:var(--mixtral-c)">Review</div>
+            <div class="f-status" id="ns-rm"></div>
+          </div>
+        </div>
+
+        <!-- Arrow 3 -->
+        <div class="f-arrow-box" id="arr3">
+          <svg viewBox="0 0 60 20" preserveAspectRatio="none">
+            <line x1="2" y1="10" x2="50" y2="10" class="arrow-line" id="al3"/>
+            <polyline points="42,4 52,10 42,16" class="arrow-head" id="ah3"/>
+          </svg>
+        </div>
+
+        <!-- CHAIRMAN -->
+        <div class="f-node">
+          <div class="f-circle" id="nc-chair">★</div>
+          <div class="f-lbl" style="color:var(--chair-c)">Chairman</div>
+          <div class="f-status" id="ns-chair"></div>
+        </div>
+
+      </div><!-- /node-row -->
+
+      <!-- Stage bar -->
+      <div class="stage-bar">
+        <div class="sbar-step" id="sb1">1 · First Opinions</div>
+        <div class="sbar-step" id="sb2">2 · Peer Review</div>
+        <div class="sbar-step" id="sb3">3 · Chairman Verdict</div>
+      </div>
+
+      <!-- Log -->
+      <div class="log-feed" id="log"></div>
+
+    </div><!-- /flow-canvas -->
+  </div><!-- /flow-section -->
+
+  <!-- ══ RESULTS ══ -->
+  <div id="results-section">
+
+    <!-- Stage 1 -->
+    <div class="stage-block">
+      <div class="stage-hdr">
+        <h2>Stage 1 — First Opinions</h2>
+        <div class="stage-line"></div>
+      </div>
+      <div class="tabs">
+        <button class="tab tl on" id="t-s1-l" onclick="tab('s1','l')">🦙 LLaMA 3.3</button>
+        <button class="tab tg" id="t-s1-g" onclick="tab('s1','g')">💎 Gemma 2</button>
+        <button class="tab tm" id="t-s1-m" onclick="tab('s1','m')">🌀 Mixtral</button>
+      </div>
+      <div class="panel on" id="s1-l">
+        <div class="response-card">
+          <div class="rc-header">
+            <div class="rc-dot" style="background:var(--llama-c)"></div>
+            <div class="rc-name" style="color:var(--llama-c)">LLaMA 3.3</div>
+            <div class="rc-model">llama-3.3-70b-versatile · Groq</div>
+          </div>
+          <div class="rc-body typing" id="r-llama">Waiting…</div>
+        </div>
+      </div>
+      <div class="panel" id="s1-g">
+        <div class="response-card">
+          <div class="rc-header">
+            <div class="rc-dot" style="background:var(--gemma-c)"></div>
+            <div class="rc-name" style="color:var(--gemma-c)">Gemma 2</div>
+            <div class="rc-model">gemma2-9b-it · Groq</div>
+          </div>
+          <div class="rc-body typing" id="r-gemma">Waiting…</div>
+        </div>
+      </div>
+      <div class="panel" id="s1-m">
+        <div class="response-card">
+          <div class="rc-header">
+            <div class="rc-dot" style="background:var(--mixtral-c)"></div>
+            <div class="rc-name" style="color:var(--mixtral-c)">Mixtral</div>
+            <div class="rc-model">mixtral-8x7b-32768 · Groq</div>
+          </div>
+          <div class="rc-body typing" id="r-mixtral">Waiting…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 2 -->
+    <div class="stage-block">
+      <div class="stage-hdr">
+        <h2>Stage 2 — Peer Reviews</h2>
+        <div class="stage-line"></div>
+      </div>
+      <div class="reviews-grid">
+        <div class="review-card">
+          <div class="rv-lbl">🦙 LLaMA 3.3 reviewing the other two</div>
+          <div class="rv-body typing" id="rv-l">Waiting…</div>
+        </div>
+        <div class="review-card">
+          <div class="rv-lbl">💎 Gemma 2 reviewing the other two</div>
+          <div class="rv-body typing" id="rv-g">Waiting…</div>
+        </div>
+        <div class="review-card">
+          <div class="rv-lbl">🌀 Mixtral reviewing the other two</div>
+          <div class="rv-body typing" id="rv-m">Waiting…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 3 -->
+    <div class="stage-block">
+      <div class="stage-hdr">
+        <h2>Stage 3 — Chairman's Verdict</h2>
+        <div class="stage-line"></div>
+      </div>
+      <div class="chairman-card">
+        <div class="ch-hdr">
+          <div class="ch-icon">★</div>
+          <div>
+            <div class="ch-title">CHAIRMAN — FINAL ANSWER</div>
+          </div>
+          <div class="ch-model">gemini-2.0-flash · Google AI Studio</div>
+        </div>
+        <div class="ch-body typing" id="r-chair">Awaiting council deliberations…</div>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<script>
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const GEM_URL  = k => `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${k}`;
+const MODELS   = { llama:'llama-3.3-70b-versatile', gemma:'gemma2-9b-it', mixtral:'mixtral-8x7b-32768' };
+const COL      = { llama:'#fb923c', gemma:'#4ade80', mixtral:'#a78bfa', chair:'#38bdf8' };
+
+/* ── UTILS ── */
+const $ = id => document.getElementById(id);
+const delay = ms => new Promise(r => setTimeout(r,ms));
+
+function log(msg, type='info') {
+  const feed = $('log');
+  const now = new Date();
+  const ts = `${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}.${String(now.getMilliseconds()).slice(0,2)}`;
+  const el = document.createElement('span');
+  el.className = `le ${type}`;
+  el.innerHTML = `<span class="ts">[${ts}]</span><span class="msg"> ${msg}</span>`;
+  feed.appendChild(el);
+  feed.scrollTop = feed.scrollHeight;
+}
+
+function tab(stage, id) {
+  ['l','g','m'].forEach(x => {
+    $(`${stage}-${x}`).classList.remove('on');
+    $(`t-${stage}-${x}`).classList.remove('on');
+  });
+  $(`${stage}-${id}`).classList.add('on');
+  $(`t-${stage}-${id}`).classList.add('on');
+}
+
+/* ── NODE STATE ── */
+function ns(id, cls, status='') {
+  const nc = $('nc-'+id), ns2 = $('ns-'+id);
+  if(nc) { nc.className = 'f-circle ' + cls; }
+  if(ns2) ns2.textContent = status;
+}
+
+/* ── ARROW STATE ── */
+function arrowOn(n) {
+  $('arr'+n).classList.add('active');
+  $('arr'+n).classList.remove('done');
+}
+function arrowDone(n) {
+  $('arr'+n).classList.remove('active');
+  $('arr'+n).classList.add('done');
+}
+
+/* ── STAGE BAR ── */
+function stageBar(n) {
+  for(let i=1;i<=3;i++){
+    const s = $('sb'+i);
+    s.className='sbar-step';
+    if(i < n) s.classList.add('complete');
+    if(i === n) s.classList.add('active');
+  }
+}
+
+/* ── FLYING PACKET ── */
+function firePacket(fromId, toId, color) {
+  const canvas = $('flow-canvas');
+  const cRect  = canvas.getBoundingClientRect();
+  const fRect  = $('nc-'+fromId).getBoundingClientRect();
+  const tRect  = $('nc-'+toId).getBoundingClientRect();
+
+  const sx = fRect.left + fRect.width/2  - cRect.left;
+  const sy = fRect.top  + fRect.height/2 - cRect.top;
+  const ex = tRect.left + tRect.width/2  - cRect.left;
+  const ey = tRect.top  + tRect.height/2 - cRect.top;
+
+  const p = document.createElement('div');
+  p.className = 'packet';
+  p.style.cssText = `
+    left:0;top:0;
+    background:${color};
+    box-shadow:0 0 10px ${color}, 0 0 4px ${color};
+    --sx:${sx}px;--sy:${sy}px;--ex:${ex}px;--ey:${ey}px;
+  `;
+  canvas.appendChild(p);
+  p.getBoundingClientRect(); // reflow
+  p.classList.add('go');
+  setTimeout(()=>p.remove(), 700);
+}
+
+function burst(fromId, toId, color, n=3) {
+  for(let i=0;i<n;i++) setTimeout(()=>firePacket(fromId,toId,color), i*200);
+}
+
+/* ── TYPEWRITER ── */
+function typewrite(elId, text, spd=6) {
+  return new Promise(res => {
+    const el = $(elId);
+    el.classList.add('typing');
+    el.textContent = '';
+    let i = 0;
+    const iv = setInterval(() => {
+      el.textContent += text[i++];
+      if(i >= text.length){ clearInterval(iv); el.classList.remove('typing'); res(); }
+    }, spd);
+  });
+}
+
+/* ── API ── */
+async function groq(key, model, messages) {
+  const r = await fetch(GROQ_URL, {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+    body: JSON.stringify({model, messages, max_tokens:600, temperature:0.7})
+  });
+  if(!r.ok){ const e=await r.json().catch(()=>({})); throw new Error(e.error?.message || 'Groq '+r.status); }
+  return (await r.json()).choices[0].message.content.trim();
+}
+
+async function gemini(key, prompt) {
+  const r = await fetch(GEM_URL(key), {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      contents:[{parts:[{text:prompt}]}],
+      generationConfig:{maxOutputTokens:800, temperature:0.5}
+    })
+  });
+  if(!r.ok){ const e=await r.json().catch(()=>({})); throw new Error(e.error?.message || 'Gemini '+r.status); }
+  return (await r.json()).candidates[0].content.parts[0].text.trim();
+}
+
+/* ── MAIN ── */
+async function startCouncil() {
+  const gKey  = $('groq-key').value.trim();
+  const aiKey = $('google-key').value.trim();
+  const query = $('q').value.trim();
+  const errEl = $('err');
+  errEl.style.display='none';
+
+  if(!gKey)  { errEl.style.display='block'; errEl.textContent='⚠ Enter your Groq API key.'; return; }
+  if(!aiKey) { errEl.style.display='block'; errEl.textContent='⚠ Enter your Google AI Studio key.'; return; }
+  if(!query) { errEl.style.display='block'; errEl.textContent='⚠ Ask a question first.'; return; }
+
+  const btn = $('run-btn');
+  btn.disabled = true; btn.textContent = 'Convening…';
+
+  $('flow-section').style.display = 'block';
+  $('results-section').style.display = 'block';
+
+  // reset
+  $('log').innerHTML = '';
+  ['user','llama','gemma','mixtral','rl','rg','rm','chair'].forEach(id => ns(id,'',''));
+  ['l','g','m'].forEach(x => { $('r-'+x === 'r-l' ? 'r-llama' : x); });
+  $('r-llama').classList.add('typing'); $('r-llama').textContent = 'Waiting…';
+  $('r-gemma').classList.add('typing'); $('r-gemma').textContent = 'Waiting…';
+  $('r-mixtral').classList.add('typing'); $('r-mixtral').textContent = 'Waiting…';
+  $('rv-l').classList.add('typing'); $('rv-l').textContent = 'Waiting…';
+  $('rv-g').classList.add('typing'); $('rv-g').textContent = 'Waiting…';
+  $('rv-m').classList.add('typing'); $('rv-m').textContent = 'Waiting…';
+  $('r-chair').classList.add('typing'); $('r-chair').textContent = 'Awaiting council deliberations…';
+  [1,2,3].forEach(n=>{ $('arr'+n).className='f-arrow-box'; });
+  stageBar(0); tab('s1','l');
+
+  $('flow-section').scrollIntoView({behavior:'smooth', block:'start'});
+  await delay(500);
+
+  try {
+    /* ───────── STAGE 1 ───────── */
+    stageBar(1);
+    log('Council convened','info');
+    log(`Query: "${query.slice(0,55)}${query.length>55?'…':''}"`, 'send');
+
+    ns('user','sending','sending…');
+    await delay(250);
+    arrowOn(1);
+
+    // packets user → 3 models
+    burst('user','llama', COL.llama);
+    await delay(150);
+    burst('user','gemma', COL.gemma);
+    await delay(150);
+    burst('user','mixtral', COL.mixtral);
+    await delay(400);
+
+    ns('user','done-node','sent ✓');
+    ns('llama','thinking','thinking…');
+    ns('gemma','thinking','thinking…');
+    ns('mixtral','thinking','thinking…');
+    log('→ LLaMA 3.3 processing', 'send');
+    log('→ Gemma 2 processing', 'send');
+    log('→ Mixtral processing', 'send');
+
+    const p1 = [{role:'user', content:query}];
+    const [rL, rG, rM] = await Promise.all([
+      groq(gKey, MODELS.llama, p1),
+      groq(gKey, MODELS.gemma, p1),
+      groq(gKey, MODELS.mixtral, p1)
+    ]);
+
+    log(`← LLaMA responded (${rL.split(' ').length}w)`, 'recv');
+    log(`← Gemma responded (${rG.split(' ').length}w)`, 'recv');
+    log(`← Mixtral responded (${rM.split(' ').length}w)`, 'recv');
+
+    // packets back: models → user
+    burst('llama','user', COL.llama, 2);
+    await delay(130);
+    burst('gemma','user', COL.gemma, 2);
+    await delay(130);
+    burst('mixtral','user', COL.mixtral, 2);
+    await delay(300);
+
+    ns('llama','done-node','done ✓');
+    ns('gemma','done-node','done ✓');
+    ns('mixtral','done-node','done ✓');
+    arrowDone(1);
+
+    await Promise.all([
+      typewrite('r-llama', rL, 5),
+      typewrite('r-gemma', rG, 5),
+      typewrite('r-mixtral', rM, 5)
+    ]);
+
+    /* ───────── STAGE 2 ───────── */
+    stageBar(2);
+    log('Stage 2: peer review initiated','info');
+    arrowOn(2);
+
+    // packets council → review nodes
+    burst('llama','rl', COL.llama);
+    await delay(130);
+    burst('gemma','rg', COL.gemma);
+    await delay(130);
+    burst('mixtral','rm', COL.mixtral);
+    await delay(350);
+
+    ns('rl','reviewing','reviewing…');
+    ns('rg','reviewing','reviewing…');
+    ns('rm','reviewing','reviewing…');
+    log('→ Models reviewing each other','send');
+
+    const rp = (name,a,b) =>
+      `The user asked: "${query}"\n\nTwo other AI models responded:\n\nResponse A:\n${a}\n\nResponse B:\n${b}\n\nAs ${name}, critique both responses critically: which is stronger, what was missing, where each failed. Be concise and honest. Max 100 words.`;
+
+    const [rvL, rvG, rvM] = await Promise.all([
+      groq(gKey, MODELS.llama,   [{role:'user',content:rp('LLaMA',rG,rM)}]),
+      groq(gKey, MODELS.gemma,   [{role:'user',content:rp('Gemma',rL,rM)}]),
+      groq(gKey, MODELS.mixtral, [{role:'user',content:rp('Mixtral',rL,rG)}])
+    ]);
+
+    log(`← LLaMA review (${rvL.split(' ').length}w)`, 'recv');
+    log(`← Gemma review (${rvG.split(' ').length}w)`, 'recv');
+    log(`← Mixtral review (${rvM.split(' ').length}w)`, 'recv');
+
+    // packets review → chair
+    burst('rl','chair', COL.llama, 2);
+    await delay(130);
+    burst('rg','chair', COL.gemma, 2);
+    await delay(130);
+    burst('rm','chair', COL.mixtral, 2);
+    await delay(300);
+
+    ns('rl','done-node','done ✓');
+    ns('rg','done-node','done ✓');
+    ns('rm','done-node','done ✓');
+    arrowDone(2);
+
+    await Promise.all([
+      typewrite('rv-l', rvL, 6),
+      typewrite('rv-g', rvG, 6),
+      typewrite('rv-m', rvM, 6)
+    ]);
+
+    /* ───────── STAGE 3 ───────── */
+    stageBar(3);
+    log('Stage 3: Chairman synthesizing…','chair');
+    arrowOn(3);
+    ns('chair','chair-active','synthesizing…');
+
+    const chairPrompt =
+      `You are the Chairman of an AI Council. The user asked:\n"${query}"\n\nThree council members gave first opinions:\n\nLLaMA 3.3:\n${rL}\n\nGemma 2:\n${rG}\n\nMixtral:\n${rM}\n\nPeer reviews:\nLLaMA on others: ${rvL}\nGemma on others: ${rvG}\nMixtral on others: ${rvM}\n\nSynthesize the strongest ideas into one clear, authoritative final answer. Be direct and comprehensive. This is what the user reads as the final verdict.`;
+
+    const chairResp = await gemini(aiKey, chairPrompt);
+
+    log(`← Chairman verdict (${chairResp.split(' ').length}w)`,'chair');
+    arrowDone(3);
+    ns('chair','chair-done','verdict ★');
+
+    // final burst to user
+    burst('chair','user', COL.chair, 3);
+    await delay(300);
+    ns('user','chair-done','received ★');
+
+    await typewrite('r-chair', chairResp, 8);
+    $('r-chair').classList.remove('typing');
+
+    // complete all bars
+    stageBar(4);
+    [1,2,3].forEach(i => $('sb'+i).className='sbar-step complete');
+    log('Session complete.','info');
+
+  } catch(e) {
+    $('err').style.display='block';
+    $('err').textContent='⚠ '+e.message;
+    log('ERROR: '+e.message,'err');
+  }
+
+  btn.disabled=false; btn.textContent='Convene Council';
+}
+
+$('q').addEventListener('keydown', e => {
+  if(e.key==='Enter' && (e.ctrlKey||e.metaKey)) startCouncil();
+});
+</script>
+</body>
+</html>
