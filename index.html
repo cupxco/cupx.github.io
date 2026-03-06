@@ -1,189 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CupX Corporation | Academic & Software Projects</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="icon" type="image/png" href="/favicon.png">
+<link rel="icon" type="image/png" href="/favicon.png">
 
-  <meta name="description" content="CupX Corporation is a student-led initiative building academic systems and practical software tools.">
+<meta name="description" content="CupX Corporation is a student-led initiative building academic systems and practical software tools.">
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background-color: #0f172a;
-      color: #e5e7eb;
-      overflow-x: hidden;
-    }
+<style>
+body {
+margin:0;
+font-family:Arial, Helvetica, sans-serif;
+background-color:#0f172a;
+color:#e5e7eb;
+overflow-x:hidden;
+}
 
-    /* HEADER (same style as tools) */
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 20px;
-      background-color: #020617;
-    }
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:16px 20px;
+background-color:#020617;
+}
 
-    header h1 {
-      margin: 0;
-      font-size: 22px;
-    }
+header h1{
+margin:0;
+font-size:22px;
+}
 
-    /* Hamburger */
-    .menu-btn {
-      font-size: 30px;
-      cursor: pointer;
-      background: none;
-      border: none;
-      color: #e5e7eb;
-    }
+.menu-btn{
+font-size:30px;
+cursor:pointer;
+background:none;
+border:none;
+color:#e5e7eb;
+}
 
-    /* Overlay */
-    .overlay {
-      position: fixed;
-      top: 0;
-      right: -100%;
-      width: 66%;
-      height: 100vh;
-      background: #020617;
-      padding: 40px 25px;
-      box-sizing: border-box;
-      transition: right 0.3s ease;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      z-index: 1000;
-    }
+.overlay{
+position:fixed;
+top:0;
+right:-100%;
+width:66%;
+height:100vh;
+background:#020617;
+padding:40px 25px;
+box-sizing:border-box;
+transition:right 0.3s ease;
+display:flex;
+flex-direction:column;
+gap:20px;
+z-index:1000;
+}
 
-    .overlay a {
-      color: #e5e7eb;
-      text-decoration: none;
-      font-size: 18px;
-    }
+.overlay a{
+color:#e5e7eb;
+text-decoration:none;
+font-size:18px;
+}
 
-    .overlay a:hover {
-      color: #38bdf8;
-    }
+.overlay a:hover{
+color:#38bdf8;
+}
 
-    .overlay.active {
-      right: 0;
-    }
+.overlay.active{
+right:0;
+}
 
-    /* HERO */
-    section {
-      padding: 60px 20px;
-      max-width: 1000px;
-      margin: auto;
-    }
+section{
+padding:60px 20px;
+max-width:1000px;
+margin:auto;
+}
 
-    .hero {
-      text-align: center;
-    }
+.hero{
+text-align:center;
+}
 
-    .hero h2 {
-      font-size: 32px;
-      margin-bottom: 12px;
-    }
+.hero h2{
+font-size:32px;
+margin-bottom:12px;
+}
 
-    .hero p {
-      font-size: 15px;
-      opacity: 0.85;
-      max-width: 650px;
-      margin: auto;
-    }
+.hero p{
+font-size:15px;
+opacity:0.85;
+max-width:650px;
+margin:auto;
+}
 
-    /* CARDS */
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 25px;
-      margin-top: 30px;
-    }
+.cards{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+gap:25px;
+margin-top:30px;
+}
 
-    .card {
-      background-color: #020617;
-      padding: 22px;
-      border-radius: 10px;
-      transition: transform 0.2s ease;
-    }
+.card{
+background-color:#020617;
+padding:22px;
+border-radius:10px;
+transition:transform 0.2s ease;
+}
 
-    .card:hover {
-      transform: translateY(-5px);
-    }
+.card:hover{
+transform:translateY(-5px);
+}
 
-    .btn {
-      display: inline-block;
-      margin-top: 12px;
-      padding: 8px 14px;
-      background: #38bdf8;
-      color: #020617;
-      border-radius: 5px;
-      text-decoration: none;
-      font-weight: bold;
-    }
+.btn{
+display:inline-block;
+margin-top:12px;
+padding:8px 14px;
+background:#38bdf8;
+color:#020617;
+border-radius:5px;
+text-decoration:none;
+font-weight:bold;
+}
 
-    footer {
-      text-align: center;
-      padding: 20px;
-      font-size: 13px;
-      background-color: #020617;
-      opacity: 0.8;
-      margin-top: 40px;
-    }
-  </style>
+footer{
+text-align:center;
+padding:20px;
+font-size:13px;
+background-color:#020617;
+opacity:0.8;
+margin-top:40px;
+}
+</style>
 </head>
 
 <body>
 
 <header>
-  <h1>CupX Corporation</h1>
-  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+<h1>CupX Corporation</h1>
+<button class="menu-btn" onclick="toggleMenu()">☰</button>
 </header>
 
-<!-- Right Slide Panel -->
 <div class="overlay" id="overlay">
-  <a href="javascript:void(0)" onclick="toggleMenu()">Close ✕</a>
-  <a href="https://auth.cupx.in">Sign In / Sign Up</a>
-  <a href="/tools/">Tools</a>
-  <a href="/about/">About</a>
-  <a href="/contact/">Contact</a>
+<a href="javascript:void(0)" onclick="toggleMenu()">Close ✕</a>
+<a href="https://auth.cupx.in">Sign In / Sign Up</a>
+<a href="/tools/">Tools</a>
+<a href="/about/">About</a>
+<a href="/contact/">Contact</a>
 </div>
 
 <section class="hero">
-  <h2>CupX Corporation – Academic & Software Projects</h2>
-  <p>
-    A student-led initiative building real academic systems and practical
-    software tools through hands-on implementation.
-  </p>
+<h2>CupX Corporation – Academic & Software Projects</h2>
+<p>
+A student-led initiative building real academic systems and practical
+software tools through hands-on implementation.
+</p>
 </section>
 
 <section>
-  <h2>Academic Projects</h2>
+<h2>Academic Projects</h2>
 
-  <div class="cards">
-    <div class="card">
-      <h3>Library Search Portal</h3>
-      <p>
-        A live academic library system featuring structured book records,
-        department categorization, and searchable database integration.
-      </p>
-      <a href="https://library.cupx.in" class="btn">Visit Live Portal</a>
-    </div>
-  </div>
+<div class="cards">
+
+<div class="card">
+<h3>Library Search Portal</h3>
+<p>
+A live academic library system featuring structured book records,
+department categorization, and searchable database integration.
+</p>
+<a href="https://library.cupx.in" class="btn">Visit Live Portal</a>
+</div>
+
+<div class="card">
+<h3>LLM Council</h3>
+<p>
+A multi-AI reasoning system where different language models analyze
+complex questions together and produce structured collective responses.
+</p>
+<a href="https://ai.cupx.in" class="btn">Open LLM Council</a>
+</div>
+
+</div>
 </section>
 
 <footer>
-  © 2026 CupX Corporation · All rights reserved
+© 2026 CupX Corporation · All rights reserved
 </footer>
 
 <script>
-  function toggleMenu() {
-    const overlay = document.getElementById("overlay");
-    overlay.classList.toggle("active");
-  }
+function toggleMenu(){
+const overlay=document.getElementById("overlay");
+overlay.classList.toggle("active");
+}
 </script>
 
 </body>
