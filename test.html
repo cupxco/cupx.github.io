@@ -1,655 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>LLM Council | CupX Corporation</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="icon" type="image/png" href="/favicon.png">
+
+<meta name="description" content="CupX Corporation is a student-led initiative building academic systems and practical software tools.">
+
 <style>
-:root {
-  --bg: #05080f;
-  --surface: #0a0f1e;
-  --surface2: #0f172a;
-  --border: rgba(56,189,248,0.12);
-  --accent: #38bdf8;
-  --m1-c: #fb923c;
-  --m2-c: #c084fc;
-  --m3-c: #f472b6;
-  --chair-c: #38bdf8;
-  --text: #e2e8f0;
-  --muted: #475569;
-  --muted2: #64748b;
-  --danger: #f87171;
-  --warn: #fbbf24;
+body {
+margin:0;
+font-family:Arial, Helvetica, sans-serif;
+background-color:#0f172a;
+color:#e5e7eb;
+overflow-x:hidden;
 }
-*{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;}
-body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(56,189,248,.06) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 80%,rgba(192,132,252,.04) 0%,transparent 50%);pointer-events:none;z-index:0;}
-nav{position:sticky;top:0;z-index:200;background:rgba(5,8,15,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:12px 24px;}
-.brand{font-size:17px;font-weight:800;color:var(--accent);text-decoration:none;letter-spacing:.06em;}
-.brand span{color:var(--text);}
-.back-btn{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted2);text-decoration:none;border:1px solid var(--border);padding:5px 14px;border-radius:4px;transition:.2s;}
-.back-btn:hover{color:var(--accent);border-color:var(--accent);}
-main{position:relative;z-index:1;max-width:940px;margin:0 auto;padding:36px 18px 100px;}
-.hdr{text-align:center;margin-bottom:44px;}
-.hdr-badge{display:inline-block;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.18em;color:var(--accent);border:1px solid var(--border);padding:4px 14px;border-radius:20px;background:rgba(56,189,248,.08);margin-bottom:14px;}
-.hdr h1{font-size:clamp(30px,5vw,52px);font-weight:800;line-height:1.05;margin-bottom:10px;}
-.hdr h1 em{font-style:normal;color:var(--accent);}
-.hdr p{font-size:14px;color:var(--muted2);max-width:500px;margin:0 auto;line-height:1.7;}
-.setup-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:22px;}
-.sec-lbl{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.15em;color:var(--muted2);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
-.sec-lbl::after{content:'';flex:1;height:1px;background:var(--border);}
-.keys-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-@media(max-width:560px){.keys-row{grid-template-columns:1fr;}}
-.field label{display:block;font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);margin-bottom:5px;letter-spacing:.05em;}
-.field input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:9px 12px;font-family:'Space Mono',monospace;font-size:12px;color:var(--text);outline:none;transition:.2s;}
-.field input:focus{border-color:var(--accent);}
-.field input::placeholder{color:var(--muted);}
-.key-note{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-top:10px;line-height:1.7;}
-.key-note a{color:var(--accent);text-decoration:none;}
-.key-note a:hover{text-decoration:underline;}
-.query-wrap{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:26px;transition:.2s;}
-.query-wrap:focus-within{border-color:rgba(56,189,248,.35);}
-textarea#q{width:100%;background:transparent;border:none;outline:none;color:var(--text);font-family:'Syne',sans-serif;font-size:15px;resize:none;line-height:1.7;min-height:70px;}
-textarea#q::placeholder{color:var(--muted);}
-.query-bar{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap;gap:10px;}
-.model-tags{display:flex;gap:6px;flex-wrap:wrap;}
-.tag{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.06em;padding:3px 9px;border-radius:20px;border:1px solid;}
-.t1{color:var(--m1-c);border-color:var(--m1-c);background:rgba(251,146,60,.07);}
-.t2{color:var(--m2-c);border-color:var(--m2-c);background:rgba(192,132,252,.07);}
-.t3{color:var(--m3-c);border-color:var(--m3-c);background:rgba(244,114,182,.07);}
-.tc{color:var(--chair-c);border-color:var(--chair-c);background:rgba(56,189,248,.07);}
-#run-btn{background:var(--accent);color:var(--bg);border:none;border-radius:8px;padding:10px 26px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:.2s;white-space:nowrap;}
-#run-btn:hover{background:#7dd3fc;transform:translateY(-1px);}
-#run-btn:disabled{opacity:.35;cursor:not-allowed;transform:none;}
-#err{display:none;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);border-radius:8px;padding:12px 16px;color:#fca5a5;font-family:'Space Mono',monospace;font-size:11px;margin-bottom:20px;line-height:1.7;}
 
-/* FLOW */
-#flow-section{display:none;margin-bottom:40px;}
-.flow-title{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.18em;color:var(--muted2);text-transform:uppercase;margin-bottom:14px;text-align:center;}
-.flow-canvas{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 16px 20px;overflow:hidden;}
-.flow-canvas::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(56,189,248,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.025) 1px,transparent 1px);background-size:28px 28px;pointer-events:none;}
-.node-row{display:flex;align-items:center;justify-content:space-between;gap:4px;position:relative;z-index:2;}
-.node-group{display:flex;flex-direction:column;gap:12px;align-items:center;}
-.f-node{display:flex;flex-direction:column;align-items:center;gap:4px;}
-.f-circle{width:50px;height:50px;border-radius:50%;border:2px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:19px;transition:border-color .3s,box-shadow .3s,transform .2s;position:relative;z-index:2;}
-.f-lbl{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.05em;color:var(--muted2);text-transform:uppercase;text-align:center;max-width:64px;}
-.f-status{font-family:'Space Mono',monospace;font-size:8px;color:var(--muted);text-align:center;height:12px;min-width:60px;}
-.f-arr{flex:1;display:flex;align-items:center;justify-content:center;min-width:20px;max-width:70px;}
-.f-arr svg{width:100%;}
-.aline{stroke:var(--border);stroke-width:1.5;fill:none;transition:stroke .4s,filter .4s;}
-.ahead{stroke:var(--border);stroke-width:1.5;fill:none;stroke-linecap:round;transition:stroke .4s,filter .4s;}
-.f-arr.on .aline,.f-arr.on .ahead{stroke:var(--accent);stroke-width:2;filter:drop-shadow(0 0 4px rgba(56,189,248,.6));}
-.f-arr.done .aline,.f-arr.done .ahead{stroke:rgba(74,222,128,.45);}
-.f-circle.sending{border-color:var(--accent);box-shadow:0 0 0 4px rgba(56,189,248,.1),0 0 16px rgba(56,189,248,.25);animation:np .85s ease-in-out infinite;}
-.f-circle.thinking{border-color:rgba(56,189,248,.35);animation:nth 1.4s linear infinite;}
-.f-circle.done-ok{border-color:#4ade80;box-shadow:0 0 12px rgba(74,222,128,.2);}
-.f-circle.done-err{border-color:var(--danger);box-shadow:0 0 10px rgba(248,113,113,.2);}
-.f-circle.reviewing{border-color:var(--m2-c);animation:np .9s ease-in-out infinite;}
-.f-circle.chair-on{border-color:var(--chair-c);box-shadow:0 0 0 6px rgba(56,189,248,.1),0 0 26px rgba(56,189,248,.35);animation:np .7s ease-in-out infinite;}
-.f-circle.chair-wait{border-color:var(--warn);box-shadow:0 0 10px rgba(251,191,36,.2);animation:np 1.2s ease-in-out infinite;}
-.f-circle.chair-done{border-color:var(--chair-c);box-shadow:0 0 22px rgba(56,189,248,.35);}
-@keyframes np{0%,100%{transform:scale(1);}50%{transform:scale(1.07);}}
-@keyframes nth{0%{box-shadow:0 0 8px rgba(56,189,248,.15);}25%{box-shadow:4px 0 12px rgba(251,146,60,.25);}50%{box-shadow:0 4px 12px rgba(192,132,252,.25);}75%{box-shadow:-4px 0 12px rgba(244,114,182,.25);}100%{box-shadow:0 0 8px rgba(56,189,248,.15);}}
-.pkt{position:absolute;width:9px;height:9px;border-radius:50%;pointer-events:none;z-index:20;opacity:0;transform:translate(calc(-50% + var(--sx)),calc(-50% + var(--sy)));}
-@keyframes pfly{0%{opacity:1;transform:translate(calc(-50% + var(--sx)),calc(-50% + var(--sy))) scale(1);}70%{opacity:.9;transform:translate(calc(-50% + var(--ex)),calc(-50% + var(--ey))) scale(1.5);}100%{opacity:0;transform:translate(calc(-50% + var(--ex)),calc(-50% + var(--ey))) scale(.2);}}
-.pkt.go{animation:pfly .65s cubic-bezier(.4,0,.2,1) forwards;}
-.stage-bar{display:flex;margin-top:16px;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
-.sb{flex:1;padding:9px 4px;text-align:center;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.05em;color:var(--muted);background:var(--surface2);border-right:1px solid var(--border);transition:all .3s;position:relative;}
-.sb:last-child{border-right:none;}
-.sb.active{color:var(--accent);background:rgba(56,189,248,.07);}
-.sb.active::after{content:'';display:block;height:2px;background:var(--accent);margin-top:5px;animation:sbp .9s ease-in-out infinite;}
-.sb.waiting{color:var(--warn);background:rgba(251,191,36,.05);}
-.sb.waiting::after{content:'';display:block;height:2px;background:var(--warn);margin-top:5px;animation:sbp .9s ease-in-out infinite;}
-.sb.done{color:#4ade80;background:rgba(74,222,128,.05);}
-@keyframes sbp{0%,100%{opacity:1;}50%{opacity:.3;}}
-.log-feed{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-top:14px;height:120px;overflow-y:auto;font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);line-height:1.9;}
-.log-feed::-webkit-scrollbar{width:3px;}
-.log-feed::-webkit-scrollbar-thumb{background:var(--border);}
-.le{display:block;animation:lein .2s ease;}
-.le .ts{color:var(--muted);margin-right:8px;}
-.le.info .msg{color:var(--muted2);}
-.le.send .msg{color:var(--accent);}
-.le.recv .msg{color:#4ade80;}
-.le.chair .msg{color:var(--chair-c);}
-.le.warn .msg{color:var(--warn);}
-.le.retry .msg{color:#fb923c;}
-.le.err .msg{color:var(--danger);}
-@keyframes lein{from{opacity:0;transform:translateX(-5px);}to{opacity:1;transform:none;}}
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:16px 20px;
+background-color:#020617;
+}
 
-/* RESULTS */
-#results-section{display:none;}
-.stage-block{margin-bottom:38px;}
-.stage-hdr{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
-.stage-hdr h2{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted2);white-space:nowrap;}
-.stage-line{flex:1;height:1px;background:var(--border);}
-.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
-.tab{font-family:'Space Mono',monospace;font-size:10px;padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--muted2);cursor:pointer;transition:.2s;}
-.tab.t1.on{color:var(--m1-c);border-color:var(--m1-c);background:rgba(251,146,60,.08);}
-.tab.t2.on{color:var(--m2-c);border-color:var(--m2-c);background:rgba(192,132,252,.08);}
-.tab.t3.on{color:var(--m3-c);border-color:var(--m3-c);background:rgba(244,114,182,.08);}
-.panel{display:none;animation:fdup .3s ease;}
-.panel.on{display:block;}
-@keyframes fdup{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
-.response-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;}
-.rc-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);flex-wrap:wrap;}
-.rc-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-.rc-name{font-weight:700;font-size:13px;}
-.rc-model{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-left:auto;}
-.rc-body{font-size:14px;line-height:1.85;color:#cbd5e1;white-space:pre-wrap;}
-.reviews-grid{display:grid;gap:10px;}
-.review-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:15px 18px;}
-.rv-lbl{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:7px;}
-.rv-body{font-size:13px;line-height:1.75;color:#94a3b8;white-space:pre-wrap;}
-.chairman-card{background:linear-gradient(135deg,rgba(56,189,248,.07),rgba(192,132,252,.04));border:1px solid rgba(56,189,248,.28);border-radius:16px;padding:30px;position:relative;overflow:hidden;}
-.chairman-card::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(56,189,248,.1),transparent 70%);pointer-events:none;}
-.ch-hdr{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(56,189,248,.15);flex-wrap:wrap;}
-.ch-icon{width:34px;height:34px;border-radius:8px;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.25);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
-.ch-title{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--chair-c);letter-spacing:.08em;}
-.ch-model{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-left:auto;}
-.ch-body{font-size:15px;line-height:1.9;color:var(--text);white-space:pre-wrap;}
-.typing::after{content:'▋';animation:blink .7s step-end infinite;color:var(--accent);margin-left:2px;font-size:.8em;}
-@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
-::-webkit-scrollbar{width:5px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+header h1{
+margin:0;
+font-size:22px;
+}
+
+.menu-btn{
+font-size:30px;
+cursor:pointer;
+background:none;
+border:none;
+color:#e5e7eb;
+}
+
+.overlay{
+position:fixed;
+top:0;
+right:-100%;
+width:66%;
+height:100vh;
+background:#020617;
+padding:40px 25px;
+box-sizing:border-box;
+transition:right 0.3s ease;
+display:flex;
+flex-direction:column;
+gap:20px;
+z-index:1000;
+}
+
+.overlay a{
+color:#e5e7eb;
+text-decoration:none;
+font-size:18px;
+}
+
+.overlay a:hover{
+color:#38bdf8;
+}
+
+.overlay.active{
+right:0;
+}
+
+section{
+padding:60px 20px;
+max-width:1000px;
+margin:auto;
+}
+
+.hero{
+text-align:center;
+}
+
+.hero h2{
+font-size:32px;
+margin-bottom:12px;
+}
+
+.hero p{
+font-size:15px;
+opacity:0.85;
+max-width:650px;
+margin:auto;
+}
+
+.cards{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+gap:25px;
+margin-top:30px;
+}
+
+.card{
+background-color:#020617;
+padding:22px;
+border-radius:10px;
+transition:transform 0.2s ease;
+}
+
+.card:hover{
+transform:translateY(-5px);
+}
+
+.btn{
+display:inline-block;
+margin-top:12px;
+padding:8px 14px;
+background:#38bdf8;
+color:#020617;
+border-radius:5px;
+text-decoration:none;
+font-weight:bold;
+}
+
+footer{
+text-align:center;
+padding:20px;
+font-size:13px;
+background-color:#020617;
+opacity:0.8;
+margin-top:40px;
+}
 </style>
 </head>
+
 <body>
-<nav>
-  <a class="brand" href="/">Cup<span>X</span></a>
-  <a class="back-btn" href="/">← Home</a>
-</nav>
-<main>
-  <div class="hdr">
-    <div class="hdr-badge">EXPERIMENTAL · KARPATHY COUNCIL</div>
-    <h1>LLM <em>Council</em></h1>
-    <p>Watch your question travel through three AI models live — peer-reviewed and synthesized into one final verdict by the Chairman.</p>
-  </div>
 
-  <div class="setup-card">
-    <div class="sec-lbl">API Keys — used only in your browser, never stored</div>
-    <div class="keys-row">
-      <div class="field">
-        <label>GROQ KEY — Council Members (Free)</label>
-        <input type="password" id="groq-key" placeholder="gsk_..." autocomplete="off"/>
-      </div>
-      <div class="field">
-        <label>GOOGLE AI STUDIO KEY — Chairman (Free)</label>
-        <input type="password" id="google-key" placeholder="AIza..." autocomplete="off"/>
-      </div>
-    </div>
-    <p class="key-note">
-      Free Groq key → <a href="https://console.groq.com" target="_blank">console.groq.com</a>
-      &nbsp;·&nbsp; Free Google key → <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a>
-    </p>
-  </div>
+<header>
+<h1>CupX Corporation</h1>
+<button class="menu-btn" onclick="toggleMenu()">☰</button>
+</header>
 
-  <div class="query-wrap">
-    <textarea id="q" placeholder="Ask the council anything… e.g. 'Which democracy is truly working in today's world?'" rows="3"></textarea>
-    <div class="query-bar">
-      <div class="model-tags">
-        <span class="tag t1">🦙 LLaMA 3.3 70B</span>
-        <span class="tag t2">⚡ LLaMA 3.1 8B</span>
-        <span class="tag t3">🚀 LLaMA 4 Scout</span>
-        <span class="tag tc">★ Gemini 2.0 Flash</span>
-      </div>
-      <button id="run-btn" onclick="startCouncil()">Convene Council</button>
-    </div>
-  </div>
+<div class="overlay" id="overlay">
+<a href="javascript:void(0)" onclick="toggleMenu()">Close ✕</a>
+<a href="https://auth.cupx.in">Sign In / Sign Up</a>
+<a href="/tools/">Tools</a>
+<a href="/about/">About</a>
+<a href="/contact/">Contact</a>
+</div>
 
-  <div id="err"></div>
+<section class="hero">
+<h2>CupX Corporation – Academic & Software Projects</h2>
+<p>
+A student-led initiative building real academic systems and practical
+software tools through hands-on implementation.
+</p>
+</section>
 
-  <!-- FLOW VISUALIZER -->
-  <div id="flow-section">
-    <div class="flow-title">Live Data Flow</div>
-    <div class="flow-canvas" id="flow-canvas">
-      <div class="node-row">
-        <div class="f-node">
-          <div class="f-circle" id="nc-user">👤</div>
-          <div class="f-lbl">You</div>
-          <div class="f-status" id="ns-user"></div>
-        </div>
-        <div class="f-arr" id="arr1">
-          <svg viewBox="0 0 50 16" preserveAspectRatio="none" style="height:16px;">
-            <line x1="2" y1="8" x2="42" y2="8" class="aline"/>
-            <polyline points="35,3 44,8 35,13" class="ahead"/>
-          </svg>
-        </div>
-        <div class="node-group">
-          <div class="f-node">
-            <div class="f-circle" id="nc-m1">🦙</div>
-            <div class="f-lbl" style="color:var(--m1-c)">LLaMA 70B</div>
-            <div class="f-status" id="ns-m1"></div>
-          </div>
-          <div class="f-node">
-            <div class="f-circle" id="nc-m2">⚡</div>
-            <div class="f-lbl" style="color:var(--m2-c)">LLaMA 8B</div>
-            <div class="f-status" id="ns-m2"></div>
-          </div>
-          <div class="f-node">
-            <div class="f-circle" id="nc-m3">🚀</div>
-            <div class="f-lbl" style="color:var(--m3-c)">LLaMA 4</div>
-            <div class="f-status" id="ns-m3"></div>
-          </div>
-        </div>
-        <div class="f-arr" id="arr2">
-          <svg viewBox="0 0 50 16" preserveAspectRatio="none" style="height:16px;">
-            <line x1="2" y1="8" x2="42" y2="8" class="aline"/>
-            <polyline points="35,3 44,8 35,13" class="ahead"/>
-          </svg>
-        </div>
-        <div class="node-group">
-          <div class="f-node">
-            <div class="f-circle" id="nc-r1">🦙</div>
-            <div class="f-lbl" style="color:var(--m1-c)">Review</div>
-            <div class="f-status" id="ns-r1"></div>
-          </div>
-          <div class="f-node">
-            <div class="f-circle" id="nc-r2">⚡</div>
-            <div class="f-lbl" style="color:var(--m2-c)">Review</div>
-            <div class="f-status" id="ns-r2"></div>
-          </div>
-          <div class="f-node">
-            <div class="f-circle" id="nc-r3">🚀</div>
-            <div class="f-lbl" style="color:var(--m3-c)">Review</div>
-            <div class="f-status" id="ns-r3"></div>
-          </div>
-        </div>
-        <div class="f-arr" id="arr3">
-          <svg viewBox="0 0 50 16" preserveAspectRatio="none" style="height:16px;">
-            <line x1="2" y1="8" x2="42" y2="8" class="aline"/>
-            <polyline points="35,3 44,8 35,13" class="ahead"/>
-          </svg>
-        </div>
-        <div class="f-node">
-          <div class="f-circle" id="nc-chair">★</div>
-          <div class="f-lbl" style="color:var(--chair-c)">Chairman</div>
-          <div class="f-status" id="ns-chair"></div>
-        </div>
-      </div>
-      <div class="stage-bar">
-        <div class="sb" id="sb1">1 · First Opinions</div>
-        <div class="sb" id="sb2">2 · Peer Review</div>
-        <div class="sb" id="sb3">3 · Chairman Verdict</div>
-      </div>
-      <div class="log-feed" id="log"></div>
-    </div>
-  </div>
+<section>
+<h2>Academic Projects</h2>
 
-  <!-- RESULTS -->
-  <div id="results-section">
-    <div class="stage-block">
-      <div class="stage-hdr"><h2>Stage 1 — First Opinions</h2><div class="stage-line"></div></div>
-      <div class="tabs">
-        <button class="tab t1 on" id="t-s1-1" onclick="switchTab('s1','1')">🦙 LLaMA 3.3 70B</button>
-        <button class="tab t2" id="t-s1-2" onclick="switchTab('s1','2')">⚡ LLaMA 3.1 8B</button>
-        <button class="tab t3" id="t-s1-3" onclick="switchTab('s1','3')">🚀 LLaMA 4 Scout</button>
-      </div>
-      <div class="panel on" id="s1-1">
-        <div class="response-card">
-          <div class="rc-header">
-            <div class="rc-dot" style="background:var(--m1-c)"></div>
-            <div class="rc-name" style="color:var(--m1-c)">LLaMA 3.3 70B</div>
-            <div class="rc-model">llama-3.3-70b-versatile · Groq</div>
-          </div>
-          <div class="rc-body typing" id="r-m1">Waiting…</div>
-        </div>
-      </div>
-      <div class="panel" id="s1-2">
-        <div class="response-card">
-          <div class="rc-header">
-            <div class="rc-dot" style="background:var(--m2-c)"></div>
-            <div class="rc-name" style="color:var(--m2-c)">LLaMA 3.1 8B</div>
-            <div class="rc-model">llama-3.1-8b-instant · Groq</div>
-          </div>
-          <div class="rc-body typing" id="r-m2">Waiting…</div>
-        </div>
-      </div>
-      <div class="panel" id="s1-3">
-        <div class="response-card">
-          <div class="rc-header">
-            <div class="rc-dot" style="background:var(--m3-c)"></div>
-            <div class="rc-name" style="color:var(--m3-c)">LLaMA 4 Scout</div>
-            <div class="rc-model">meta-llama/llama-4-scout-17b-16e-instruct · Groq</div>
-          </div>
-          <div class="rc-body typing" id="r-m3">Waiting…</div>
-        </div>
-      </div>
-    </div>
+<div class="cards">
 
-    <div class="stage-block">
-      <div class="stage-hdr"><h2>Stage 2 — Peer Reviews</h2><div class="stage-line"></div></div>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="rv-lbl">🦙 LLaMA 3.3 reviewing 8B + Scout</div>
-          <div class="rv-body typing" id="rv-1">Waiting…</div>
-        </div>
-        <div class="review-card">
-          <div class="rv-lbl">⚡ LLaMA 3.1 8B reviewing 70B + Scout</div>
-          <div class="rv-body typing" id="rv-2">Waiting…</div>
-        </div>
-        <div class="review-card">
-          <div class="rv-lbl">🚀 LLaMA 4 Scout reviewing 70B + 8B</div>
-          <div class="rv-body typing" id="rv-3">Waiting…</div>
-        </div>
-      </div>
-    </div>
+<div class="card">
+<h3>Library Search Portal</h3>
+<p>
+A live academic library system featuring structured book records,
+department categorization, and searchable database integration.
+</p>
+<a href="https://library.cupx.in" class="btn">Visit Live Portal</a>
+</div>
 
-    <div class="stage-block">
-      <div class="stage-hdr"><h2>Stage 3 — Chairman's Verdict</h2><div class="stage-line"></div></div>
-      <div class="chairman-card">
-        <div class="ch-hdr">
-          <div class="ch-icon">★</div>
-          <div><div class="ch-title">CHAIRMAN — FINAL ANSWER</div></div>
-          <div class="ch-model" id="ch-model-lbl">gemini-2.0-flash · Google AI Studio</div>
-        </div>
-        <div class="ch-body typing" id="r-chair">Awaiting council deliberations…</div>
-      </div>
-    </div>
-  </div>
-</main>
+<div class="card">
+<h3>LLM Council</h3>
+<p>
+A multi-AI reasoning system where different language models analyze
+complex questions together and produce structured collective responses.
+</p>
+<a href="https://ai.cupx.in" class="btn">Open LLM Council</a>
+</div>
+
+</div>
+</section>
+
+<footer>
+© 2026 CupX Corporation · All rights reserved
+</footer>
 
 <script>
-// ═══════════════════════════════════════════
-// CONFIRMED ACTIVE MODELS — March 2026
-// ═══════════════════════════════════════════
-const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
-
-// Gemini: try 2.0-flash first, fallback to 1.5-flash
-const GEMINI_MODELS = [
-  'gemini-2.0-flash',
-  'gemini-1.5-flash',
-  'gemini-1.5-flash-latest'
-];
-
-const MODELS = {
-  m1: 'llama-3.3-70b-versatile',          // confirmed active
-  m2: 'llama-3.1-8b-instant',             // confirmed active
-  m3: 'meta-llama/llama-4-scout-17b-16e-instruct'  // confirmed active
-};
-const COL = { m1:'#fb923c', m2:'#c084fc', m3:'#f472b6', chair:'#38bdf8' };
-
-const $   = id => document.getElementById(id);
-const delay = ms => new Promise(r => setTimeout(r, ms));
-
-function addLog(msg, type='info') {
-  const feed=$('log'), now=new Date();
-  const ts=`${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}.${String(now.getMilliseconds()).slice(0,2)}`;
-  const el=document.createElement('span');
-  el.className=`le ${type}`;
-  el.innerHTML=`<span class="ts">[${ts}]</span><span class="msg"> ${msg}</span>`;
-  feed.appendChild(el);
-  feed.scrollTop=feed.scrollHeight;
+function toggleMenu(){
+const overlay=document.getElementById("overlay");
+overlay.classList.toggle("active");
 }
-
-function switchTab(stage,id){
-  ['1','2','3'].forEach(x=>{
-    $(`${stage}-${x}`).classList.remove('on');
-    $(`t-${stage}-${x}`).classList.remove('on');
-  });
-  $(`${stage}-${id}`).classList.add('on');
-  $(`t-${stage}-${id}`).classList.add('on');
-}
-
-function setNode(id,cls,status=''){
-  const c=$('nc-'+id),s=$('ns-'+id);
-  if(c) c.className='f-circle '+cls;
-  if(s) s.textContent=status;
-}
-
-function arrOn(n){const a=$('arr'+n);a.classList.add('on');a.classList.remove('done');}
-function arrDone(n){const a=$('arr'+n);a.classList.remove('on');a.classList.add('done');}
-
-function stageBar(n,variant='active'){
-  for(let i=1;i<=3;i++){
-    const s=$('sb'+i);s.className='sb';
-    if(i<n) s.classList.add('done');
-    if(i===n) s.classList.add(variant);
-  }
-}
-
-function firePacket(fromId,toId,color){
-  const canvas=$('flow-canvas');
-  const cR=canvas.getBoundingClientRect();
-  const fR=$('nc-'+fromId).getBoundingClientRect();
-  const tR=$('nc-'+toId).getBoundingClientRect();
-  const sx=fR.left+fR.width/2-cR.left, sy=fR.top+fR.height/2-cR.top;
-  const ex=tR.left+tR.width/2-cR.left, ey=tR.top+tR.height/2-cR.top;
-  const p=document.createElement('div');
-  p.className='pkt';
-  p.style.cssText=`left:0;top:0;background:${color};box-shadow:0 0 10px ${color};--sx:${sx}px;--sy:${sy}px;--ex:${ex}px;--ey:${ey}px;`;
-  canvas.appendChild(p);
-  p.getBoundingClientRect();
-  p.classList.add('go');
-  setTimeout(()=>p.remove(),700);
-}
-function burst(from,to,color,n=3){for(let i=0;i<n;i++)setTimeout(()=>firePacket(from,to,color),i*200);}
-
-function typewrite(elId,text,spd=6){
-  return new Promise(res=>{
-    const el=$(elId);
-    el.classList.add('typing');
-    el.textContent='';
-    const clean=text.replace(/<think>[\s\S]*?<\/think>/gi,'').trim();
-    let i=0;
-    const iv=setInterval(()=>{
-      el.textContent+=clean[i++];
-      if(i>=clean.length){clearInterval(iv);el.classList.remove('typing');res();}
-    },spd);
-  });
-}
-
-async function groqCall(key,model,messages){
-  const r=await fetch(GROQ_URL,{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-    body:JSON.stringify({model,messages,max_tokens:600,temperature:0.7})
-  });
-  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'Groq error '+r.status);}
-  return (await r.json()).choices[0].message.content.trim();
-}
-
-// Try multiple Gemini models until one works
-async function geminiCall(key,prompt,modelIdx=0,attempt=1){
-  if(modelIdx>=GEMINI_MODELS.length) throw new Error('All Gemini models failed. Please check your Google AI Studio key.');
-  const model=GEMINI_MODELS[modelIdx];
-  const url=`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
-
-  const r=await fetch(url,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      contents:[{parts:[{text:prompt}]}],
-      generationConfig:{maxOutputTokens:900,temperature:0.5}
-    })
-  });
-
-  if(!r.ok){
-    const e=await r.json().catch(()=>({}));
-    const msg=e.error?.message||'error '+r.status;
-
-    // Rate limited — wait and retry same model
-    const retryMatch=msg.match(/retry in (\d+(?:\.\d+)?)s/i);
-    if(retryMatch && attempt<=3){
-      const waitSec=Math.ceil(parseFloat(retryMatch[1]))+1;
-      addLog(`⏳ ${model} rate limited — waiting ${waitSec}s (${attempt}/3)`,'retry');
-      setNode('chair','chair-wait',`wait ${waitSec}s`);
-      stageBar(3,'waiting');
-      await delay(waitSec*1000);
-      setNode('chair','chair-on','synthesizing…');
-      stageBar(3,'active');
-      return geminiCall(key,prompt,modelIdx,attempt+1);
-    }
-
-    // Model not found or quota — try next model
-    addLog(`⚠ ${model} unavailable — trying next…`,'warn');
-    return geminiCall(key,prompt,modelIdx+1,1);
-  }
-
-  const data=await r.json();
-  addLog(`✓ Chairman using ${model}`,'chair');
-  // Update UI label
-  $('ch-model-lbl').textContent=`${model} · Google AI Studio`;
-  return data.candidates[0].content.parts[0].text.trim();
-}
-
-async function safeGroq(key,model,messages){
-  try{return [await groqCall(key,model,messages),null];}
-  catch(e){return [null,e.message];}
-}
-
-async function startCouncil(){
-  const gKey=$('groq-key').value.trim();
-  const aiKey=$('google-key').value.trim();
-  const query=$('q').value.trim();
-  const errEl=$('err');
-  errEl.style.display='none';
-
-  if(!gKey){errEl.style.display='block';errEl.textContent='⚠ Enter your Groq API key.';return;}
-  if(!aiKey){errEl.style.display='block';errEl.textContent='⚠ Enter your Google AI Studio key.';return;}
-  if(!query){errEl.style.display='block';errEl.textContent='⚠ Ask a question first.';return;}
-
-  const btn=$('run-btn');
-  btn.disabled=true; btn.textContent='Convening…';
-
-  $('flow-section').style.display='block';
-  $('results-section').style.display='block';
-
-  $('log').innerHTML='';
-  ['user','m1','m2','m3','r1','r2','r3','chair'].forEach(id=>setNode(id,'',''));
-  ['r-m1','r-m2','r-m3','rv-1','rv-2','rv-3','r-chair'].forEach(id=>{
-    const el=$(id);el.classList.add('typing');el.textContent='Waiting…';
-  });
-  $('r-chair').textContent='Awaiting council deliberations…';
-  [1,2,3].forEach(n=>{$('arr'+n).className='f-arr';});
-  stageBar(0); switchTab('s1','1');
-
-  $('flow-section').scrollIntoView({behavior:'smooth',block:'start'});
-  await delay(500);
-
-  try{
-    /* ── STAGE 1 ── */
-    stageBar(1);
-    addLog('Council convened','info');
-    addLog(`Query: "${query.slice(0,55)}${query.length>55?'…':''}"`, 'send');
-
-    setNode('user','sending','sending…');
-    await delay(300);
-    arrOn(1);
-
-    burst('user','m1',COL.m1);
-    await delay(150);
-    burst('user','m2',COL.m2);
-    await delay(150);
-    burst('user','m3',COL.m3);
-    await delay(400);
-
-    setNode('user','done-ok','sent ✓');
-    setNode('m1','thinking','thinking…');
-    setNode('m2','thinking','thinking…');
-    setNode('m3','thinking','thinking…');
-    addLog('→ LLaMA 3.3 70B processing','send');
-    addLog('→ LLaMA 3.1 8B processing','send');
-    addLog('→ LLaMA 4 Scout processing','send');
-
-    const p1=[{role:'user',content:query}];
-    const [[r1,e1],[r2,e2],[r3,e3]]=await Promise.all([
-      safeGroq(gKey,MODELS.m1,p1),
-      safeGroq(gKey,MODELS.m2,p1),
-      safeGroq(gKey,MODELS.m3,p1)
-    ]);
-
-    if(e1){addLog(`✗ LLaMA 70B: ${e1.slice(0,80)}`,'err');setNode('m1','done-err','error ✗');}
-    else{addLog(`← LLaMA 70B responded (${r1.split(' ').length}w)`,'recv');setNode('m1','done-ok','done ✓');burst('m1','user',COL.m1,2);}
-
-    if(e2){addLog(`✗ LLaMA 8B: ${e2.slice(0,80)}`,'err');setNode('m2','done-err','error ✗');}
-    else{addLog(`← LLaMA 8B responded (${r2.split(' ').length}w)`,'recv');setNode('m2','done-ok','done ✓');burst('m2','user',COL.m2,2);}
-
-    if(e3){addLog(`✗ LLaMA 4 Scout: ${e3.slice(0,80)}`,'err');setNode('m3','done-err','error ✗');}
-    else{addLog(`← LLaMA 4 Scout responded (${r3.split(' ').length}w)`,'recv');setNode('m3','done-ok','done ✓');burst('m3','user',COL.m3,2);}
-
-    await delay(300);
-    arrDone(1);
-    if(e1&&e2&&e3) throw new Error('All three council models failed. Check your Groq API key at console.groq.com');
-
-    await Promise.all([
-      typewrite('r-m1',r1||`⚠ Unavailable: ${e1}`,5),
-      typewrite('r-m2',r2||`⚠ Unavailable: ${e2}`,5),
-      typewrite('r-m3',r3||`⚠ Unavailable: ${e3}`,5)
-    ]);
-
-    /* ── STAGE 2 ── */
-    stageBar(2);
-    addLog('Stage 2: peer review initiated','info');
-    arrOn(2);
-    burst('m1','r1',COL.m1); await delay(140);
-    burst('m2','r2',COL.m2); await delay(140);
-    burst('m3','r3',COL.m3); await delay(400);
-    setNode('r1','reviewing','reviewing…');
-    setNode('r2','reviewing','reviewing…');
-    setNode('r3','reviewing','reviewing…');
-    addLog('→ Models cross-reviewing each other','send');
-
-    const rp=(name,a,aN,b,bN)=>
-      `The user asked: "${query}"\n\nTwo other AI models responded:\n\n${aN}:\n${a||'[unavailable]'}\n\n${bN}:\n${b||'[unavailable]'}\n\nAs ${name}, critically compare both. Which is stronger and why? What is each missing? Be direct. Max 100 words.`;
-
-    const [[rv1,rve1],[rv2,rve2],[rv3,rve3]]=await Promise.all([
-      safeGroq(gKey,MODELS.m1,[{role:'user',content:rp('LLaMA 3.3 70B',r2,'LLaMA 3.1 8B',r3,'LLaMA 4 Scout')}]),
-      safeGroq(gKey,MODELS.m2,[{role:'user',content:rp('LLaMA 3.1 8B',r1,'LLaMA 3.3 70B',r3,'LLaMA 4 Scout')}]),
-      safeGroq(gKey,MODELS.m3,[{role:'user',content:rp('LLaMA 4 Scout',r1,'LLaMA 3.3 70B',r2,'LLaMA 3.1 8B')}])
-    ]);
-
-    if(!rve1){addLog(`← LLaMA 70B review (${rv1.split(' ').length}w)`,'recv');setNode('r1','done-ok','done ✓');burst('r1','chair',COL.m1,2);}
-    else{addLog('✗ LLaMA 70B review failed','warn');setNode('r1','done-err','error ✗');}
-    if(!rve2){addLog(`← LLaMA 8B review (${rv2.split(' ').length}w)`,'recv');setNode('r2','done-ok','done ✓');burst('r2','chair',COL.m2,2);}
-    else{addLog('✗ LLaMA 8B review failed','warn');setNode('r2','done-err','error ✗');}
-    if(!rve3){addLog(`← LLaMA 4 Scout review (${rv3.split(' ').length}w)`,'recv');setNode('r3','done-ok','done ✓');burst('r3','chair',COL.m3,2);}
-    else{addLog('✗ LLaMA 4 Scout review failed','warn');setNode('r3','done-err','error ✗');}
-
-    await delay(300);
-    arrDone(2);
-    await Promise.all([
-      typewrite('rv-1',rv1||'⚠ Review unavailable',6),
-      typewrite('rv-2',rv2||'⚠ Review unavailable',6),
-      typewrite('rv-3',rv3||'⚠ Review unavailable',6)
-    ]);
-
-    /* ── STAGE 3 ── */
-    stageBar(3);
-    addLog('Stage 3: Chairman synthesizing…','chair');
-    arrOn(3);
-    setNode('chair','chair-on','synthesizing…');
-
-    const chairPrompt=`You are the Chairman of an AI Council. The user asked:\n"${query}"\n\nThree council members gave their opinions:\n\nLLaMA 3.3 70B:\n${r1||'[unavailable]'}\n\nLLaMA 3.1 8B:\n${r2||'[unavailable]'}\n\nLLaMA 4 Scout:\n${r3||'[unavailable]'}\n\nPeer reviews:\nLLaMA 70B on others: ${rv1||'[unavailable]'}\nLLaMA 8B on others: ${rv2||'[unavailable]'}\nScout on others: ${rv3||'[unavailable]'}\n\nSynthesize the strongest insights into one clear, authoritative final answer. Be direct and comprehensive.`;
-
-    const chairResp=await geminiCall(aiKey,chairPrompt);
-    addLog(`← Chairman verdict (${chairResp.split(' ').length}w)`,'chair');
-    arrDone(3);
-    setNode('chair','chair-done','verdict ★');
-    burst('chair','user',COL.chair,3);
-    await delay(300);
-    setNode('user','chair-done','received ★');
-
-    await typewrite('r-chair',chairResp,8);
-    $('r-chair').classList.remove('typing');
-    for(let i=1;i<=3;i++) $('sb'+i).className='sb done';
-    addLog('Session complete.','info');
-
-  }catch(e){
-    $('err').style.display='block';
-    $('err').textContent='⚠ '+e.message;
-    addLog('ERROR: '+e.message,'err');
-  }
-
-  btn.disabled=false; btn.textContent='Convene Council';
-}
-
-$('q').addEventListener('keydown',e=>{
-  if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)) startCouncil();
-});
 </script>
+
 </body>
 </html>
