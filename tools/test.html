@@ -1,362 +1,1005 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Question Paper Maker | CupX Corporation</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <meta name="description" content="Create professional question papers with MCQ and subjective questions. Export to PDF or DOCX.">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-<title>Attendance System | CupX Corporation</title>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: #0f172a;
+      color: #e5e7eb;
+      min-height: 100vh;
+    }
 
-<meta name="description" content="Professional attendance system built by CupX Corporation." />
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background-color: #020617;
+      border-bottom: 1px solid #1e293b;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    header h1 { font-size: 20px; color: #38bdf8; }
+    header a { color: #38bdf8; text-decoration: none; font-size: 14px; }
+    header a:hover { text-decoration: underline; }
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    .workspace {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      height: calc(100vh - 57px);
+    }
 
-<style>
-body {
-  margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  background-color: #0f172a;
-  color: #e5e7eb;
-}
+    /* ── LEFT PANEL ── */
+    .left-panel {
+      background: #0f172a;
+      overflow-y: auto;
+      padding: 24px;
+      border-right: 2px solid #1e293b;
+    }
 
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  background-color: #020617;
-}
+    .section-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #38bdf8;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #1e293b;
+    }
 
-header h1 {
-  margin: 0;
-  font-size: 22px;
-}
+    .field-group {
+      margin-bottom: 18px;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      color: #94a3b8;
+      margin-bottom: 5px;
+    }
+    input[type="text"], input[type="number"], select, textarea {
+      width: 100%;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      color: #e5e7eb;
+      font-size: 14px;
+      padding: 8px 10px;
+      outline: none;
+      transition: border-color 0.2s;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    input:focus, select:focus, textarea:focus { border-color: #38bdf8; }
 
-header a {
-  color: #38bdf8;
-  text-decoration: none;
-  font-size: 14px;
-}
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
 
-main {
-  max-width: 1100px;
-  margin: auto;
-  padding: 60px 20px;
-}
+    .toggle-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .toggle-btn {
+      padding: 7px 16px;
+      border-radius: 20px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    .toggle-btn.active {
+      background: #38bdf8;
+      color: #020617;
+      border-color: #38bdf8;
+      font-weight: bold;
+    }
 
-h2 {
-  text-align: center;
-  font-size: 32px;
-  margin-bottom: 10px;
-}
+    .divider {
+      border: none;
+      border-top: 1px solid #1e293b;
+      margin: 20px 0;
+    }
 
-p.subtitle {
-  text-align: center;
-  opacity: 0.85;
-  margin-bottom: 30px;
-}
+    /* Questions */
+    .question-block {
+      background: #1e293b;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 14px;
+      border-left: 3px solid #334155;
+      position: relative;
+    }
+    .question-block.mcq-block { border-left-color: #38bdf8; }
+    .question-block.sub-block { border-left-color: #a78bfa; }
 
-.form-box {
-  background-color: #020617;
-  padding: 25px;
-  border-radius: 10px;
-  margin-bottom: 30px;
-}
+    .q-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .q-label {
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .q-label.mcq { color: #38bdf8; }
+    .q-label.sub { color: #a78bfa; }
 
-input, select, button {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 12px;
-  border-radius: 5px;
-  border: none;
-  font-size: 14px;
-  box-sizing: border-box;
-}
+    .q-actions { display: flex; gap: 6px; }
+    .q-actions button {
+      background: none;
+      border: 1px solid #334155;
+      border-radius: 4px;
+      color: #94a3b8;
+      cursor: pointer;
+      padding: 3px 8px;
+      font-size: 12px;
+    }
+    .q-actions button:hover { border-color: #ef4444; color: #ef4444; }
+    .q-actions button.move:hover { border-color: #38bdf8; color: #38bdf8; }
 
-button {
-  background: #38bdf8;
-  color: #020617;
-  font-weight: bold;
-  cursor: pointer;
-}
+    .option-row { display: grid; gap: 8px; margin-top: 8px; }
+    .option-row.cols-2 { grid-template-columns: 1fr 1fr; }
+    .option-row.cols-1 { grid-template-columns: 1fr; }
 
-.action-row {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-}
+    .option-input {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .option-label {
+      font-size: 12px;
+      font-weight: bold;
+      color: #38bdf8;
+      min-width: 22px;
+    }
 
-.action-row button {
-  flex: 1;
-}
+    /* Add question bar */
+    .add-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .add-bar select { flex: 1; min-width: 100px; }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background-color: #020617;
-  border-radius: 10px;
-  overflow: hidden;
-}
+    .btn {
+      padding: 9px 18px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn-primary { background: #38bdf8; color: #020617; }
+    .btn-secondary { background: #1e293b; color: #e5e7eb; border: 1px solid #334155; }
+    .btn-purple { background: #a78bfa; color: #020617; }
+    .btn-green { background: #22c55e; color: #020617; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-sm { padding: 6px 12px; font-size: 13px; }
 
-th, td {
-  padding: 10px;
-  border-bottom: 1px solid #1e293b;
-  text-align: left;
-  font-size: 14px;
-}
+    .export-bar {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
 
-th {
-  background: #1e40af;
-  color: white;
-}
+    .info-box {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 14px;
+    }
+    .info-box span { color: #38bdf8; }
 
-.present { color: #22c55e; font-weight: bold; }
-.absent { color: #ef4444; font-weight: bold; }
+    /* Option count sticky note */
+    .sticky-note {
+      background: #1e3a5f;
+      border: 1px solid #38bdf8;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #7dd3fc;
+      margin-bottom: 12px;
+      display: none;
+    }
+    .sticky-note.show { display: block; }
 
-footer {
-  text-align: center;
-  padding: 20px;
-  font-size: 13px;
-  background-color: #020617;
-  opacity: 0.8;
-  margin-top: 40px;
-}
-</style>
+    /* ── RIGHT PANEL (PREVIEW) ── */
+    .right-panel {
+      background: #f8f8f8;
+      overflow-y: auto;
+      padding: 0;
+    }
+
+    .preview-toolbar {
+      background: #1e293b;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid #0f172a;
+      font-size: 13px;
+      color: #94a3b8;
+    }
+    .preview-toolbar span { color: #22c55e; font-weight: bold; }
+
+    .paper-page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 20px auto;
+      background: white;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      font-family: 'Times New Roman', Times, serif;
+      color: #000;
+      padding: 15mm 18mm 15mm 18mm;
+      position: relative;
+    }
+
+    .paper-header {
+      text-align: center;
+      border-bottom: 2px solid #000;
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+    }
+    .paper-header .inst-name {
+      font-size: 20pt;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .paper-header .inst-sub { font-size: 11pt; }
+    .paper-header .exam-info { font-size: 10pt; margin-top: 6px; }
+
+    .paper-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      font-size: 10pt;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #000;
+      padding-bottom: 8px;
+    }
+    .paper-meta .left { text-align: left; }
+    .paper-meta .right { text-align: right; }
+
+    .paper-instructions {
+      font-size: 9pt;
+      margin-bottom: 12px;
+      border: 1px solid #000;
+      padding: 6px 10px;
+    }
+    .paper-instructions b { font-size: 10pt; }
+
+    .section-header-paper {
+      font-size: 12pt;
+      font-weight: bold;
+      text-align: center;
+      text-decoration: underline;
+      margin: 14px 0 8px;
+    }
+
+    .paper-question {
+      font-size: 10.5pt;
+      margin-bottom: 10px;
+      line-height: 1.6;
+    }
+    .paper-question .q-num { font-weight: bold; }
+
+    .paper-options {
+      display: grid;
+      margin: 5px 0 0 20px;
+      font-size: 10pt;
+    }
+    .paper-options.grid-2 { grid-template-columns: 1fr 1fr; }
+    .paper-options.grid-1 { grid-template-columns: 1fr; }
+
+    .paper-option { padding: 2px 0; }
+
+    .paper-footer {
+      position: relative;
+      text-align: center;
+      font-size: 9pt;
+      border-top: 1px solid #000;
+      padding-top: 6px;
+      margin-top: 20px;
+      color: #333;
+    }
+
+    .answer-line {
+      border-bottom: 1px dotted #999;
+      min-height: 22px;
+      margin-top: 4px;
+      margin-bottom: 2px;
+    }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #020617; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+
+    @media (max-width: 900px) {
+      .workspace { grid-template-columns: 1fr; height: auto; }
+      .right-panel { display: none; }
+      .paper-page { width: 100%; margin: 10px; padding: 10mm; }
+    }
+  </style>
 </head>
-
 <body>
 
 <header>
-  <h1>Attendance System</h1>
-  <a href="/tools/">← Back to Tools</a>
+  <h1>📄 Question Paper Maker</h1>
+  <a href="../">← Back to Tools</a>
 </header>
 
-<main>
+<div class="workspace">
 
-<h2>CupX Attendance System</h2>
-<p class="subtitle">Professional Attendance Record Tool</p>
+  <!-- ════════════════ LEFT PANEL ════════════════ -->
+  <div class="left-panel" id="leftPanel">
 
-<div class="form-box">
-  <input type="text" id="attendanceTitle" placeholder="Attendance Title (Max 40 characters)">
-  <input type="text" id="name" placeholder="Student Name">
-  <input type="text" id="roll" placeholder="Roll Number">
+    <!-- STEP 1: HEADER INFO -->
+    <div class="section-title">① Paper Header</div>
 
-  <select id="status">
-    <option value="Present">Present</option>
-    <option value="Absent">Absent</option>
-  </select>
+    <div class="field-group">
+      <label>Institution / College Name</label>
+      <input type="text" id="instName" placeholder="e.g. Harvard University" oninput="renderPreview()">
+    </div>
+    <div class="field-group">
+      <label>Address / Location</label>
+      <input type="text" id="instAddr" placeholder="e.g. Cambridge, MA, USA" oninput="renderPreview()">
+    </div>
+    <div class="row-2">
+      <div class="field-group">
+        <label>Examination / Term</label>
+        <input type="text" id="examName" placeholder="e.g. Mid-Term Exam" oninput="renderPreview()">
+      </div>
+      <div class="field-group">
+        <label>Exam Date</label>
+        <input type="text" id="examDate" placeholder="e.g. 09/03/2026" oninput="renderPreview()">
+      </div>
+    </div>
+    <div class="row-2">
+      <div class="field-group">
+        <label>Subject / Course</label>
+        <input type="text" id="subject" placeholder="e.g. Computer Science" oninput="renderPreview()">
+      </div>
+      <div class="field-group">
+        <label>Subject Code</label>
+        <input type="text" id="subjectCode" placeholder="e.g. CS-101" oninput="renderPreview()">
+      </div>
+    </div>
+    <div class="row-3">
+      <div class="field-group">
+        <label>Class / Batch</label>
+        <input type="text" id="classBatch" placeholder="e.g. 2023-24" oninput="renderPreview()">
+      </div>
+      <div class="field-group">
+        <label>Max Marks</label>
+        <input type="number" id="maxMarks" placeholder="100" oninput="renderPreview()">
+      </div>
+      <div class="field-group">
+        <label>Duration</label>
+        <input type="text" id="duration" placeholder="3 Hours" oninput="renderPreview()">
+      </div>
+    </div>
+    <div class="field-group">
+      <label>General Instructions (one per line)</label>
+      <textarea id="instructions" rows="3" placeholder="All questions are compulsory.&#10;Attempt MCQs first.&#10;Write neatly." oninput="renderPreview()"></textarea>
+    </div>
 
-  <button onclick="addAttendance()">Add Record</button>
+    <hr class="divider">
+
+    <!-- STEP 2: PAPER TYPE -->
+    <div class="section-title">② Paper Type</div>
+    <div class="toggle-group" id="paperTypeGroup">
+      <button class="toggle-btn active" onclick="setPaperType('mcq')">MCQ Only</button>
+      <button class="toggle-btn" onclick="setPaperType('sub')">Subjective Only</button>
+      <button class="toggle-btn" onclick="setPaperType('both')">Both (MCQ + Subjective)</button>
+    </div>
+
+    <hr class="divider">
+
+    <!-- STEP 3: MCQ SETTINGS (shown when mcq or both) -->
+    <div id="mcqSettings">
+      <div class="section-title">③ MCQ Settings</div>
+      <div class="sticky-note show" id="optionFixNote">
+        💡 The number of options you set for the <b>first MCQ</b> will be locked for all MCQs.
+      </div>
+      <div class="row-2">
+        <div class="field-group">
+          <label>Options per MCQ</label>
+          <select id="globalOptionCount" onchange="updateOptionCount()">
+            <option value="2">2 Options (A, B)</option>
+            <option value="3">3 Options (A, B, C)</option>
+            <option value="4" selected>4 Options (A, B, C, D)</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Options Layout</label>
+          <select id="optionLayout" onchange="renderPreview()">
+            <option value="2">2 per line (A B / C D)</option>
+            <option value="1">1 per line (A / B / C / D)</option>
+            <option value="4">All in one line</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-group">
+        <label>MCQ Section Heading</label>
+        <input type="text" id="mcqHeading" value="Section A: Multiple Choice Questions" oninput="renderPreview()">
+      </div>
+      <div class="field-group">
+        <label>Marks per MCQ</label>
+        <input type="number" id="marksPerMcq" value="1" min="0.5" step="0.5" oninput="renderPreview()">
+      </div>
+    </div>
+
+    <!-- STEP 4: SUBJECTIVE SETTINGS -->
+    <div id="subSettings" style="display:none;">
+      <div class="section-title" id="subSectionNum">③ Subjective Settings</div>
+      <div class="field-group">
+        <label>Subjective Section Heading</label>
+        <input type="text" id="subHeading" value="Section B: Subjective Questions" oninput="renderPreview()">
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- STEP 5: QUESTIONS -->
+    <div class="section-title" id="questionsTitle">④ Add Questions</div>
+
+    <div class="info-box" id="questionStats">
+      Questions: <span id="statTotal">0</span> &nbsp;|&nbsp;
+      MCQ: <span id="statMcq">0</span> &nbsp;|&nbsp;
+      Subjective: <span id="statSub">0</span>
+    </div>
+
+    <div class="add-bar">
+      <select id="addQType">
+        <option value="mcq">MCQ</option>
+        <option value="sub">Subjective</option>
+      </select>
+      <button class="btn btn-primary btn-sm" onclick="addQuestion()">+ Add Question</button>
+    </div>
+
+    <div id="questionsContainer"></div>
+
+    <hr class="divider">
+
+    <!-- EXPORT -->
+    <div class="section-title">⑤ Export</div>
+    <div class="export-bar">
+      <button class="btn btn-green" onclick="exportPDF()">⬇ Export PDF</button>
+      <button class="btn btn-purple" onclick="exportDOCX()">⬇ Export DOCX</button>
+      <button class="btn btn-secondary btn-sm" onclick="clearAll()">🗑 Clear All</button>
+    </div>
+    <p style="font-size:11px; color:#64748b; margin-top:8px;">PDF renders the exact preview. DOCX is editable in MS Word.</p>
+    <br>
+
+  </div>
+
+  <!-- ════════════════ RIGHT PANEL (LIVE PREVIEW) ════════════════ -->
+  <div class="right-panel">
+    <div class="preview-toolbar">
+      <span>● LIVE</span> Preview updates as you type
+    </div>
+    <div id="previewContainer">
+      <div class="paper-page" id="paperPreview">
+        <div style="text-align:center; color:#999; margin-top: 80px; font-family: Arial;">
+          Start filling the form on the left to see your paper here...
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
-
-<div class="action-row">
-  <button onclick="exportExcel()">Export Excel</button>
-  <button onclick="exportPDF()">Export PDF</button>
-  <button onclick="clearAll()">Clear All</button>
-</div>
-
-<table>
-<thead>
-<tr>
-<th>Sr. No</th>
-<th>Name</th>
-<th>Roll</th>
-<th>Status</th>
-<th>Date</th>
-</tr>
-</thead>
-<tbody id="records"></tbody>
-</table>
-
-</main>
-
-<footer>
-© 2026 CupX Corporation · All rights reserved
-</footer>
 
 <script>
-let records = JSON.parse(localStorage.getItem("attendance")) || [];
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+let paperType = 'mcq';
+let questions = [];
+let globalOptions = 4;
+let optionLocked = false;
+let qIdCounter = 0;
 
-function render() {
-  const table = document.getElementById("records");
-  table.innerHTML = "";
+const ALPHA = ['A','B','C','D','E','F'];
 
-  records.forEach((r, index) => {
-    table.innerHTML += `
-      <tr>
-        <td>${index + 1}</td>
-        <td>${escapeHTML(r.name)}</td>
-        <td>${escapeHTML(r.roll)}</td>
-        <td class="${r.status === 'Present' ? 'present' : 'absent'}">
-          ${r.status}
-        </td>
-        <td>${r.date}</td>
-      </tr>
-    `;
+// ══════════════════════════════════════════════
+// PAPER TYPE
+// ══════════════════════════════════════════════
+function setPaperType(type) {
+  paperType = type;
+  document.querySelectorAll('#paperTypeGroup .toggle-btn').forEach((b,i) => {
+    b.classList.toggle('active', ['mcq','sub','both'][i] === type);
   });
-}
 
-function addAttendance() {
-  const title = document.getElementById("attendanceTitle").value.trim().slice(0,40);
-  const name = document.getElementById("name").value.trim();
-  const roll = document.getElementById("roll").value.trim();
-  const status = document.getElementById("status").value;
+  const mcqS = document.getElementById('mcqSettings');
+  const subS = document.getElementById('subSettings');
+  const addQType = document.getElementById('addQType');
 
-  if (!name || !roll) {
-    alert("Please fill all fields");
-    return;
+  if (type === 'mcq') {
+    mcqS.style.display = '';
+    subS.style.display = 'none';
+    addQType.innerHTML = '<option value="mcq">MCQ</option>';
+    document.getElementById('subSectionNum').textContent = '③ Subjective Settings';
+  } else if (type === 'sub') {
+    mcqS.style.display = 'none';
+    subS.style.display = '';
+    addQType.innerHTML = '<option value="sub">Subjective</option>';
+    document.getElementById('subSectionNum').textContent = '③ Subjective Settings';
+  } else {
+    mcqS.style.display = '';
+    subS.style.display = '';
+    addQType.innerHTML = '<option value="mcq">MCQ</option><option value="sub">Subjective</option>';
+    document.getElementById('subSectionNum').textContent = '④ Subjective Settings';
+    document.getElementById('questionsTitle').textContent = '⑤ Add Questions';
   }
 
-  const record = {
-    title,
-    name,
-    roll,
-    status,
-    date: new Date().toLocaleDateString()
+  renderPreview();
+}
+
+// ══════════════════════════════════════════════
+// OPTIONS
+// ══════════════════════════════════════════════
+function updateOptionCount() {
+  if (optionLocked) {
+    alert('Option count is locked because you already have MCQs. To change, remove all MCQ questions first.');
+    document.getElementById('globalOptionCount').value = globalOptions;
+    return;
+  }
+  globalOptions = parseInt(document.getElementById('globalOptionCount').value);
+  renderPreview();
+}
+
+// ══════════════════════════════════════════════
+// ADD QUESTION
+// ══════════════════════════════════════════════
+function addQuestion() {
+  const type = document.getElementById('addQType').value;
+  const id = ++qIdCounter;
+  const q = {
+    id,
+    type,
+    text: '',
+    options: type === 'mcq' ? Array(globalOptions).fill('') : [],
+    marks: type === 'mcq' ? parseFloat(document.getElementById('marksPerMcq').value) || 1 : 5,
+    lines: 3
   };
 
-  records.push(record);
-  localStorage.setItem("attendance", JSON.stringify(records));
+  if (type === 'mcq') {
+    optionLocked = true;
+    document.getElementById('globalOptionCount').disabled = true;
+  }
 
-  document.getElementById("name").value = "";
-  document.getElementById("roll").value = "";
+  questions.push(q);
+  renderQuestions();
+  renderPreview();
+}
 
-  render();
+function removeQuestion(id) {
+  questions = questions.filter(q => q.id !== id);
+  const hasMcq = questions.some(q => q.type === 'mcq');
+  if (!hasMcq) {
+    optionLocked = false;
+    document.getElementById('globalOptionCount').disabled = false;
+  }
+  renderQuestions();
+  renderPreview();
+}
+
+function moveQuestion(id, dir) {
+  const idx = questions.findIndex(q => q.id === id);
+  if (dir === 'up' && idx > 0) {
+    [questions[idx-1], questions[idx]] = [questions[idx], questions[idx-1]];
+  } else if (dir === 'down' && idx < questions.length - 1) {
+    [questions[idx+1], questions[idx]] = [questions[idx], questions[idx+1]];
+  }
+  renderQuestions();
+  renderPreview();
+}
+
+function updateQuestion(id, field, value) {
+  const q = questions.find(q => q.id === id);
+  if (!q) return;
+  if (field === 'text') q.text = value;
+  else if (field === 'marks') q.marks = parseFloat(value) || 0;
+  else if (field === 'lines') q.lines = parseInt(value) || 3;
+  else if (field.startsWith('opt')) {
+    const i = parseInt(field.replace('opt',''));
+    q.options[i] = value;
+  }
+  renderPreview();
+}
+
+// ══════════════════════════════════════════════
+// RENDER QUESTION BUILDER
+// ══════════════════════════════════════════════
+function renderQuestions() {
+  const container = document.getElementById('questionsContainer');
+  const mcqCount = questions.filter(q => q.type === 'mcq').length;
+  const subCount = questions.filter(q => q.type === 'sub').length;
+
+  document.getElementById('statTotal').textContent = questions.length;
+  document.getElementById('statMcq').textContent = mcqCount;
+  document.getElementById('statSub').textContent = subCount;
+
+  let mcqNum = 0, subNum = 0;
+
+  container.innerHTML = questions.map((q, idx) => {
+    const num = q.type === 'mcq' ? ++mcqNum : ++subNum;
+    const label = q.type === 'mcq' ? `MCQ #${num}` : `Subjective #${num}`;
+    const cls = q.type === 'mcq' ? 'mcq-block' : 'sub-block';
+    const labelCls = q.type === 'mcq' ? 'mcq' : 'sub';
+
+    let optionsHTML = '';
+    if (q.type === 'mcq') {
+      const opts = q.options.map((opt, i) => `
+        <div class="option-input">
+          <span class="option-label">${ALPHA[i]}.</span>
+          <input type="text" value="${escHtml(opt)}" placeholder="Option ${ALPHA[i]}"
+            oninput="updateQuestion(${q.id},'opt${i}',this.value)">
+        </div>`).join('');
+      const cols = globalOptions <= 2 ? 'cols-1' : 'cols-2';
+      optionsHTML = `<div class="option-row ${cols}">${opts}</div>`;
+    } else {
+      optionsHTML = `
+        <div class="row-2" style="margin-top:8px;">
+          <div class="field-group" style="margin:0">
+            <label>Marks</label>
+            <input type="number" value="${q.marks}" min="1" step="1"
+              oninput="updateQuestion(${q.id},'marks',this.value)">
+          </div>
+          <div class="field-group" style="margin:0">
+            <label>Answer Lines</label>
+            <input type="number" value="${q.lines}" min="1" max="20"
+              oninput="updateQuestion(${q.id},'lines',this.value)">
+          </div>
+        </div>`;
+    }
+
+    return `
+      <div class="question-block ${cls}" id="qblock_${q.id}">
+        <div class="q-header">
+          <span class="q-label ${labelCls}">${label}</span>
+          <div class="q-actions">
+            <button class="move" onclick="moveQuestion(${q.id},'up')" title="Move Up">↑</button>
+            <button class="move" onclick="moveQuestion(${q.id},'down')" title="Move Down">↓</button>
+            <button onclick="removeQuestion(${q.id})" title="Delete">✕</button>
+          </div>
+        </div>
+        <textarea rows="2" placeholder="Type question ${num} here..."
+          oninput="updateQuestion(${q.id},'text',this.value)">${escHtml(q.text)}</textarea>
+        ${optionsHTML}
+      </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+// RENDER PREVIEW
+// ══════════════════════════════════════════════
+function renderPreview() {
+  const instName = v('instName') || 'Institution Name';
+  const instAddr = v('instAddr') || '';
+  const examName = v('examName') || 'Examination';
+  const examDate = v('examDate') || '';
+  const subject = v('subject') || 'Subject';
+  const subCode = v('subjectCode') || '';
+  const classBatch = v('classBatch') || '';
+  const maxMarks = v('maxMarks') || '';
+  const duration = v('duration') || '';
+  const instrRaw = v('instructions') || '';
+  const instructions = instrRaw.split('\n').filter(l => l.trim());
+
+  const optLayout = parseInt(v('optionLayout') || '2');
+  const mcqHead = v('mcqHeading') || 'Section A: Multiple Choice Questions';
+  const subHead = v('subHeading') || 'Section B: Subjective Questions';
+  const marksPerMcq = parseFloat(v('marksPerMcq') || '1');
+
+  // Instructions HTML
+  let instrHTML = '';
+  if (instructions.length) {
+    instrHTML = `<div class="paper-instructions">
+      <b>General Instructions:</b>
+      <ol style="margin:4px 0 0 18px; padding:0;">
+        ${instructions.map(l => `<li>${l}</li>`).join('')}
+      </ol>
+    </div>`;
+  }
+
+  // MCQ section
+  let mcqSection = '';
+  const mcqs = questions.filter(q => q.type === 'mcq');
+  if ((paperType === 'mcq' || paperType === 'both') && mcqs.length) {
+    const mcqMarksTotal = (mcqs.length * marksPerMcq).toFixed(1);
+    const qHTML = mcqs.map((q, i) => {
+      let optHTML = '';
+      const opts = q.options.map((o, oi) => `<div class="paper-option"><b>${ALPHA[oi]}.</b> ${escHtml(o) || '___________'}</div>`);
+
+      let gridClass = 'grid-2';
+      if (optLayout === 1) gridClass = 'grid-1';
+      else if (optLayout === 4) gridClass = `grid-${Math.min(4, q.options.length)}`;
+      else gridClass = q.options.length <= 2 ? 'grid-1' : 'grid-2';
+
+      optHTML = `<div class="paper-options ${gridClass}">${opts.join('')}</div>`;
+
+      return `<div class="paper-question">
+        <span class="q-num">Q${i+1}.</span> ${escHtml(q.text) || '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'}
+        ${optHTML}
+      </div>`;
+    }).join('');
+
+    mcqSection = `
+      <div class="section-header-paper">${escHtml(mcqHead)} <small style="font-weight:normal;">[${mcqMarksTotal} Marks]</small></div>
+      ${qHTML}`;
+  }
+
+  // Subjective section
+  let subSection = '';
+  const subs = questions.filter(q => q.type === 'sub');
+  if ((paperType === 'sub' || paperType === 'both') && subs.length) {
+    const subMarksTotal = subs.reduce((a, q) => a + q.marks, 0);
+    let startNum = (paperType === 'both') ? mcqs.length + 1 : 1;
+    const qHTML = subs.map((q, i) => {
+      const lines = Array(q.lines).fill('<div class="answer-line"></div>').join('');
+      return `<div class="paper-question">
+        <span class="q-num">Q${startNum + i}.</span> ${escHtml(q.text) || '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'}
+        <span style="float:right; font-size:9pt;">[${q.marks} Marks]</span>
+        ${lines}
+      </div>`;
+    }).join('');
+
+    subSection = `
+      <div class="section-header-paper">${escHtml(subHead)} <small style="font-weight:normal;">[${subMarksTotal} Marks]</small></div>
+      ${qHTML}`;
+  }
+
+  const preview = document.getElementById('paperPreview');
+  preview.innerHTML = `
+    <div class="paper-header">
+      <div class="inst-name">${escHtml(instName)}</div>
+      ${instAddr ? `<div class="inst-sub">${escHtml(instAddr)}</div>` : ''}
+      <div class="exam-info"><b>${escHtml(examName)}</b>${examDate ? ' &nbsp;|&nbsp; Date: '+escHtml(examDate) : ''}</div>
+    </div>
+
+    <div class="paper-meta">
+      <div class="left">
+        ${subject ? `<b>Subject:</b> ${escHtml(subject)}${subCode ? ' (' + escHtml(subCode) + ')' : ''}<br>` : ''}
+        ${classBatch ? `<b>Class/Batch:</b> ${escHtml(classBatch)}<br>` : ''}
+        <b>Name:</b> ________________________________
+      </div>
+      <div class="right">
+        ${maxMarks ? `<b>Max Marks:</b> ${escHtml(maxMarks)}<br>` : ''}
+        ${duration ? `<b>Duration:</b> ${escHtml(duration)}<br>` : ''}
+        <b>Roll No.:</b> _______________
+      </div>
+    </div>
+
+    ${instrHTML}
+    ${mcqSection}
+    ${subSection}
+
+    <div class="paper-footer">
+      ✦ &nbsp; All the Best &nbsp; ✦ &nbsp;&nbsp; CupX Corporation · cupx.in
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════════
+// EXPORT PDF
+// ══════════════════════════════════════════════
+function exportPDF() {
+  const printContent = document.getElementById('paperPreview').outerHTML;
+  const instName = v('instName') || 'Question Paper';
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head>
+    <meta charset="UTF-8">
+    <title>${instName}</title>
+    <style>
+      body { margin: 0; font-family: 'Times New Roman', Times, serif; background: white; }
+      .paper-page {
+        width: 210mm;
+        min-height: 297mm;
+        margin: 0 auto;
+        background: white;
+        font-family: 'Times New Roman', Times, serif;
+        color: #000;
+        padding: 15mm 18mm 15mm 18mm;
+      }
+      .paper-header { text-align:center; border-bottom:2px solid #000; padding-bottom:10px; margin-bottom:14px; }
+      .paper-header .inst-name { font-size:20pt; font-weight:bold; text-transform:uppercase; }
+      .paper-header .inst-sub { font-size:11pt; }
+      .paper-header .exam-info { font-size:10pt; margin-top:6px; }
+      .paper-meta { display:grid; grid-template-columns:1fr 1fr; font-size:10pt; margin-bottom:10px; border-bottom:1px solid #000; padding-bottom:8px; }
+      .paper-meta .left { text-align:left; }
+      .paper-meta .right { text-align:right; }
+      .paper-instructions { font-size:9pt; margin-bottom:12px; border:1px solid #000; padding:6px 10px; }
+      .section-header-paper { font-size:12pt; font-weight:bold; text-align:center; text-decoration:underline; margin:14px 0 8px; }
+      .paper-question { font-size:10.5pt; margin-bottom:10px; line-height:1.6; }
+      .paper-question .q-num { font-weight:bold; }
+      .paper-options { display:grid; margin:5px 0 0 20px; font-size:10pt; }
+      .paper-options.grid-2 { grid-template-columns:1fr 1fr; }
+      .paper-options.grid-1 { grid-template-columns:1fr; }
+      .paper-options.grid-4 { grid-template-columns:1fr 1fr 1fr 1fr; }
+      .paper-option { padding:2px 0; }
+      .answer-line { border-bottom:1px dotted #999; min-height:22px; margin-top:4px; margin-bottom:2px; }
+      .paper-footer { text-align:center; font-size:9pt; border-top:1px solid #000; padding-top:6px; margin-top:20px; color:#333; }
+      @media print {
+        @page { size: A4; margin: 0; }
+        body { margin: 0; }
+      }
+    </style>
+  </head><body>${printContent}<script>window.onload=function(){window.print();}<\/script></body></html>`);
+  win.document.close();
+}
+
+// ══════════════════════════════════════════════
+// EXPORT DOCX (via HTML → Word trick)
+// ══════════════════════════════════════════════
+function exportDOCX() {
+  const instName = v('instName') || 'Institution';
+  const instAddr = v('instAddr') || '';
+  const examName = v('examName') || 'Examination';
+  const examDate = v('examDate') || '';
+  const subject = v('subject') || 'Subject';
+  const subCode = v('subjectCode') || '';
+  const classBatch = v('classBatch') || '';
+  const maxMarks = v('maxMarks') || '';
+  const duration = v('duration') || '';
+  const instrRaw = v('instructions') || '';
+  const instructions = instrRaw.split('\n').filter(l => l.trim());
+  const optLayout = parseInt(v('optionLayout') || '2');
+  const mcqHead = v('mcqHeading') || 'Section A: Multiple Choice Questions';
+  const subHead = v('subHeading') || 'Section B: Subjective Questions';
+  const marksPerMcq = parseFloat(v('marksPerMcq') || '1');
+  const mcqs = questions.filter(q => q.type === 'mcq');
+  const subs = questions.filter(q => q.type === 'sub');
+
+  let instrHTML = instructions.length
+    ? `<p><b>General Instructions:</b></p><ol>${instructions.map(l=>`<li>${l}</li>`).join('')}</ol>`
+    : '';
+
+  let mcqHTML = '';
+  if ((paperType === 'mcq' || paperType === 'both') && mcqs.length) {
+    const mcqTotal = (mcqs.length * marksPerMcq).toFixed(1);
+    mcqHTML = `<h3 style="text-align:center;text-decoration:underline;">${escHtml(mcqHead)} [${mcqTotal} Marks]</h3>`;
+    mcqs.forEach((q, i) => {
+      mcqHTML += `<p><b>Q${i+1}.</b> ${escHtml(q.text) || '_______________________________'}</p>`;
+      const perRow = optLayout === 1 ? 1 : optLayout === 4 ? q.options.length : 2;
+      if (perRow === 1) {
+        q.options.forEach((o, oi) => { mcqHTML += `<p style="margin-left:20pt;"><b>${ALPHA[oi]}.</b> ${escHtml(o) || '___________'}</p>`; });
+      } else {
+        let row = '';
+        q.options.forEach((o, oi) => {
+          row += `<b>${ALPHA[oi]}.</b>&nbsp;${escHtml(o) || '___________'}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`;
+          if ((oi + 1) % perRow === 0) { mcqHTML += `<p style="margin-left:20pt;">${row}</p>`; row = ''; }
+        });
+        if (row) mcqHTML += `<p style="margin-left:20pt;">${row}</p>`;
+      }
+    });
+  }
+
+  let subHTML = '';
+  if ((paperType === 'sub' || paperType === 'both') && subs.length) {
+    const subTotal = subs.reduce((a,q) => a + q.marks, 0);
+    subHTML = `<h3 style="text-align:center;text-decoration:underline;">${escHtml(subHead)} [${subTotal} Marks]</h3>`;
+    let startNum = (paperType === 'both') ? mcqs.length + 1 : 1;
+    subs.forEach((q, i) => {
+      subHTML += `<p><b>Q${startNum+i}.</b> ${escHtml(q.text) || '_______________________________'} <span style="float:right;">[${q.marks} Marks]</span></p>`;
+      for (let l = 0; l < q.lines; l++) subHTML += `<p style="border-bottom:1px solid #aaa; min-height:18px;">&nbsp;</p>`;
+    });
+  }
+
+  const html = `
+    <html xmlns:o='urn:schemas-microsoft-com:office:office'
+          xmlns:w='urn:schemas-microsoft-com:office:word'
+          xmlns='http://www.w3.org/TR/REC-html40'>
+    <head>
+      <meta charset="UTF-8">
+      <title>Question Paper</title>
+      <!--[if gte mso 9]>
+      <xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml>
+      <![endif]-->
+      <style>
+        @page { size: A4; margin: 2.5cm; }
+        body { font-family: 'Times New Roman', serif; font-size: 12pt; color: #000; }
+        h1 { font-size: 18pt; text-align: center; text-transform: uppercase; margin-bottom: 4pt; }
+        h2 { font-size: 11pt; text-align: center; font-weight: normal; margin: 2pt 0; }
+        h3 { font-size: 12pt; }
+        table { width: 100%; border-collapse: collapse; }
+        td { font-size: 10.5pt; padding: 2pt 4pt; }
+        hr { border: 1px solid #000; }
+        p { margin: 6pt 0; }
+        ol { margin: 4pt 0; padding-left: 20pt; font-size: 9.5pt; }
+        .footer { text-align: center; font-size: 9pt; border-top: 1px solid #000; padding-top: 6pt; margin-top: 20pt; }
+      </style>
+    </head>
+    <body>
+      <h1>${escHtml(instName)}</h1>
+      ${instAddr ? `<h2>${escHtml(instAddr)}</h2>` : ''}
+      <h2><b>${escHtml(examName)}</b>${examDate ? ' | Date: ' + escHtml(examDate) : ''}</h2>
+      <hr>
+      <table>
+        <tr>
+          <td><b>Subject:</b> ${escHtml(subject)}${subCode ? ' ('+escHtml(subCode)+')' : ''}<br>
+              ${classBatch ? '<b>Class/Batch:</b> ' + escHtml(classBatch) + '<br>' : ''}
+              <b>Name:</b> ____________________________________</td>
+          <td style="text-align:right;">
+              ${maxMarks ? '<b>Max Marks:</b> ' + escHtml(maxMarks) + '<br>' : ''}
+              ${duration ? '<b>Duration:</b> ' + escHtml(duration) + '<br>' : ''}
+              <b>Roll No.:</b> ____________________</td>
+        </tr>
+      </table>
+      <hr>
+      ${instrHTML}
+      ${mcqHTML}
+      ${subHTML}
+      <div class="footer">✦ All the Best ✦ &nbsp;&nbsp; CupX Corporation · cupx.in</div>
+    </body>
+    </html>`;
+
+  const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${instName.replace(/[^a-zA-Z0-9]/g,'_') || 'QuestionPaper'}_${new Date().toISOString().slice(0,10)}.doc`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ══════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════
+function v(id) { return document.getElementById(id)?.value?.trim() || ''; }
+
+function escHtml(str) {
+  return String(str || '')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
 }
 
 function clearAll() {
-  if (confirm("Delete all records?")) {
-    records = [];
-    localStorage.removeItem("attendance");
-    render();
-  }
+  if (!confirm('Clear all questions and reset the form?')) return;
+  questions = [];
+  qIdCounter = 0;
+  optionLocked = false;
+  document.getElementById('globalOptionCount').disabled = false;
+  document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(el => {
+    if (el.id === 'marksPerMcq') el.value = '1';
+    else if (el.id === 'mcqHeading') el.value = 'Section A: Multiple Choice Questions';
+    else if (el.id === 'subHeading') el.value = 'Section B: Subjective Questions';
+    else el.value = '';
+  });
+  renderQuestions();
+  renderPreview();
 }
 
-/* PROFESSIONAL EXCEL EXPORT */
-function exportExcel() {
-  if (records.length === 0) {
-    alert("No data to export.");
-    return;
-  }
-
-  const title = records[0]?.title || "";
-
-  let html = `
-  <html>
-  <head>
-  <meta charset="UTF-8">
-  </head>
-  <body>
-  <table border="1" style="border-collapse:collapse;">
-
-  <!-- Main Heading -->
-  <tr>
-    <td colspan="5" style="
-      background:#2f5fb3;
-      color:white;
-      font-size:22px;
-      font-weight:bold;
-      text-align:center;
-      height:45px;
-    ">
-      CupX Attendance System
-    </td>
-  </tr>
-
-  <!-- Attendance Title -->
-  <tr>
-    <td colspan="5" style="
-      background:#2f5fb3;
-      color:white;
-      text-align:center;
-      font-weight:600;
-    ">
-      ${title}
-    </td>
-  </tr>
-
-  <!-- Column Headers -->
-  <tr style="background:#2f5fb3;color:white;font-weight:bold;text-align:center;">
-    <td>Sr. No</td>
-    <td>Name</td>
-    <td>Roll</td>
-    <td>Status</td>
-    <td>Date</td>
-  </tr>
-  `;
-
-  records.forEach((r, i) => {
-    html += `
-    <tr>
-      <td>${i + 1}</td>
-      <td>${r.name}</td>
-      <td>${r.roll}</td>
-      <td>${r.status}</td>
-      <td>${r.date}</td>
-    </tr>
-    `;
-  });
-
-  html += `
-  </table>
-  </body>
-  </html>
-  `;
-
-  const blob = new Blob([html], {
-    type: "application/vnd.ms-excel"
-  });
-
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "attendance.xls";
-  link.click();
-  }
-
-/* PROFESSIONAL PDF EXPORT */
-function exportPDF() {
-  if (records.length === 0) return alert("No data to export.");
-
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-
-  const title = records[0]?.title || "";
-  const pageHeight = doc.internal.pageSize.height;
-  let y = 20;
-
-  function addHeader() {
-    doc.setFontSize(18);
-    doc.text("CupX Attendance System", 105, 10, {align:"center"});
-    doc.setFontSize(12);
-    doc.text(title, 105, 18, {align:"center"});
-    y = 30;
-  }
-
-  addHeader();
-
-  doc.setFontSize(11);
-
-  records.forEach((r,i) => {
-    if (y > pageHeight - 10) {
-      doc.addPage();
-      addHeader();
-    }
-    doc.text(`${i+1}. ${r.name} | ${r.roll} | ${r.status} | ${r.date}`, 10, y);
-    y += 8;
-  });
-
-  doc.save("attendance.pdf");
-}
-
-function escapeHTML(str) {
-  return String(str)
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;");
-}
-
-render();
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+renderPreview();
+renderQuestions();
 </script>
-
 </body>
 </html>
