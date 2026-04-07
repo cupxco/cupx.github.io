@@ -3,95 +3,130 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="icon" type="image/png" href="/favicon.png">
+
+<meta name="description" content="CupX Privacy Policy">
+
 <title>Privacy Policy - CupX</title>
 
 <style>
 
-*{
+body {
 margin:0;
-padding:0;
-box-sizing:border-box;
-font-family: system-ui, -apple-system, sans-serif;
-}
-
-body{
-background:#fff;
-color:#111;
-line-height:1.6;
+font-family:Arial, Helvetica, sans-serif;
+background-color:#0f172a;
+color:#e5e7eb;
+overflow-x:hidden;
 }
 
 /* Header */
 
 header{
-padding:20px;
-border-bottom:1px solid #eee;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:16px 20px;
+background-color:#020617;
 }
 
-.logo{
-font-weight:600;
-font-size:20px;
+header h1{
+margin:0;
+font-size:22px;
+}
+
+.menu-btn{
+font-size:30px;
+cursor:pointer;
+background:none;
+border:none;
+color:#e5e7eb;
+}
+
+/* Overlay Menu */
+
+.overlay{
+position:fixed;
+top:0;
+right:-100%;
+width:66%;
+height:100vh;
+background:#020617;
+padding:40px 25px;
+box-sizing:border-box;
+transition:right 0.3s ease;
+display:flex;
+flex-direction:column;
+gap:20px;
+z-index:1000;
+}
+
+.overlay a{
+color:#e5e7eb;
 text-decoration:none;
-color:#000;
+font-size:18px;
 }
 
-/* Container */
+.overlay a:hover{
+color:#38bdf8;
+}
 
-.container{
-max-width:850px;
+.overlay.active{
+right:0;
+}
+
+/* Content */
+
+section{
+padding:50px 20px;
+max-width:900px;
 margin:auto;
-padding:40px 20px;
 }
-
-/* Typography */
 
 h1{
-font-size:32px;
+font-size:30px;
 margin-bottom:10px;
 }
 
 h2{
 margin-top:30px;
-margin-bottom:10px;
 }
 
 p{
-color:#444;
-margin-bottom:15px;
+opacity:0.9;
+line-height:1.6;
 }
 
 /* Buttons */
 
-.buttons{
-margin:20px 0;
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-}
-
 .btn{
-padding:10px 16px;
-border:1px solid #ddd;
-background:#fff;
-cursor:pointer;
+display:inline-block;
+margin:10px 10px 10px 0;
+padding:8px 14px;
+background:#38bdf8;
+color:#020617;
+border-radius:5px;
 text-decoration:none;
-color:#000;
-font-size:14px;
-border-radius:6px;
+font-weight:bold;
+border:none;
+cursor:pointer;
 }
 
-.btn:hover{
-background:#f5f5f5;
+.btn.secondary{
+background:#020617;
+color:#38bdf8;
+border:1px solid #38bdf8;
 }
 
 /* Footer */
 
 footer{
-border-top:1px solid #eee;
-padding:20px;
 text-align:center;
-color:#666;
-margin-top:60px;
-font-size:14px;
+padding:20px;
+font-size:13px;
+background-color:#020617;
+opacity:0.8;
+margin-top:40px;
 }
 
 </style>
@@ -101,59 +136,89 @@ font-size:14px;
 <body>
 
 <header>
-<a href="https://cupx.in" class="logo">CupX Corporation</a>
+<h1>CupX Corporation</h1>
+<button class="menu-btn" onclick="toggleMenu()">☰</button>
 </header>
 
-<div class="container">
-
-<div class="buttons">
-<button class="btn" onclick="history.back()">← Back</button>
-<a href="https://cupx.in" class="btn">Home</a>
-<a href="mailto:legal@cupx.in" class="btn">Email Legal</a>
-<a href="mailto:support@cupx.in" class="btn">Email Support</a>
-<button class="btn" onclick="downloadPolicy()">Download</button>
+<div class="overlay" id="overlay">
+<a href="javascript:void(0)" onclick="toggleMenu()">Close ✕</a>
+<a href="https://auth.cupx.in">Sign In / Sign Up</a>
+<a href="/tools/">Tools</a>
+<a href="/about/">About</a>
+<a href="/contact/">Contact</a>
 </div>
+
+<section>
+
+<button class="btn secondary" onclick="history.back()">← Back</button>
+<a href="/" class="btn secondary">Home</a>
+<button class="btn" onclick="downloadPolicy()">Download Privacy Policy</button>
 
 <h1>Privacy Policy</h1>
 
-<p>Last updated: April 2026</p>
+<p>Last Updated: April 2026</p>
 
-<p>CupX respects your privacy and is committed to protecting your personal information. This Privacy Policy explains how we collect, use, and safeguard your data.</p>
+<p>At CupX, we value your privacy. This Privacy Policy explains how we collect, use, and protect your information when you use CupX services.</p>
 
 <h2>Information We Collect</h2>
 
+<p>We may collect the following information:</p>
+
 <p>
 • Name<br>
-• Email Address<br>
-• Phone Number<br>
-• Account Data<br>
-• Transaction Data<br>
-• Usage Data
+• Email address<br>
+• Phone number<br>
+• Login information<br>
+• Transaction data<br>
+• Usage information
 </p>
 
 <h2>How We Use Information</h2>
 
+<p>We use your information to:</p>
+
 <p>
 • Provide services<br>
-• Improve platform<br>
+• Improve user experience<br>
 • Maintain security<br>
 • Prevent fraud<br>
-• Communication
+• Communicate updates
 </p>
+
+<h2>Cookies</h2>
+
+<p>CupX may use cookies to improve functionality and user experience. You can disable cookies in your browser settings.</p>
 
 <h2>Data Security</h2>
 
-<p>We implement reasonable security measures to protect your information.</p>
+<p>We implement reasonable security measures to protect your data. However, no system is completely secure.</p>
 
-<h2>Third Party Services</h2>
+<h2>Third-Party Services</h2>
 
-<p>CupX may use third-party services for authentication, hosting, and analytics.</p>
+<p>CupX may use third-party services such as authentication providers, hosting platforms, and analytics tools.</p>
 
-<h2>Policy Updates</h2>
+<h2>User Rights</h2>
 
-<p>We may update this Privacy Policy periodically.</p>
+<p>You may:</p>
 
+<p>
+• Request data deletion<br>
+• Update your information<br>
+• Contact us regarding privacy concerns
+</p>
+
+<h2>Changes to Policy</h2>
+
+<p>We may update this Privacy Policy from time to time.</p>
+
+<h2>Contact</h2>
+
+<div>
+<a href="mailto:legal@cupx.in" class="btn">Email Legal</a>
+<a href="mailto:support@cupx.in" class="btn secondary">Email Support</a>
 </div>
+
+</section>
 
 <footer>
 © 2026 CupX Corporation · All rights reserved
@@ -161,20 +226,19 @@ font-size:14px;
 
 <script>
 
+function toggleMenu(){
+const overlay=document.getElementById("overlay");
+overlay.classList.toggle("active");
+}
+
 function downloadPolicy(){
-
-const content = document.documentElement.outerHTML;
-
-const blob = new Blob([content], { type: 'text/html' });
-
-const a = document.createElement('a');
-
-a.href = URL.createObjectURL(blob);
-
-a.download = "CupX-Privacy-Policy.html";
-
-a.click();
-
+const element = document.createElement('a');
+const text = document.body.innerText;
+const file = new Blob([text], {type: 'text/plain'});
+element.href = URL.createObjectURL(file);
+element.download = "CupX-Privacy-Policy.txt";
+document.body.appendChild(element);
+element.click();
 }
 
 </script>
