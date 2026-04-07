@@ -6,11 +6,12 @@
 <title>Privacy Policy - CupX</title>
 
 <style>
+
 *{
 margin:0;
 padding:0;
 box-sizing:border-box;
-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+font-family: system-ui, -apple-system, sans-serif;
 }
 
 body{
@@ -22,64 +23,23 @@ line-height:1.6;
 /* Header */
 
 header{
-border-bottom:1px solid #e5e5e5;
-background:#fff;
-position:sticky;
-top:0;
-z-index:100;
-}
-
-.nav{
-max-width:1100px;
-margin:auto;
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:16px;
+padding:20px;
+border-bottom:1px solid #eee;
 }
 
 .logo{
 font-weight:600;
-font-size:18px;
-color:#000;
+font-size:20px;
 text-decoration:none;
-}
-
-.nav a{
-text-decoration:none;
-color:#555;
-margin-left:20px;
-font-size:14px;
-}
-
-.nav a:hover{
 color:#000;
 }
 
 /* Container */
 
 .container{
-max-width:900px;
+max-width:850px;
 margin:auto;
 padding:40px 20px;
-}
-
-/* Back Button */
-
-.back-btn{
-display:inline-block;
-margin-bottom:20px;
-padding:8px 14px;
-border:1px solid #e5e5e5;
-border-radius:6px;
-text-decoration:none;
-color:#333;
-font-size:14px;
-cursor:pointer;
-}
-
-.back-btn:hover{
-background:#f5f5f5;
 }
 
 /* Typography */
@@ -92,57 +52,48 @@ margin-bottom:10px;
 h2{
 margin-top:30px;
 margin-bottom:10px;
-font-size:20px;
 }
 
 p{
-margin-bottom:15px;
 color:#444;
+margin-bottom:15px;
+}
+
+/* Buttons */
+
+.buttons{
+margin:20px 0;
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.btn{
+padding:10px 16px;
+border:1px solid #ddd;
+background:#fff;
+cursor:pointer;
+text-decoration:none;
+color:#000;
+font-size:14px;
+border-radius:6px;
+}
+
+.btn:hover{
+background:#f5f5f5;
 }
 
 /* Footer */
 
 footer{
-border-top:1px solid #e5e5e5;
-margin-top:60px;
-}
-
-.footer{
-max-width:1100px;
-margin:auto;
+border-top:1px solid #eee;
 padding:20px;
-font-size:14px;
+text-align:center;
 color:#666;
-display:flex;
-justify-content:space-between;
-flex-wrap:wrap;
+margin-top:60px;
+font-size:14px;
 }
 
-.footer a{
-text-decoration:none;
-color:#555;
-margin-left:15px;
-}
-
-.footer a:hover{
-color:#000;
-}
-
-/* Responsive */
-
-@media(max-width:768px){
-
-.nav{
-flex-direction:column;
-align-items:flex-start;
-}
-
-.footer{
-flex-direction:column;
-gap:10px;
-}
-
-}
 </style>
 
 </head>
@@ -150,106 +101,83 @@ gap:10px;
 <body>
 
 <header>
-<div class="nav">
-
-<a href="https://cupx.in" class="logo">CupX</a>
-
-<div>
-<a href="https://cupx.in">Home</a>
-<a href="https://cupx.in/about">About</a>
-<a href="https://cupx.in/privacy">Privacy</a>
-</div>
-
-</div>
+<a href="https://cupx.in" class="logo">CupX Corporation</a>
 </header>
 
 <div class="container">
 
-<button class="back-btn" onclick="history.back()">← Back</button>
+<div class="buttons">
+<button class="btn" onclick="history.back()">← Back</button>
+<a href="https://cupx.in" class="btn">Home</a>
+<a href="mailto:legal@cupx.in" class="btn">Email Legal</a>
+<a href="mailto:support@cupx.in" class="btn">Email Support</a>
+<button class="btn" onclick="downloadPolicy()">Download</button>
+</div>
 
 <h1>Privacy Policy</h1>
-<p>Last Updated: April 2026</p>
 
-<p>At CupX, we value your privacy. This Privacy Policy explains how we collect, use, and protect your information when you use CupX services.</p>
+<p>Last updated: April 2026</p>
+
+<p>CupX respects your privacy and is committed to protecting your personal information. This Privacy Policy explains how we collect, use, and safeguard your data.</p>
 
 <h2>Information We Collect</h2>
 
-<p>We may collect the following information:</p>
-
 <p>
 • Name<br>
-• Email address<br>
-• Phone number<br>
-• Login information<br>
-• Transaction data<br>
-• Usage information
+• Email Address<br>
+• Phone Number<br>
+• Account Data<br>
+• Transaction Data<br>
+• Usage Data
 </p>
 
 <h2>How We Use Information</h2>
 
-<p>We use your information to:</p>
-
 <p>
 • Provide services<br>
-• Improve user experience<br>
+• Improve platform<br>
 • Maintain security<br>
 • Prevent fraud<br>
-• Communicate updates
+• Communication
 </p>
-
-<h2>Cookies</h2>
-
-<p>CupX may use cookies to improve functionality and user experience. You can disable cookies in your browser settings.</p>
 
 <h2>Data Security</h2>
 
-<p>We implement reasonable security measures to protect your data. However, no system is completely secure.</p>
+<p>We implement reasonable security measures to protect your information.</p>
 
-<h2>Third-Party Services</h2>
+<h2>Third Party Services</h2>
 
-<p>CupX may use third-party services such as authentication providers, hosting platforms, and analytics tools.</p>
+<p>CupX may use third-party services for authentication, hosting, and analytics.</p>
 
-<h2>User Rights</h2>
+<h2>Policy Updates</h2>
 
-<p>You may:</p>
-
-<p>
-• Request data deletion<br>
-• Update your information<br>
-• Contact us regarding privacy concerns
-</p>
-
-<h2>Changes to Policy</h2>
-
-<p>We may update this Privacy Policy from time to time.</p>
-
-<h2>Contact</h2>
-
-<p>
-Legal Email: <a href="mailto:legal@cupx.in">legal@cupx.in</a><br>
-Support Email: <a href="mailto:support@cupx.in">support@cupx.in</a><br>
-Website: https://cupx.in
-</p>
+<p>We may update this Privacy Policy periodically.</p>
 
 </div>
 
 <footer>
-
-<div class="footer">
-
-<div>
-© 2026 CupX Corporation
-</div>
-
-<div>
-<a href="https://cupx.in/privacy">Privacy</a>
-<a href="https://cupx.in/terms">Terms</a>
-<a href="https://cupx.in/about">About</a>
-</div>
-
-</div>
-
+© 2026 CupX Corporation · All rights reserved
 </footer>
 
+<script>
+
+function downloadPolicy(){
+
+const content = document.documentElement.outerHTML;
+
+const blob = new Blob([content], { type: 'text/html' });
+
+const a = document.createElement('a');
+
+a.href = URL.createObjectURL(blob);
+
+a.download = "CupX-Privacy-Policy.html";
+
+a.click();
+
+}
+
+</script>
+
 </body>
-  </html>
+</html>
