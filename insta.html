@@ -3,13 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CupX Instagram Username Finder</title>
+
+<title>CupX Insta Username Finder</title>
 
 <style>
+
 body{
-font-family: Arial, sans-serif;
 background:#0f172a;
 color:white;
+font-family:Arial;
 text-align:center;
 padding:20px;
 }
@@ -29,9 +31,9 @@ background:#1d4ed8;
 }
 
 #results{
-margin-top:20px;
-max-width:700px;
+max-width:600px;
 margin:auto;
+margin-top:20px;
 text-align:left;
 }
 
@@ -40,9 +42,10 @@ color:#22c55e;
 }
 
 .progress{
-margin-top:15px;
+margin-top:20px;
 color:#94a3b8;
 }
+
 </style>
 
 </head>
@@ -53,13 +56,10 @@ color:#94a3b8;
 
 <button onclick="startCheck(3)">Check All 3 Characters</button>
 <button onclick="startCheck(4)">Check All 4 Characters</button>
-
-<br>
-
+<button onclick="stopCheck()">Stop</button>
 <button onclick="downloadCSV()">Download CSV</button>
 
 <div class="progress" id="progress"></div>
-
 <div id="results"></div>
 
 <script>
@@ -67,70 +67,104 @@ color:#94a3b8;
 const chars = "abcdefghijklmnopqrstuvwxyz0123456789_.";
 let available = [];
 let stop = false;
+let total = 0;
+let current = 0;
 
-function generate(length) {
-let results = [];
+function* generate(length) {
 
-function helper(prefix, length) {
-if (prefix.length === length) {
-results.push(prefix);
-return;
+let arr = chars.split('');
+let indexes = new Array(length).fill(0);
+
+while(true){
+
+yield indexes.map(i => arr[i]).join('');
+
+let pos = length - 1;
+
+while(pos >= 0){
+indexes[pos]++;
+if(indexes[pos] < arr.length) break;
+indexes[pos] = 0;
+pos--;
 }
 
-for (let i = 0; i < chars.length; i++) {
-helper(prefix + chars[i], length);
-}
+if(pos < 0) return;
+
 }
 
-helper("", length);
-return results;
 }
 
-async function check(username) {
-try {
-let res = await fetch("https://www.instagram.com/" + username, {
-mode: "no-cors"
+async function check(username){
+
+try{
+
+let res = await fetch(
+"https://www.instagram.com/" + username + "/?__a=1&__d=dis",
+{
+method:"GET"
 });
 
-document.getElementById("results").innerHTML += 
-"<div class='available'>✔ " + username + "</div>";
+if(res.status == 404){
 
 available.push(username);
 
-} catch (e) {}
+document.getElementById("results").innerHTML +=
+"<div class='available'>"+username+"</div>";
+
+}
+
+}catch(e){}
+
 }
 
 async function startCheck(length){
 
+stop = false;
+
 available = [];
 document.getElementById("results").innerHTML = "";
 
-let list = generate(length);
+total = Math.pow(chars.length,length);
+current = 0;
 
-for(let i=0;i<list.length;i++){
+let gen = generate(length);
+
+for(let username of gen){
+
+if(stop) break;
+
+current++;
 
 document.getElementById("progress").innerText =
-"Checking " + (i+1) + " / " + list.length;
+current + " / " + total;
 
-await check(list[i]);
+await check(username);
 
-await new Promise(r => setTimeout(r, 300));
+await new Promise(r=>setTimeout(r,400));
+
 }
+
+}
+
+function stopCheck(){
+stop = true;
 }
 
 function downloadCSV(){
 
-let csv = "Username\n";
+let csv = "username\n";
 
 available.forEach(u=>{
 csv += u + "\n";
 });
 
-let blob = new Blob([csv], { type: "text/csv" });
+let blob = new Blob([csv],{type:"text/csv"});
 
 let link = document.createElement("a");
+
 link.href = URL.createObjectURL(blob);
-link.download = "instagram_available.csv";
+link.download = "available_instagram.csv";
+
 link.click();
 
 }
