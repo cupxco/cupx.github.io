@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CupX Instagram Username Finder</title>
+
+<style>
+body{
+font-family: Arial, sans-serif;
+background:#0f172a;
+color:white;
+text-align:center;
+padding:20px;
+}
+
+button{
+padding:12px 20px;
+margin:10px;
+border:none;
+border-radius:8px;
+background:#2563eb;
+color:white;
+cursor:pointer;
+}
+
+button:hover{
+background:#1d4ed8;
+}
+
+#results{
+margin-top:20px;
+max-width:700px;
+margin:auto;
+text-align:left;
+}
+
+.available{
+color:#22c55e;
+}
+
+.progress{
+margin-top:15px;
+color:#94a3b8;
+}
+</style>
+
+</head>
+
+<body>
+
+<h2>CupX Instagram Username Checker</h2>
+
+<button onclick="startCheck(3)">Check All 3 Characters</button>
+<button onclick="startCheck(4)">Check All 4 Characters</button>
+
+<br>
+
+<button onclick="downloadCSV()">Download CSV</button>
+
+<div class="progress" id="progress"></div>
+
+<div id="results"></div>
+
+<script>
+
+const chars = "abcdefghijklmnopqrstuvwxyz0123456789_.";
+let available = [];
+let stop = false;
+
+function generate(length) {
+let results = [];
+
+function helper(prefix, length) {
+if (prefix.length === length) {
+results.push(prefix);
+return;
+}
+
+for (let i = 0; i < chars.length; i++) {
+helper(prefix + chars[i], length);
+}
+}
+
+helper("", length);
+return results;
+}
+
+async function check(username) {
+try {
+let res = await fetch("https://www.instagram.com/" + username, {
+mode: "no-cors"
+});
+
+document.getElementById("results").innerHTML += 
+"<div class='available'>✔ " + username + "</div>";
+
+available.push(username);
+
+} catch (e) {}
+}
+
+async function startCheck(length){
+
+available = [];
+document.getElementById("results").innerHTML = "";
+
+let list = generate(length);
+
+for(let i=0;i<list.length;i++){
+
+document.getElementById("progress").innerText =
+"Checking " + (i+1) + " / " + list.length;
+
+await check(list[i]);
+
+await new Promise(r => setTimeout(r, 300));
+}
+}
+
+function downloadCSV(){
+
+let csv = "Username\n";
+
+available.forEach(u=>{
+csv += u + "\n";
+});
+
+let blob = new Blob([csv], { type: "text/csv" });
+
+let link = document.createElement("a");
+link.href = URL.createObjectURL(blob);
+link.download = "instagram_available.csv";
+link.click();
+
+}
+
+</script>
+
+</body>
+</html>
