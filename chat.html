@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>messenger.cupx.in</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: linear-gradient(135deg, #0a0a0a, #1a0033);
+      color: #e0e0ff;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .container {
+      width: 100%;
+      max-width: 420px;
+      height: 92vh;
+      background: #12121a;
+      border-radius: 20px;
+      box-shadow: 0 0 40px rgba(120, 80, 255, 0.3);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #3a2a66;
+    }
+    header {
+      background: linear-gradient(to right, #6b46ff, #a855f7);
+      padding: 16px;
+      text-align: center;
+      color: white;
+      font-weight: 600;
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+    }
+    .form-section {
+      padding: 20px;
+      background: #1a1a24;
+      border-bottom: 1px solid #3a2a66;
+    }
+    .input-group {
+      margin-bottom: 14px;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.85rem;
+      color: #b0b0ff;
+      font-weight: 500;
+    }
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      background: #252532;
+      border: 2px solid #4a3a88;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+    input:focus {
+      outline: none;
+      border-color: #8b5cf6;
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+    }
+    .error {
+      color: #ff6b6b;
+      font-size: 0.8rem;
+      margin-top: 6px;
+      min-height: 20px;
+    }
+    .connect-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(to right, #6b46ff, #a855f7);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .connect-btn:hover {
+      transform: translateY(-2px);
+    }
+    .chat-area {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background: #0f0f17;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .message {
+      max-width: 85%;
+      padding: 12px 16px;
+      border-radius: 18px;
+      line-height: 1.4;
+      position: relative;
+    }
+    .message.system {
+      background: #2a2a3a;
+      color: #aaa;
+      align-self: center;
+      font-size: 0.85rem;
+      border-radius: 20px;
+      padding: 8px 16px;
+    }
+    .message.own {
+      background: linear-gradient(to right, #6b46ff, #a855f7);
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+    .message.other {
+      background: #252532;
+      color: #e0e0ff;
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+    .username {
+      font-size: 0.75rem;
+      opacity: 0.8;
+      margin-bottom: 4px;
+    }
+    .input-bar {
+      padding: 16px;
+      background: #1a1a24;
+      border-top: 1px solid #3a2a66;
+      display: flex;
+      gap: 10px;
+    }
+    #message-input {
+      flex: 1;
+      padding: 14px 18px;
+      background: #252532;
+      border: 2px solid #4a3a88;
+      border-radius: 9999px;
+      color: white;
+    }
+    #send-btn {
+      width: 48px;
+      height: 48px;
+      background: #6b46ff;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .clear-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      color: #888;
+      font-size: 1.4rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      CUPX MESSENGER
+      <button class="clear-btn" onclick="clearChat()">🗑</button>
+    </header>
+
+    <div class="form-section">
+      <div class="input-group">
+        <label for="username">USERNAME</label>
+        <input type="text" id="username" placeholder="Your name (e.g. Faisal)" maxlength="20" value="CupX User">
+      </div>
+      <div class="input-group">
+        <label for="cupx-id">CUPX ID (ROOM CODE)</label>
+        <input type="text" id="cupx-id" placeholder="ABC-1234" maxlength="8" oninput="formatCupxId(this)">
+        <div id="error" class="error"></div>
+      </div>
+      <button class="connect-btn" onclick="connect()">CONNECT TO ROOM</button>
+    </div>
+
+    <div class="chat-area" id="chat-area">
+      <!-- Messages appear here -->
+      <div class="message system" id="welcome">
+        Welcome to CupX Messenger<br>
+        Enter a Cupx ID (e.g. ABC-1234) and connect
+      </div>
+    </div>
+
+    <div class="input-bar">
+      <input type="text" id="message-input" placeholder="Type a message..." onkeypress="if(event.key === 'Enter') sendMessage()">
+      <button id="send-btn" onclick="sendMessage()">↑</button>
+    </div>
+  </div>
+
+  <script>
+    let currentUsername = "CupX User";
+    let isConnected = false;
+    let currentCupxId = "";
+
+    function formatCupxId(input) {
+      let val = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      
+      const errorEl = document.getElementById('error');
+      
+      // Limit to 7 characters
+      if (val.length > 7) val = val.substring(0, 7);
+      
+      // Validate first 3: letters only
+      let letters = val.substring(0, 3);
+      if (letters.length > 0 && !/^[A-Z]*$/.test(letters)) {
+        errorEl.textContent = "First 3 characters must be letters (A-Z)";
+      } 
+      // Validate last 4: numbers only
+      else if (val.length > 3) {
+        let numbers = val.substring(3);
+        if (!/^\d*$/.test(numbers)) {
+          errorEl.textContent = "Last 4 characters must be numbers (0-9)";
+        } else {
+          errorEl.textContent = "";
+        }
+      } else {
+        errorEl.textContent = "";
+      }
+      
+      // Auto add dash after 3 letters
+      if (val.length > 3) {
+        val = val.substring(0, 3) + '-' + val.substring(3);
+      }
+      
+      input.value = val;
+    }
+
+    function connect() {
+      const cupxInput = document.getElementById('cupx-id').value.trim();
+      const usernameInput = document.getElementById('username').value.trim();
+      
+      if (!cupxInput || cupxInput.length !== 8 || !cupxInput.includes('-')) {
+        alert("Please enter a valid Cupx ID in format ABC-1234");
+        return;
+      }
+      
+      if (!usernameInput) {
+        alert("Please enter a username");
+        return;
+      }
+      
+      currentUsername = usernameInput;
+      currentCupxId = cupxInput;
+      isConnected = true;
+      
+      const chatArea = document.getElementById('chat-area');
+      chatArea.innerHTML = `
+        <div class="message system">
+          ✅ Connected to room <strong>${currentCupxId}</strong><br>
+          Share this Cupx ID with others to chat
+        </div>
+      `;
+      
+      // Simulate a welcome message from system
+      setTimeout(() => {
+        addMessage("CupX System", "Room is now active. Say hello!", false);
+      }, 800);
+    }
+
+    function addMessage(sender, text, isOwn) {
+      const chatArea = document.getElementById('chat-area');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `message ${isOwn ? 'own' : 'other'}`;
+      
+      if (!isOwn) {
+        msgDiv.innerHTML = `
+          <div class="username">${sender}</div>
+          ${text}
+        `;
+      } else {
+        msgDiv.textContent = text;
+      }
+      
+      chatArea.appendChild(msgDiv);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    function sendMessage() {
+      if (!isConnected) {
+        alert("Please connect to a room first!");
+        return;
+      }
+      
+      const input = document.getElementById('message-input');
+      const text = input.value.trim();
+      
+      if (!text) return;
+      
+      addMessage(currentUsername, text, true);
+      input.value = '';
+      
+      // Simulate reply after a short delay (demo only)
+      setTimeout(() => {
+        if (Math.random() > 0.6) {
+          addMessage("Other User", "Hey! Received your message.", false);
+        }
+      }, 1200);
+    }
+
+    function clearChat() {
+      if (confirm("Clear all messages?")) {
+        const chatArea = document.getElementById('chat-area');
+        chatArea.innerHTML = `
+          <div class="message system">
+            Chat cleared.<br>
+            ${isConnected ? `Still connected to ${currentCupxId}` : 'Connect to a room to start chatting'}
+          </div>
+        `;
+      }
+    }
+
+    // Allow pressing Enter in username or cupx-id to connect
+    document.getElementById('cupx-id').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') connect();
+    });
+    
+    document.getElementById('username').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') connect();
+    });
+
+    // Initial demo message
+    setTimeout(() => {
+      if (!isConnected) {
+        const chatArea = document.getElementById('chat-area');
+        if (chatArea.children.length === 1) {
+          addMessage("CupX System", "Try entering a Cupx ID like XYZ-5678 and connect!", false);
+        }
+      }
+    }, 1500);
+  </script>
+</body>
+  </html>
