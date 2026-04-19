@@ -3,172 +3,224 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CupX Periodic Table</title>
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;800&display=swap" rel="stylesheet"/>
+<title>Periodic Table — CupX Corporation</title>
+<meta name="description" content="Interactive periodic table with heatmaps, phase states, molar mass, normality, molarity, molality calculator and animated Bohr models. Built by CupX Corporation."/>
+<meta name="keywords" content="periodic table, interactive, elements, chemistry, physics, molar mass, normality, molarity, molality, n-factor, equivalent weight, CupX"/>
+<meta name="author" content="CupX Corporation"/>
+<link rel="canonical" href="https://cupx.in/periodictable/"/>
+<meta property="og:title" content="Periodic Table — CupX Corporation"/>
+<meta property="og:description" content="Explore all 118 elements with heatmaps, phase states, molar mass, normality, molarity, molality calculators and animated atomic models."/>
+<meta property="og:url" content="https://cupx.in/periodictable/"/>
+<meta property="og:type" content="website"/>
+<link rel="icon" type="image/png" href="/favicon.png"/>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet"/>
 <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#07090f;
-  --bg2:#0e1117;
-  --bg3:#151b26;
-  --accent:#00e5ff;
-  --accent2:#ff6b35;
-  --text:#c8d8e8;
-  --muted:#4a5a6a;
-  --border:#1e2a3a;
+  --bg:#0f172a;--bg2:#020617;--bg3:#1e293b;
+  --accent:#38bdf8;--accent2:#f59e0b;
+  --text:#e2e8f0;--muted:#64748b;--border:#1e3a5f;
+  --card:#0f1e33;--shadow:rgba(0,0,0,0.5);
+  --green:#4ade80;--red:#f87171;--orange:#fb923c;
 }
-body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(0,229,255,0.04) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(255,107,53,0.03) 0%,transparent 60%);pointer-events:none;z-index:0}
-
-/* SCROLLBAR */
-::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-track{background:#0e1117}
-::-webkit-scrollbar-thumb{background:#1e2a3a;border-radius:2px}
+@media(prefers-color-scheme:light){
+  :root{
+    --bg:#f1f5f9;--bg2:#ffffff;--bg3:#e2e8f0;
+    --accent:#0284c7;--accent2:#d97706;
+    --text:#0f172a;--muted:#64748b;--border:#cbd5e1;
+    --card:#ffffff;--shadow:rgba(0,0,0,0.12);
+  }
+  body::before{display:none}
+  .el .en{color:rgba(0,0,0,0.4)}
+  .el .es{color:#0f172a}
+  .el .ename{color:rgba(0,0,0,0.5)}
+  .el .emass{color:rgba(0,0,0,0.3)}
+  .modal,.modal-header{background:#fff}
+  .prop,.econfig{background:#f8fafc}
+  .compare-bar,.compare-slot{background:#fff}
+  .molar-box,.compare-modal{background:#fff}
+  ::-webkit-scrollbar-track{background:#e2e8f0}
+  ::-webkit-scrollbar-thumb{background:#94a3b8}
+}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 15% 15%,rgba(56,189,248,0.05) 0%,transparent 55%),radial-gradient(ellipse at 85% 85%,rgba(245,158,11,0.04) 0%,transparent 55%);pointer-events:none;z-index:0}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
 /* HEADER */
-.header{position:relative;z-index:10;padding:16px 20px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
-.logo{font-family:'Share Tech Mono',monospace;font-size:22px;color:var(--accent);letter-spacing:3px;text-shadow:0 0 20px rgba(0,229,255,0.5)}
-.logo span{color:var(--muted);font-size:12px;display:block;letter-spacing:1px;margin-top:2px}
-.header-actions{display:flex;gap:8px}
-.btn{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:7px 14px;border-radius:4px;cursor:pointer;font-family:'Exo 2',sans-serif;font-size:12px;font-weight:600;letter-spacing:1px;transition:all 0.2s}
-.btn:hover,.btn.active{border-color:var(--accent);color:var(--accent);background:rgba(0,229,255,0.08)}
-.btn.accent{background:var(--accent);color:#000;border-color:var(--accent)}
-.btn.accent:hover{background:#00c8e0}
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background-color:#020617;position:relative;z-index:20;border-bottom:1px solid rgba(56,189,248,0.15)}
+.logo-block{display:flex;flex-direction:column;gap:1px}
+.logo-title{font-size:22px;font-weight:900;color:#38bdf8;line-height:1.2;display:block;letter-spacing:0.3px}
+.logo-sub{font-size:13.3px;font-weight:400;color:#64748b;line-height:1.2;display:block}
+header a{color:#38bdf8;text-decoration:none;font-size:14px;font-weight:700}
+header a:hover{text-decoration:underline}
 
-/* CONTROL PANEL */
-.controls{position:relative;z-index:10;padding:10px 20px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.search-wrap{position:relative}
-.search-wrap input{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:7px 12px 7px 32px;border-radius:4px;font-family:'Share Tech Mono',monospace;font-size:13px;width:200px;outline:none;transition:border-color 0.2s}
+/* BUTTONS */
+.btn{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:7px 14px;border-radius:6px;cursor:pointer;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;transition:all 0.18s;white-space:nowrap}
+.btn:hover,.btn.active{border-color:var(--accent);color:var(--accent);background:rgba(56,189,248,0.08)}
+.btn.accent-btn{background:var(--accent);color:#020617;border-color:var(--accent);font-weight:900}
+.btn.accent-btn:hover{opacity:0.88}
+
+/* CONTROLS */
+.controls{position:relative;z-index:10;padding:12px 20px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start}
+.search-wrap{position:relative;flex:1;min-width:260px;max-width:460px}
+.search-wrap input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px 14px 10px 40px;border-radius:6px;font-family:'Lato',sans-serif;font-size:14px;font-weight:400;outline:none;transition:border-color 0.2s}
 .search-wrap input:focus{border-color:var(--accent)}
-.search-wrap::before{content:'⌕';position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px;pointer-events:none}
+.search-wrap input::placeholder{color:var(--muted)}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:17px;pointer-events:none}
 .ctrl-group{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.ctrl-label{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-right:4px}
-.filter-btn{background:transparent;border:1px solid var(--border);color:var(--muted);padding:5px 10px;border-radius:3px;cursor:pointer;font-size:10px;font-family:'Exo 2',sans-serif;letter-spacing:0.5px;transition:all 0.15s;white-space:nowrap}
+.ctrl-label{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-right:2px;white-space:nowrap}
+.filter-btn{background:transparent;border:1px solid var(--border);color:var(--muted);padding:5px 11px;border-radius:4px;cursor:pointer;font-size:11px;font-family:'Lato',sans-serif;font-weight:700;transition:all 0.15s;white-space:nowrap}
 .filter-btn:hover{border-color:var(--text);color:var(--text)}
-.filter-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(0,229,255,0.1)}
-select{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:4px;font-family:'Exo 2',sans-serif;font-size:12px;outline:none;cursor:pointer}
+.filter-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(56,189,248,0.1)}
+select{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-family:'Lato',sans-serif;font-size:13px;font-weight:400;outline:none;cursor:pointer}
 select:focus{border-color:var(--accent)}
-.temp-wrap{display:flex;align-items:center;gap:8px}
-.temp-wrap input[type=range]{width:120px;accent-color:var(--accent)}
-.temp-val{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--accent);min-width:55px}
+
+/* TEMPERATURE */
+.temp-block{display:flex;flex-direction:column;gap:5px;flex:1;min-width:320px;max-width:580px}
+.temp-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.temp-controls input[type=range]{flex:1;min-width:200px;accent-color:var(--accent);cursor:pointer;height:5px}
+.temp-number{width:78px;background:var(--bg);border:1px solid var(--border);color:var(--accent);padding:7px 8px;border-radius:5px;font-family:monospace;font-size:13px;text-align:center;outline:none}
+.temp-number:focus{border-color:var(--accent)}
+.unit-toggle{display:flex;border:1px solid var(--border);border-radius:5px;overflow:hidden}
+.unit-toggle button{background:transparent;border:none;color:var(--muted);padding:6px 10px;cursor:pointer;font-family:'Lato',sans-serif;font-size:12px;font-weight:700;transition:all 0.15s}
+.unit-toggle button.active{background:var(--accent);color:#020617}
+.phase-summary{font-size:11px;color:var(--muted);font-weight:400}
 
 /* TABLE */
-.table-scroll{overflow-x:auto;padding:10px 20px 5px;position:relative;z-index:5}
+.table-scroll{overflow-x:auto;padding:12px 20px 6px;position:relative;z-index:5}
 .pt-grid{display:grid;grid-template-columns:repeat(18,minmax(52px,1fr));gap:3px;min-width:980px;max-width:1400px;margin:0 auto}
 
 /* ELEMENT CARD */
-.el{
-  aspect-ratio:1;padding:4px 3px 3px;cursor:pointer;border:1px solid transparent;border-radius:3px;
-  display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;
-  transition:transform 0.15s,border-color 0.15s,box-shadow 0.15s,opacity 0.2s,filter 0.2s;
-  background:var(--bg3);
-}
-.el::before{content:'';position:absolute;inset:0;opacity:0.18;transition:opacity 0.2s}
-.el:hover{transform:scale(1.18);z-index:50;border-color:rgba(255,255,255,0.6)!important;box-shadow:0 0 20px rgba(0,0,0,0.8)}
-.el:hover::before{opacity:0.35}
-.el.dimmed{opacity:0.08;filter:grayscale(1);pointer-events:none}
-.el.search-match{border-color:var(--accent)!important;box-shadow:0 0 12px rgba(0,229,255,0.4)}
-.el .en{font-size:9px;color:rgba(255,255,255,0.5);font-family:'Share Tech Mono',monospace;line-height:1}
-.el .es{font-size:17px;font-weight:800;text-align:center;line-height:1.1;color:#fff;font-family:'Exo 2',sans-serif}
-.el .ename{font-size:7px;text-align:center;color:rgba(255,255,255,0.6);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-.el .emass{font-size:7px;text-align:right;color:rgba(255,255,255,0.4);font-family:'Share Tech Mono',monospace}
-
-/* Phase indicators */
-.el.liquid .es{text-shadow:0 0 8px #4fc3f7}
-.el.gas .es{text-shadow:0 0 8px #ff8a65}
-
-/* Spacers */
-.spacer{aspect-ratio:1;grid-column:span 1}
-.series-label{grid-column:1/3;display:flex;align-items:center;justify-content:flex-end;padding-right:6px}
-.series-label span{font-size:8px;color:var(--muted);letter-spacing:0.5px;text-align:right;line-height:1.3}
-.gap-row{grid-column:1/19;height:6px}
+.el{aspect-ratio:1;padding:4px 3px 3px;cursor:pointer;border:1px solid transparent;border-radius:4px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;transition:transform 0.15s,border-color 0.15s,box-shadow 0.15s,opacity 0.2s,filter 0.2s;background:var(--card)}
+.el:hover{transform:scale(1.18);z-index:50;border-color:rgba(255,255,255,0.5)!important;box-shadow:0 0 22px var(--shadow)}
+.el.dimmed{opacity:0.07;filter:grayscale(1);pointer-events:none}
+.el.search-match{border-color:var(--accent)!important;box-shadow:0 0 10px rgba(56,189,248,0.4)}
+.el .en{font-size:9px;color:rgba(255,255,255,0.45);font-family:monospace;line-height:1}
+.el .es{font-size:17px;font-weight:900;text-align:center;line-height:1.1;color:#fff}
+.el .ename{font-size:7px;text-align:center;color:rgba(255,255,255,0.55);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.el .emass{font-size:7px;text-align:right;color:rgba(255,255,255,0.35);font-family:monospace}
 
 /* LEGEND */
 .legend{display:flex;flex-wrap:wrap;gap:8px;padding:8px 20px;border-bottom:1px solid var(--border);position:relative;z-index:5}
-.legend-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);font-weight:400}
 .legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
 
-/* HEATMAP LEGEND */
-.heatmap-bar{padding:6px 20px;display:flex;align-items:center;gap:10px;font-size:10px;color:var(--muted);border-bottom:1px solid var(--border)}
+/* HEATMAP BAR */
+.heatmap-bar{padding:7px 20px;display:flex;align-items:center;gap:10px;font-size:11px;color:var(--muted);border-bottom:1px solid var(--border)}
 .heatmap-bar .gradient{flex:1;max-width:300px;height:6px;border-radius:3px;background:linear-gradient(to right,#313695,#74add1,#ffffbf,#f46d43,#a50026)}
-.heatmap-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--accent)}
 
 /* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;display:flex;align-items:flex-start;justify-content:flex-end}
-.modal{width:380px;height:100vh;background:var(--bg2);border-left:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column;animation:slideIn 0.25s ease}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:flex;align-items:flex-start;justify-content:flex-end}
+.modal{width:385px;height:100vh;background:var(--bg2);border-left:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column;animation:slideIn 0.22s ease}
 @keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
 .modal-header{padding:20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg2);z-index:10;display:flex;justify-content:space-between;align-items:flex-start}
-.modal-symbol-big{font-size:64px;font-weight:900;font-family:'Exo 2',sans-serif;line-height:1;color:#fff}
+.modal-symbol-big{font-size:60px;font-weight:900;line-height:1}
 .modal-meta{text-align:right}
-.modal-name{font-size:18px;font-weight:600;color:var(--accent)}
-.modal-num{font-size:12px;color:var(--muted);font-family:'Share Tech Mono',monospace}
-.modal-cat{display:inline-block;padding:3px 8px;border-radius:2px;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-top:6px;font-weight:600}
+.modal-name{font-size:17px;font-weight:700;color:var(--accent)}
+.modal-num{font-size:12px;color:var(--muted);font-family:monospace}
+.modal-cat{display:inline-block;padding:3px 8px;border-radius:3px;font-size:10px;text-transform:uppercase;margin-top:6px;font-weight:700}
 .modal-tabs{display:flex;border-bottom:1px solid var(--border)}
-.tab{flex:1;padding:10px;text-align:center;font-size:11px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all 0.2s}
+.tab{flex:1;padding:10px;text-align:center;font-size:12px;text-transform:uppercase;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all 0.2s;font-weight:700;letter-spacing:0.3px}
 .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
 .modal-body{padding:16px;flex:1}
 .prop-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
-.prop{background:var(--bg3);padding:8px 10px;border-radius:4px;border:1px solid var(--border)}
-.prop-label{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
-.prop-val{font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--text)}
+.prop{background:var(--bg3);padding:8px 10px;border-radius:5px;border:1px solid var(--border)}
+.prop-label{font-size:9px;color:var(--muted);text-transform:uppercase;margin-bottom:3px;font-weight:700;letter-spacing:0.4px}
+.prop-val{font-family:monospace;font-size:13px;color:var(--text)}
 .prop-val.accent{color:var(--accent)}
-.section-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:12px 0 8px;display:flex;align-items:center;gap:8px}
+.section-title{font-size:10px;text-transform:uppercase;color:var(--muted);margin:12px 0 8px;display:flex;align-items:center;gap:8px;font-weight:700;letter-spacing:0.5px}
 .section-title::after{content:'';flex:1;height:1px;background:var(--border)}
-
-/* BOHR MODEL */
-.bohr{display:flex;justify-content:center;align-items:center;margin:10px 0;height:160px;position:relative}
+.econfig{font-family:monospace;font-size:12px;color:var(--accent);background:var(--bg3);padding:10px;border-radius:5px;border:1px solid var(--border);word-break:break-all;line-height:1.7}
+.bohr{display:flex;justify-content:center;align-items:center;margin:8px 0;height:170px}
 .bohr svg{overflow:visible}
-@keyframes orbit1{from{transform:rotate(0deg) translateX(var(--r)) rotate(0deg)}to{transform:rotate(360deg) translateX(var(--r)) rotate(-360deg)}}
+.bohr-controls{display:flex;justify-content:center;margin-bottom:4px}
 
-/* ELECTRON CONFIG */
-.econfig{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--accent);background:var(--bg3);padding:10px;border-radius:4px;border:1px solid var(--border);word-break:break-all;line-height:1.6}
-
-/* COMPARE PANEL */
-.compare-bar{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--accent);z-index:900;padding:12px 20px;display:flex;align-items:center;gap:12px;animation:slideUp 0.2s ease}
+/* COMPARE */
+.compare-bar{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:2px solid var(--accent);z-index:900;padding:12px 20px;display:flex;align-items:center;gap:12px;animation:slideUp 0.2s ease;flex-wrap:wrap}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.compare-slot{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:8px 12px;display:flex;align-items:center;gap:8px;min-width:120px}
-.compare-slot .sym{font-weight:800;font-size:18px;font-family:'Exo 2',sans-serif}
+.compare-slot{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:8px 12px;display:flex;align-items:center;gap:8px;min-width:120px}
+.compare-slot .sym{font-weight:900;font-size:17px}
 .compare-slot .nm{font-size:10px;color:var(--muted)}
-.compare-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px}
-.compare-table th{text-align:left;padding:5px 8px;color:var(--muted);font-size:9px;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--border)}
-.compare-table td{padding:5px 8px;border-bottom:1px solid var(--border);font-family:'Share Tech Mono',monospace}
-.compare-table td.best{color:#69f0ae}
-.compare-table td.worst{color:#ff5252}
+.compare-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}
+.compare-table th{text-align:left;padding:6px 8px;color:var(--muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);font-weight:700}
+.compare-table td{padding:6px 8px;border-bottom:1px solid var(--border);font-family:monospace}
+.compare-table td.best{color:var(--green)}
+.compare-table td.worst{color:var(--red)}
 .compare-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:1100;display:flex;align-items:center;justify-content:center;padding:20px}
-.compare-modal{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:20px;max-width:700px;width:100%;max-height:90vh;overflow-y:auto}
+.compare-modal{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:20px;max-width:720px;width:100%;max-height:90vh;overflow-y:auto}
 
 /* MOLAR CALC */
 .molar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:1100;display:flex;align-items:center;justify-content:center;padding:20px}
-.molar-box{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:24px;max-width:440px;width:100%}
-.molar-input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:4px;font-family:'Share Tech Mono',monospace;font-size:18px;outline:none;margin:10px 0;transition:border-color 0.2s}
+.molar-box{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:0;max-width:520px;width:100%;max-height:90vh;overflow-y:auto}
+.molar-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.molar-tabs{display:flex;border-bottom:1px solid var(--border)}
+.molar-tab{flex:1;padding:10px;text-align:center;font-size:12px;text-transform:uppercase;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all 0.2s;font-weight:700;letter-spacing:0.3px}
+.molar-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.molar-content{padding:18px 20px}
+.molar-input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:11px 14px;border-radius:6px;font-family:monospace;font-size:17px;outline:none;margin-bottom:12px;transition:border-color 0.2s}
 .molar-input:focus{border-color:var(--accent)}
-.molar-result{font-family:'Share Tech Mono',monospace;font-size:24px;color:var(--accent);margin:10px 0;min-height:32px}
-.molar-breakdown{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}
-.molar-breakdown th{text-align:left;padding:4px 8px;color:var(--muted);font-size:10px;border-bottom:1px solid var(--border)}
-.molar-breakdown td{padding:4px 8px;font-family:'Share Tech Mono',monospace;border-bottom:1px solid var(--border)}
-.molar-error{color:#ff5252;font-size:13px;margin-top:8px}
+.molar-input-sm{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:5px;font-family:'Lato',sans-serif;font-size:13px;outline:none;transition:border-color 0.2s;margin-bottom:0}
+.molar-input-sm:focus{border-color:var(--accent)}
+.molar-result{font-family:monospace;font-size:22px;color:var(--accent);margin:10px 0;min-height:30px;font-weight:400}
+.molar-breakdown{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.molar-breakdown th{text-align:left;padding:5px 8px;color:var(--muted);font-size:10px;border-bottom:1px solid var(--border);font-weight:700;text-transform:uppercase}
+.molar-breakdown td{padding:5px 8px;font-family:monospace;border-bottom:1px solid var(--border)}
+.molar-error{color:var(--red);font-size:13px;margin-top:8px;font-weight:700}
+.input-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.input-label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:10px}
+.badge-green{background:rgba(74,222,128,0.15);color:var(--green);border:1px solid rgba(74,222,128,0.3)}
+.badge-orange{background:rgba(251,146,60,0.15);color:var(--orange);border:1px solid rgba(251,146,60,0.3)}
+.badge-grey{background:rgba(100,116,139,0.15);color:var(--muted);border:1px solid rgba(100,116,139,0.3)}
+.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.result-card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px 12px}
+.result-card.highlight{border-color:rgba(56,189,248,0.4);background:rgba(56,189,248,0.06)}
+.result-label{font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:700;letter-spacing:0.4px;margin-bottom:4px}
+.result-val{font-family:monospace;font-size:15px;color:var(--text)}
+.result-val.accent{color:var(--accent)}
+.result-val.accent2{color:var(--accent2)}
+.medium-select{background:var(--bg);border:1px solid var(--orange);color:var(--text);padding:6px 10px;border-radius:5px;font-family:'Lato',sans-serif;font-size:12px;outline:none;cursor:pointer;width:100%;margin-bottom:8px}
 
-/* MOBILE */
+/* FOOTER */
+footer{text-align:center;padding:20px;font-size:13px;background-color:#020617;color:#64748b;margin-top:40px;font-weight:400;border-top:1px solid rgba(56,189,248,0.1)}
+
 @media(max-width:700px){
   .modal{width:100vw}
-  .controls{padding:8px 10px}
-  .search-wrap input{width:140px}
-  .temp-wrap input[type=range]{width:80px}
-  .header{padding:10px}
-  .logo{font-size:16px}
+  .controls{padding:8px 12px}
+  .search-wrap{min-width:180px}
+  header{padding:10px 14px}
+  .logo-title{font-size:18px}
+  .logo-sub{font-size:12px}
+  .temp-controls input[type=range]{min-width:100px}
+  .temp-block{min-width:220px}
+  .results-grid{grid-template-columns:1fr}
+  .input-row{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
+
+<header>
+  <div class="logo-block">
+    <span class="logo-title">Periodic Table</span>
+    <span class="logo-sub">by CupX Corporation</span>
+  </div>
+  <a href="/">← Back to Home</a>
+</header>
+
 <div id="root"></div>
+
+<footer>© 2026 CupX Corporation · All rights reserved</footer>
+
 <script type="text/babel">
 
-// ─── ELEMENT DATA ──────────────────────────────────────────────────────────────
-// Compact but complete: 118 elements with all needed properties
-const ELEMENTS = [
+// ─── ELEMENT DATA ─────────────────────────────────────────────────────────────
+const ELEMENTS=[
   {n:1,s:"H",name:"Hydrogen",mass:1.008,g:1,p:1,cat:"nonmetal",c:"#a8d8ea",mp:14.01,bp:20.28,en:2.20,ar:53,d:0.00009,ec:"1s¹",eps:[1],ox:[1,-1],disc:"1766",by:"Henry Cavendish",ety:"Greek: hydro+genes (water-forming)"},
   {n:2,s:"He",name:"Helium",mass:4.003,g:18,p:1,cat:"noble gas",c:"#d4e6ff",mp:0.95,bp:4.22,en:null,ar:31,d:0.000178,ec:"1s²",eps:[2],ox:[0],disc:"1868",by:"Janssen/Lockyer",ety:"Greek: Helios (sun)"},
   {n:3,s:"Li",name:"Lithium",mass:6.941,g:1,p:2,cat:"alkali metal",c:"#ff6b6b",mp:453.69,bp:1615,en:0.98,ar:167,d:0.534,ec:"[He] 2s¹",eps:[2,1],ox:[1],disc:"1817",by:"Johan Arfvedson",ety:"Greek: lithos (stone)"},
@@ -219,7 +271,7 @@ const ELEMENTS = [
   {n:48,s:"Cd",name:"Cadmium",mass:112.411,g:12,p:5,cat:"transition metal",c:"#f0c040",mp:594.22,bp:1040,en:1.69,ar:161,d:8.65,ec:"[Kr] 4d¹⁰ 5s²",eps:[2,8,18,18,2],ox:[2],disc:"1817",by:"Karl Hermann",ety:"Latin: cadmia (calamine)"},
   {n:49,s:"In",name:"Indium",mass:114.818,g:13,p:5,cat:"post-transition",c:"#b0c4de",mp:429.75,bp:2345,en:1.78,ar:156,d:7.31,ec:"[Kr] 4d¹⁰ 5s² 5p¹",eps:[2,8,18,18,3],ox:[3],disc:"1863",by:"Reich/Richter",ety:"Indigo (spectral line color)"},
   {n:50,s:"Sn",name:"Tin",mass:118.710,g:14,p:5,cat:"post-transition",c:"#b0c4de",mp:505.08,bp:2875,en:1.96,ar:145,d:7.265,ec:"[Kr] 4d¹⁰ 5s² 5p²",eps:[2,8,18,18,4],ox:[4,2],disc:"ancient",by:"Known since antiquity",ety:"Anglo-Saxon: tin; Symbol from Latin: stannum"},
-  {n:51,s:"Sb",name:"Antimony",mass:121.760,g:15,p:5,cat:"metalloid",c:"#69db7c",mp:903.78,bp:1860,en:2.05,ar:133,d:6.697,ec:"[Kr] 4d¹⁰ 5s² 5p³",eps:[2,8,18,18,5],ox:[-3,3,5],disc:"ancient",by:"Known since antiquity",ety:"Greek: anti+monos (not alone); Symbol from Latin: stibium"},
+  {n:51,s:"Sb",name:"Antimony",mass:121.760,g:15,p:5,cat:"metalloid",c:"#69db7c",mp:903.78,bp:1860,en:2.05,ar:133,d:6.697,ec:"[Kr] 4d¹⁰ 5s² 5p³",eps:[2,8,18,18,5],ox:[-3,3,5],disc:"ancient",by:"Known since antiquity",ety:"Greek: anti+monos; Symbol from Latin: stibium"},
   {n:52,s:"Te",name:"Tellurium",mass:127.60,g:16,p:5,cat:"metalloid",c:"#69db7c",mp:722.66,bp:1261,en:2.1,ar:123,d:6.24,ec:"[Kr] 4d¹⁰ 5s² 5p⁴",eps:[2,8,18,18,6],ox:[-2,4,6],disc:"1782",by:"Franz Muller",ety:"Latin: tellus (earth)"},
   {n:53,s:"I",name:"Iodine",mass:126.904,g:17,p:5,cat:"halogen",c:"#74c0fc",mp:386.85,bp:457.4,en:2.66,ar:115,d:4.933,ec:"[Kr] 4d¹⁰ 5s² 5p⁵",eps:[2,8,18,18,7],ox:[-1,1,3,5,7],disc:"1811",by:"Bernard Courtois",ety:"Greek: iodes (violet)"},
   {n:54,s:"Xe",name:"Xenon",mass:131.293,g:18,p:5,cat:"noble gas",c:"#d4e6ff",mp:161.4,bp:165.03,en:null,ar:108,d:0.00589,ec:"[Kr] 4d¹⁰ 5s² 5p⁶",eps:[2,8,18,18,8],ox:[0],disc:"1898",by:"Ramsay/Travers",ety:"Greek: xenos (stranger)"},
@@ -289,7 +341,7 @@ const ELEMENTS = [
   {n:118,s:"Og",name:"Oganesson",mass:294,g:18,p:7,cat:"noble gas",c:"#d4e6ff",mp:325,bp:450,en:null,ar:null,d:5,ec:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶",eps:[2,8,18,32,32,18,8],ox:[0],disc:"2002",by:"Dubna/Livermore",ety:"Yuri Oganessian"},
 ];
 
-const CATEGORIES = [
+const CATEGORIES=[
   {key:"alkali metal",label:"Alkali Metal",color:"#ff6b6b"},
   {key:"alkaline earth",label:"Alkaline Earth",color:"#ffa94d"},
   {key:"transition metal",label:"Transition Metal",color:"#f0c040"},
@@ -301,162 +353,363 @@ const CATEGORIES = [
   {key:"lanthanide",label:"Lanthanide",color:"#cc88ff"},
   {key:"actinide",label:"Actinide",color:"#ff9966"},
 ];
-
-const HEATMAP_PROPS = [
-  {key:null,label:"None"},
-  {key:"mass",label:"Atomic Mass"},
-  {key:"en",label:"Electronegativity"},
-  {key:"ar",label:"Atomic Radius"},
-  {key:"mp",label:"Melting Point"},
-  {key:"bp",label:"Boiling Point"},
-  {key:"d",label:"Density"},
+const HEATMAP_PROPS=[
+  {key:null,label:"None"},{key:"mass",label:"Atomic Mass"},
+  {key:"en",label:"Electronegativity"},{key:"ar",label:"Atomic Radius"},
+  {key:"mp",label:"Melting Point"},{key:"bp",label:"Boiling Point"},{key:"d",label:"Density"},
 ];
 
 // ─── UTILS ────────────────────────────────────────────────────────────────────
-function lerp3(t,c1,c2,c3){
-  if(t<=0.5){const s=t*2;return lerpColor(s,c1,c2)}
-  else{const s=(t-0.5)*2;return lerpColor(s,c2,c3)}
-}
 function lerpColor(t,a,b){
-  const hr=h=>parseInt(h.slice(1,3),16),hg=h=>parseInt(h.slice(3,5),16),hb=h=>parseInt(h.slice(5,7),16);
-  const r=Math.round(hr(a)+(hr(b)-hr(a))*t);
-  const g=Math.round(hg(a)+(hg(b)-hg(a))*t);
-  const bl=Math.round(hb(a)+(hb(b)-hb(a))*t);
-  return `rgb(${r},${g},${bl})`;
+  const p=s=>parseInt(s,16);
+  const r=Math.round(p(a.slice(1,3))+(p(b.slice(1,3))-p(a.slice(1,3)))*t);
+  const g=Math.round(p(a.slice(3,5))+(p(b.slice(3,5))-p(a.slice(3,5)))*t);
+  const bl=Math.round(p(a.slice(5,7))+(p(b.slice(5,7))-p(a.slice(5,7)))*t);
+  return`rgb(${r},${g},${bl})`;
 }
 function getHeatColor(val,min,max){
   if(val==null||min==null||max==null||min===max)return null;
   const t=(val-min)/(max-min);
-  return lerp3(t,'#313695','#ffffbf','#a50026');
+  return t<=0.5?lerpColor(t*2,'#313695','#ffffbf'):lerpColor((t-0.5)*2,'#ffffbf','#a50026');
 }
 function getRange(els,key){
   const vals=els.map(e=>e[key]).filter(v=>v!=null&&!isNaN(v));
   return{min:Math.min(...vals),max:Math.max(...vals)};
 }
 
-// ─── BOHR MODEL ───────────────────────────────────────────────────────────────
-function BohrModel({eps,color}){
-  const shells=eps||[];
-  const maxR=70;
-  const cx=85,cy=85;
-  const radii=shells.map((_,i)=>18+i*(maxR/(shells.length||1)));
-  const [tick,setTick]=React.useState(0);
-  React.useEffect(()=>{
-    const id=setInterval(()=>setTick(t=>t+1),50);
-    return()=>clearInterval(id);
-  },[]);
-  return(
-    <svg width="170" height="170" style={{overflow:'visible'}}>
-      <circle cx={cx} cy={cy} r={10} fill={color||'#00e5ff'} opacity={0.9}/>
-      {radii.map((r,si)=>{
-        const count=shells[si];
-        return(
-          <g key={si}>
-            <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1"/>
-            {Array.from({length:count}).map((_,ei)=>{
-              const speed=(si+1)*0.04;
-              const base=(ei/count)*Math.PI*2;
-              const angle=base+tick*speed*(si%2===0?1:-1);
-              const ex=cx+r*Math.cos(angle);
-              const ey=cy+r*Math.sin(angle);
-              return<circle key={ei} cx={ex} cy={ey} r={2.5} fill="#00e5ff" opacity={0.85}/>;
-            })}
-          </g>
-        );
-      })}
-    </svg>
-  );
+// ─── TEMP CONVERSIONS ─────────────────────────────────────────────────────────
+function kToUnit(k,u){
+  if(u==='C')return+(k-273.15).toFixed(1);
+  if(u==='F')return+((k-273.15)*9/5+32).toFixed(1);
+  return k;
+}
+function unitToK(v,u){
+  if(u==='C')return Math.round(+v+273.15);
+  if(u==='F')return Math.round((+v-32)*5/9+273.15);
+  return Math.round(+v);
+}
+function unitRange(u){
+  if(u==='C')return{min:-273,max:5727};
+  if(u==='F')return{min:-460,max:10340};
+  return{min:0,max:6000};
 }
 
-// ─── MOLAR MASS CALCULATOR ────────────────────────────────────────────────────
-function parseFormula(formula,elMap){
+// ─── FORMULA PARSER ───────────────────────────────────────────────────────────
+function parseFormula(f,elMap){
   let i=0;
   function parse(){
-    const counts={};
-    while(i<formula.length){
-      if(formula[i]==='('){
-        i++;
-        const inner=parse();
-        if(formula[i]!==')')throw new Error('Missing )');
-        i++;
-        const num=readNum()||1;
-        for(const k in inner)counts[k]=(counts[k]||0)+inner[k]*num;
-      }else if(formula[i]===')'){
-        break;
-      }else if(formula[i]>='A'&&formula[i]<='Z'){
-        let sym=formula[i++];
-        while(i<formula.length&&formula[i]>='a'&&formula[i]<='z')sym+=formula[i++];
-        const num=readNum()||1;
-        counts[sym]=(counts[sym]||0)+num;
-      }else i++;
+    const c={};
+    while(i<f.length){
+      if(f[i]==='('){i++;const inn=parse();if(f[i]===')'){i++;}const n=rd()||1;for(const k in inn)c[k]=(c[k]||0)+inn[k]*n;}
+      else if(f[i]===')'){break;}
+      else if(f[i]>='A'&&f[i]<='Z'){let s=f[i++];while(i<f.length&&f[i]>='a'&&f[i]<='z')s+=f[i++];const n=rd()||1;c[s]=(c[s]||0)+n;}
+      else i++;
     }
-    return counts;
+    return c;
   }
-  function readNum(){
-    let s='';
-    while(i<formula.length&&formula[i]>='0'&&formula[i]<='9')s+=formula[i++];
-    return s?parseInt(s):0;
-  }
+  function rd(){let s='';while(i<f.length&&f[i]>='0'&&f[i]<='9')s+=f[i++];return s?parseInt(s):0;}
   return parse();
 }
 
-function MolarCalc({elements,onClose}){
+// ─── N-FACTOR DETECTION ───────────────────────────────────────────────────────
+// Returns { nFactor, tier, label, needsMedium, symbol }
+function detectNFactor(formula,elMap,medium){
+  if(!formula.trim())return null;
+  let counts;
+  try{ counts=parseFormula(formula,elMap); }catch(e){ return null; }
+
+  const syms=Object.keys(counts);
+  const up=formula.toUpperCase();
+
+  // Tier 2 — variable oxidation state compounds (check first for specific formulas)
+  const tier2={
+    'KMNO4':{Acidic:5,Basic:3,Neutral:1},
+    'K2CR2O7':{Acidic:6,Basic:6,Neutral:6},
+    'K2CRO4':{Acidic:6,Basic:6,Neutral:6},
+    'NA2CR2O7':{Acidic:6,Basic:6,Neutral:6},
+  };
+  const normKey=formula.replace(/\d/g,'').replace(/[()]/g,'').toUpperCase().split('').sort().join('');
+  for(const key in tier2){
+    const kn=key.replace(/\d/g,'').split('').sort().join('');
+    if(normKey===kn||up.includes(key.replace(/\d/g,''))){
+      const med=medium||'Acidic';
+      return{nFactor:tier2[key][med]||tier2[key]['Acidic'],tier:2,label:`Guided (${med} medium): n = ${tier2[key][med]||tier2[key]['Acidic']}`,needsMedium:true};
+    }
+  }
+  // Tier 2 — elements with variable oxidation
+  const variableEls=['Fe','Mn','Cr','V','Co','Cu','Pb','Sn'];
+  const hasVariable=syms.find(s=>variableEls.includes(s));
+  if(hasVariable){
+    const el=elMap[hasVariable];
+    const med=medium||'default';
+    let nf=el&&el.ox&&el.ox.length>0?Math.abs(el.ox[0]):1;
+    // context-specific overrides
+    if(hasVariable==='Fe'&&med==='Basic')nf=1;
+    else if(hasVariable==='Fe')nf=3;
+    else if(hasVariable==='Mn'&&med==='Basic')nf=3;
+    else if(hasVariable==='Mn'&&med==='Neutral')nf=1;
+    else if(hasVariable==='Mn')nf=5;
+    else if(hasVariable==='Cr')nf=3;
+    else if(hasVariable==='Cu')nf=2;
+    return{nFactor:nf,tier:2,label:`Guided (${med}): n = ${nf}`,needsMedium:true,symbol:hasVariable};
+  }
+
+  // Tier 1 — Acids: starts with H and has ionisable H
+  if(counts['H']&&syms[0]==='H'){
+    const nf=counts['H'];
+    return{nFactor:nf,tier:1,label:`Auto-detected (acid, H count): n = ${nf}`,needsMedium:false};
+  }
+  // Tier 1 — Bases: contains OH
+  const ohCount=formula.match(/OH/g);
+  if(ohCount){
+    const nf=ohCount.length;
+    return{nFactor:nf,tier:1,label:`Auto-detected (base, OH count): n = ${nf}`,needsMedium:false};
+  }
+  // Tier 1 — Salts: find metal, use its primary oxidation state
+  const metals=['Na','K','Ca','Mg','Al','Fe','Zn','Cu','Ag','Ba','Li','Sr','Cs','Rb','Be'];
+  const metal=syms.find(s=>metals.includes(s));
+  if(metal){
+    const el=elMap[metal];
+    if(el&&el.ox&&el.ox.length>0){
+      const nf=Math.abs(el.ox[0]);
+      return{nFactor:nf,tier:1,label:`Auto-detected (salt, ${metal} oxidation state): n = ${nf}`,needsMedium:false};
+    }
+  }
+
+  // Tier 3 — fallback
+  return{nFactor:null,tier:3,label:'Could not auto-detect',needsMedium:false};
+}
+
+// ─── MOLAR MASS CALCULATOR (with Solution tab) ────────────────────────────────
+function MolarCalc({onClose}){
+  const [activeTab,setActiveTab]=React.useState('molar');
   const [formula,setFormula]=React.useState('');
-  const elMap=React.useMemo(()=>{
-    const m={};elements.forEach(e=>m[e.s]=e);return m;
-  },[elements]);
-  const result=React.useMemo(()=>{
+  const [givenMass,setGivenMass]=React.useState('');
+  const [volume,setVolume]=React.useState('');
+  const [solventMass,setSolventMass]=React.useState('');
+  const [manualN,setManualN]=React.useState('');
+  const [medium,setMedium]=React.useState('Acidic');
+
+  const elMap=React.useMemo(()=>{const m={};ELEMENTS.forEach(e=>m[e.s]=e);return m;},[]);
+
+  // Molar mass calc
+  const molarResult=React.useMemo(()=>{
     if(!formula.trim())return null;
     try{
       const counts=parseFormula(formula,elMap);
-      let total=0;
-      const rows=[];
+      let total=0;const rows=[];
       for(const sym in counts){
         const el=elMap[sym];
         if(!el)return{error:`Unknown element: ${sym}`};
-        const sub=el.mass*counts[sym];
-        total+=sub;
+        const sub=el.mass*counts[sym];total+=sub;
         rows.push({sym,name:el.name,count:counts[sym],mass:el.mass,sub:sub.toFixed(4)});
       }
       return{total:total.toFixed(4),rows};
     }catch(e){return{error:e.message};}
   },[formula,elMap]);
+
+  // N-factor detection
+  const nInfo=React.useMemo(()=>detectNFactor(formula,elMap,medium),[formula,elMap,medium]);
+  const nFactor=nInfo&&nInfo.tier<3?nInfo.nFactor:(manualN?+manualN:null);
+
+  // Solution calculations
+  const sol=React.useMemo(()=>{
+    if(!molarResult||molarResult.error||!molarResult.total)return null;
+    const M=+molarResult.total;
+    const gm=givenMass?+givenMass:null;
+    const volL=volume?+volume/1000:null;
+    const solKg=solventMass?+solventMass/1000:null;
+    const nf=nFactor;
+    const fmt=v=>v!=null&&isFinite(v)?v.toFixed(4):'—';
+    const moles=gm&&M?gm/M:null;
+    const eqWt=nf&&M?M/nf:null;
+    const gramEq=gm&&eqWt?gm/eqWt:null;
+    const molarity=moles&&volL?moles/volL:null;
+    const normality=gramEq&&volL?gramEq/volL:null;
+    const molality=moles&&solKg?moles/solKg:null;
+    const moleFracSolute=moles&&solKg?(moles/(moles+(solKg*1000/18))):null;
+    return{
+      molarMass:fmt(M),
+      nFactor:nf!=null?nf:'—',
+      eqWt:fmt(eqWt),
+      moles:fmt(moles),
+      gramEq:fmt(gramEq),
+      molarity:fmt(molarity),
+      normality:fmt(normality),
+      molality:fmt(molality),
+      moleFrac:fmt(moleFracSolute),
+    };
+  },[molarResult,givenMass,volume,solventMass,nFactor]);
+
+  const f=v=>(v&&v!=='—')?<span style={{color:'var(--accent)'}}>{v}</span>:'—';
+  const fH=v=>(v&&v!=='—')?<span style={{color:'var(--accent)',fontSize:'17px',fontWeight:'400'}}>{v}</span>:'—';
+
   return(
     <div className="molar-overlay" onClick={onClose}>
       <div className="molar-box" onClick={e=>e.stopPropagation()}>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}}>
-          <div style={{fontSize:'11px',letterSpacing:'2px',color:'var(--muted)',textTransform:'uppercase'}}>Molar Mass Calculator</div>
+        <div className="molar-header">
+          <span style={{fontSize:'15px',fontWeight:'700'}}>Chemistry Calculator</span>
           <button className="btn" onClick={onClose}>✕</button>
         </div>
-        <input className="molar-input" placeholder="e.g. H2SO4" value={formula} onChange={e=>setFormula(e.target.value)} autoFocus/>
-        {result&&!result.error&&(
-          <>
-            <div className="molar-result">{result.total} g/mol</div>
-            <table className="molar-breakdown">
-              <thead><tr><th>Symbol</th><th>Element</th><th>Count</th><th>Mass</th><th>Subtotal</th></tr></thead>
-              <tbody>
-                {result.rows.map(r=>(
+        <div className="molar-tabs">
+          <div className={`molar-tab ${activeTab==='molar'?'active':''}`} onClick={()=>setActiveTab('molar')}>Molar Mass</div>
+          <div className={`molar-tab ${activeTab==='solution'?'active':''}`} onClick={()=>setActiveTab('solution')}>Solution</div>
+        </div>
+        <div className="molar-content">
+          {/* Shared formula input */}
+          <div className="input-label">Chemical Formula</div>
+          <input className="molar-input" placeholder="e.g. H2SO4 or Ca(OH)2 or KMnO4" value={formula} onChange={e=>setFormula(e.target.value)} autoFocus/>
+
+          {/* ── MOLAR MASS TAB ── */}
+          {activeTab==='molar'&&<>
+            {molarResult&&!molarResult.error&&<>
+              <div className="molar-result">{molarResult.total} g/mol</div>
+              <table className="molar-breakdown">
+                <thead><tr><th>Symbol</th><th>Name</th><th>Count</th><th>Atomic Mass</th><th>Subtotal</th></tr></thead>
+                <tbody>{molarResult.rows.map(r=>(
                   <tr key={r.sym}>
                     <td style={{color:'var(--accent)'}}>{r.sym}</td>
-                    <td style={{color:'var(--text)'}}>{r.name}</td>
-                    <td>{r.count}</td>
-                    <td>{r.mass}</td>
+                    <td>{r.name}</td><td>{r.count}</td>
+                    <td style={{fontFamily:'monospace'}}>{r.mass}</td>
                     <td style={{color:'var(--accent2)'}}>{r.sub}</td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </>
-        )}
-        {result&&result.error&&<div className="molar-error">⚠ {result.error}</div>}
-        {!result&&<div style={{color:'var(--muted)',fontSize:'12px',marginTop:'8px'}}>Type a chemical formula above</div>}
+                ))}</tbody>
+              </table>
+            </>}
+            {molarResult&&molarResult.error&&<div className="molar-error">⚠ {molarResult.error}</div>}
+            {!molarResult&&<div style={{color:'var(--muted)',fontSize:'13px'}}>Type a chemical formula above</div>}
+          </>}
+
+          {/* ── SOLUTION TAB ── */}
+          {activeTab==='solution'&&<>
+
+            {/* N-factor section */}
+            <div className="input-label" style={{marginBottom:'6px'}}>n-factor Detection</div>
+            {nInfo&&nInfo.tier===1&&<div className="badge badge-green">✓ {nInfo.label}</div>}
+            {nInfo&&nInfo.tier===2&&<>
+              <div className="badge badge-orange">⚡ {nInfo.label}</div>
+              {nInfo.needsMedium&&(
+                <select className="medium-select" value={medium} onChange={e=>setMedium(e.target.value)}>
+                  <option>Acidic</option>
+                  <option>Basic</option>
+                  <option>Neutral</option>
+                </select>
+              )}
+            </>}
+            {nInfo&&nInfo.tier===3&&<>
+              <div className="badge badge-grey">Manual input required</div>
+              <div className="input-label" style={{marginTop:'8px'}}>Enter n-factor manually</div>
+              <input className="molar-input-sm" type="number" min="1" step="1" placeholder="e.g. 2"
+                value={manualN} onChange={e=>setManualN(e.target.value)} style={{marginBottom:'10px'}}/>
+            </>}
+            {!nInfo&&formula&&<div style={{color:'var(--muted)',fontSize:'12px',marginBottom:'8px'}}>Enter a valid formula above</div>}
+
+            {/* Input fields */}
+            <div style={{marginTop:'10px'}}>
+              <div className="input-row">
+                <div>
+                  <div className="input-label">Given Mass (g)</div>
+                  <input className="molar-input-sm" type="number" placeholder="e.g. 4.9" value={givenMass} onChange={e=>setGivenMass(e.target.value)}/>
+                </div>
+                <div>
+                  <div className="input-label">Volume of Solution (mL)</div>
+                  <input className="molar-input-sm" type="number" placeholder="e.g. 500" value={volume} onChange={e=>setVolume(e.target.value)}/>
+                </div>
+              </div>
+              <div className="input-row">
+                <div>
+                  <div className="input-label">Mass of Solvent (g)</div>
+                  <input className="molar-input-sm" type="number" placeholder="e.g. 250" value={solventMass} onChange={e=>setSolventMass(e.target.value)}/>
+                </div>
+                <div>
+                  <div className="input-label" style={{marginBottom:'4px'}}>Molar Mass</div>
+                  <div style={{fontFamily:'monospace',fontSize:'14px',color:'var(--accent)',paddingTop:'8px'}}>
+                    {molarResult&&!molarResult.error?`${molarResult.total} g/mol`:'—'}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Results */}
+            {sol&&<>
+              <div className="section-title" style={{marginTop:'14px'}}>Results</div>
+              <div className="results-grid">
+                <div className="result-card highlight">
+                  <div className="result-label">Molarity (M)</div>
+                  <div className="result-val accent">{fH(sol.molarity)} mol/L</div>
+                </div>
+                <div className="result-card highlight">
+                  <div className="result-label">Normality (N)</div>
+                  <div className="result-val accent">{fH(sol.normality)} eq/L</div>
+                </div>
+                <div className="result-card highlight">
+                  <div className="result-label">Molality (m)</div>
+                  <div className="result-val accent">{fH(sol.molality)} mol/kg</div>
+                </div>
+                <div className="result-card">
+                  <div className="result-label">Moles of Solute</div>
+                  <div className="result-val">{f(sol.moles)} mol</div>
+                </div>
+                <div className="result-card">
+                  <div className="result-label">n-factor</div>
+                  <div className="result-val">{sol.nFactor}</div>
+                </div>
+                <div className="result-card">
+                  <div className="result-label">Equivalent Weight</div>
+                  <div className="result-val">{f(sol.eqWt)} g/eq</div>
+                </div>
+                <div className="result-card">
+                  <div className="result-label">Gram Equivalents</div>
+                  <div className="result-val">{f(sol.gramEq)} eq</div>
+                </div>
+                <div className="result-card">
+                  <div className="result-label">Mole Fraction (solute)</div>
+                  <div className="result-val">{f(sol.moleFrac)}</div>
+                </div>
+              </div>
+              <div style={{marginTop:'10px',fontSize:'11px',color:'var(--muted)',lineHeight:'1.6'}}>
+                Formulas: M = n/V(L) · N = geq/V(L) · m = n/kg(solvent) · EqWt = MM/n-factor
+              </div>
+            </>}
+            {!formula&&<div style={{color:'var(--muted)',fontSize:'13px'}}>Enter a formula to begin</div>}
+          </>}
+        </div>
       </div>
     </div>
   );
 }
 
+// ─── BOHR MODEL — slow animation ──────────────────────────────────────────────
+function BohrModel({eps,color,animOn}){
+  const shells=eps||[];
+  const cx=85,cy=85;
+  const radii=shells.map((_,i)=>18+i*(62/Math.max(shells.length,1)));
+  const [tick,setTick]=React.useState(0);
+  React.useEffect(()=>{
+    if(!animOn)return;
+    const id=setInterval(()=>setTick(t=>t+1),80); // slow: 80ms tick, 0.012 speed
+    return()=>clearInterval(id);
+  },[animOn]);
+  return(
+    <svg width="170" height="170" style={{overflow:'visible'}}>
+      <circle cx={cx} cy={cy} r={10} fill={color||'#38bdf8'} opacity={0.9}/>
+      {radii.map((r,si)=>(
+        <g key={si}>
+          <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1"/>
+          {Array.from({length:shells[si]}).map((_,ei)=>{
+            const speed=(si+1)*0.012;
+            const base=(ei/shells[si])*Math.PI*2;
+            const angle=base+(animOn?tick*speed*(si%2===0?1:-1):0);
+            return<circle key={ei} cx={cx+r*Math.cos(angle)} cy={cy+r*Math.sin(angle)} r={2.5} fill="#38bdf8" opacity={0.85}/>;
+          })}
+        </g>
+      ))}
+    </svg>
+  );
+}
+
 // ─── DETAIL MODAL ─────────────────────────────────────────────────────────────
-function DetailModal({el,onClose,onCompare,compareList}){
+function DetailModal({el,onClose,onCompare,compareList,animOn,setAnimOn}){
   const [tab,setTab]=React.useState('overview');
   React.useEffect(()=>{
     setTab('overview');
@@ -468,14 +721,10 @@ function DetailModal({el,onClose,onCompare,compareList}){
   const cat=CATEGORIES.find(c=>c.key===el.cat)||{color:'#888'};
   const inCompare=compareList.some(c=>c.n===el.n);
   const props=[
-    {l:'Atomic Mass',v:`${el.mass} u`},
-    {l:'Electronegativity',v:el.en!=null?`${el.en} (Pauling)`:'—'},
-    {l:'Atomic Radius',v:el.ar!=null?`${el.ar} pm`:'—'},
-    {l:'Density',v:el.d!=null?`${el.d} g/cm³`:'—'},
-    {l:'Melting Point',v:el.mp!=null?`${el.mp} K`:'—'},
-    {l:'Boiling Point',v:el.bp!=null?`${el.bp} K`:'—'},
-    {l:'Oxidation States',v:el.ox?el.ox.join(', '):'—'},
-    {l:'Discovered',v:el.disc||'—'},
+    {l:'Atomic Mass',v:`${el.mass} u`},{l:'Electronegativity',v:el.en!=null?`${el.en} (Pauling)`:'—'},
+    {l:'Atomic Radius',v:el.ar!=null?`${el.ar} pm`:'—'},{l:'Density',v:el.d!=null?`${el.d} g/cm³`:'—'},
+    {l:'Melting Point',v:el.mp!=null?`${el.mp} K`:'—'},{l:'Boiling Point',v:el.bp!=null?`${el.bp} K`:'—'},
+    {l:'Oxidation States',v:el.ox?el.ox.join(', '):'—'},{l:'Discovered',v:el.disc||'—'},
   ];
   return(
     <div className="modal-overlay" onClick={onClose}>
@@ -487,157 +736,93 @@ function DetailModal({el,onClose,onCompare,compareList}){
             <div className="modal-num">#{el.n} · {el.mass} u</div>
             <div className="modal-cat" style={{background:`${cat.color}22`,color:cat.color}}>{el.cat}</div>
             <div style={{marginTop:'8px',display:'flex',gap:'6px',justifyContent:'flex-end'}}>
-              <button className={`btn ${inCompare?'active':''}`} onClick={()=>onCompare(el)} style={{fontSize:'10px',padding:'5px 10px'}}>
-                {inCompare?'✓ Added':'+ Compare'}
-              </button>
+              <button className={`btn ${inCompare?'active':''}`} onClick={()=>onCompare(el)} style={{fontSize:'11px',padding:'5px 10px'}}>{inCompare?'✓ Added':'+ Compare'}</button>
               <button className="btn" onClick={onClose}>✕</button>
             </div>
           </div>
         </div>
         <div className="modal-tabs">
-          {['overview','nucleus','history'].map(t=>(
-            <div key={t} className={`tab ${tab===t?'active':''}`} onClick={()=>setTab(t)}>
-              {t.charAt(0).toUpperCase()+t.slice(1)}
-            </div>
-          ))}
+          {['overview','nucleus','history'].map(t=><div key={t} className={`tab ${tab===t?'active':''}`} onClick={()=>setTab(t)}>{t.charAt(0).toUpperCase()+t.slice(1)}</div>)}
         </div>
         <div className="modal-body">
-          {tab==='overview'&&(
-            <>
-              <div className="bohr" style={{height:'180px'}}>
-                <BohrModel eps={el.eps} color={cat.color}/>
-              </div>
-              <div className="section-title">Electron Configuration</div>
-              <div className="econfig">{el.ec}</div>
-              <div className="section-title" style={{marginTop:'14px'}}>Properties</div>
-              <div className="prop-grid">
-                {props.map(p=>(
-                  <div key={p.l} className="prop">
-                    <div className="prop-label">{p.l}</div>
-                    <div className="prop-val accent">{p.v}</div>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-          {tab==='nucleus'&&(
-            <>
-              <div className="prop-grid">
-                <div className="prop"><div className="prop-label">Protons</div><div className="prop-val accent">{el.n}</div></div>
-                <div className="prop"><div className="prop-label">Electrons</div><div className="prop-val accent">{el.n}</div></div>
-                <div className="prop"><div className="prop-label">Neutrons (common)</div><div className="prop-val accent">{Math.round(el.mass)-el.n}</div></div>
-                <div className="prop"><div className="prop-label">Mass Number</div><div className="prop-val accent">{Math.round(el.mass)}</div></div>
-              </div>
-              <div className="section-title">Electron Shells</div>
-              <div style={{display:'flex',gap:'8px',flexWrap:'wrap',marginTop:'6px'}}>
-                {(el.eps||[]).map((c,i)=>(
-                  <div key={i} style={{background:'var(--bg3)',border:'1px solid var(--border)',borderRadius:'4px',padding:'8px 12px',textAlign:'center'}}>
-                    <div style={{fontSize:'9px',color:'var(--muted)'}}>Shell {i+1}</div>
-                    <div style={{fontFamily:'Share Tech Mono',fontSize:'18px',color:'var(--accent)'}}>{c}</div>
-                    <div style={{fontSize:'9px',color:'var(--muted)'}}>e⁻</div>
-                  </div>
-                ))}
-              </div>
-              <div className="section-title" style={{marginTop:'14px'}}>Oxidation States</div>
-              <div style={{display:'flex',gap:'6px',flexWrap:'wrap'}}>
-                {(el.ox||[]).map(ox=>(
-                  <div key={ox} style={{padding:'4px 10px',background:'var(--bg3)',border:`1px solid ${ox>0?'#69f0ae':ox<0?'#ff5252':'var(--border)'}`,borderRadius:'3px',fontFamily:'Share Tech Mono',fontSize:'13px',color:ox>0?'#69f0ae':ox<0?'#ff5252':'var(--muted)'}}>
-                    {ox>0?`+${ox}`:ox}
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-          {tab==='history'&&(
-            <>
-              <div className="prop-grid">
-                <div className="prop"><div className="prop-label">Discovered</div><div className="prop-val accent">{el.disc}</div></div>
-                <div className="prop"><div className="prop-label">Discovered By</div><div className="prop-val" style={{fontSize:'11px'}}>{el.by}</div></div>
-              </div>
-              <div className="section-title">Etymology</div>
-              <div style={{background:'var(--bg3)',border:'1px solid var(--border)',borderRadius:'4px',padding:'12px',fontSize:'13px',lineHeight:'1.6',color:'var(--text)'}}>
-                {el.ety}
-              </div>
-              <div className="section-title" style={{marginTop:'14px'}}>Category</div>
-              <div style={{padding:'10px',background:`${cat.color}11`,border:`1px solid ${cat.color}44`,borderRadius:'4px',color:cat.color,fontSize:'13px',textTransform:'capitalize'}}>
-                {el.cat}
-              </div>
-            </>
-          )}
+          {tab==='overview'&&<>
+            <div style={{display:'flex',justifyContent:'center',marginBottom:'4px'}}>
+              <button className={`btn ${animOn?'active':''}`} onClick={()=>setAnimOn(!animOn)} style={{fontSize:'11px',padding:'4px 10px'}}>{animOn?'⏸ Pause':'▶ Play'} Orbit</button>
+            </div>
+            <div className="bohr"><BohrModel eps={el.eps} color={cat.color} animOn={animOn}/></div>
+            <div className="section-title">Electron Configuration</div>
+            <div className="econfig">{el.ec}</div>
+            <div className="section-title" style={{marginTop:'14px'}}>Properties</div>
+            <div className="prop-grid">{props.map(p=><div key={p.l} className="prop"><div className="prop-label">{p.l}</div><div className="prop-val accent">{p.v}</div></div>)}</div>
+          </>}
+          {tab==='nucleus'&&<>
+            <div className="prop-grid">
+              <div className="prop"><div className="prop-label">Protons</div><div className="prop-val accent">{el.n}</div></div>
+              <div className="prop"><div className="prop-label">Electrons</div><div className="prop-val accent">{el.n}</div></div>
+              <div className="prop"><div className="prop-label">Neutrons</div><div className="prop-val accent">{Math.round(el.mass)-el.n}</div></div>
+              <div className="prop"><div className="prop-label">Mass Number</div><div className="prop-val accent">{Math.round(el.mass)}</div></div>
+            </div>
+            <div className="section-title">Electron Shells</div>
+            <div style={{display:'flex',gap:'8px',flexWrap:'wrap',marginTop:'6px'}}>
+              {(el.eps||[]).map((c,i)=><div key={i} style={{background:'var(--bg3)',border:'1px solid var(--border)',borderRadius:'5px',padding:'8px 12px',textAlign:'center'}}><div style={{fontSize:'9px',color:'var(--muted)',fontWeight:'700'}}>Shell {i+1}</div><div style={{fontFamily:'monospace',fontSize:'18px',color:'var(--accent)'}}>{c}</div><div style={{fontSize:'9px',color:'var(--muted)'}}>e⁻</div></div>)}
+            </div>
+            <div className="section-title" style={{marginTop:'14px'}}>Oxidation States</div>
+            <div style={{display:'flex',gap:'6px',flexWrap:'wrap'}}>
+              {(el.ox||[]).map(ox=><div key={ox} style={{padding:'4px 10px',background:'var(--bg3)',border:`1px solid ${ox>0?'#4ade80':ox<0?'#f87171':'var(--border)'}`,borderRadius:'4px',fontFamily:'monospace',fontSize:'13px',color:ox>0?'#4ade80':ox<0?'#f87171':'var(--muted)'}}>{ox>0?`+${ox}`:ox}</div>)}
+            </div>
+          </>}
+          {tab==='history'&&<>
+            <div className="prop-grid">
+              <div className="prop"><div className="prop-label">Discovered</div><div className="prop-val accent">{el.disc}</div></div>
+              <div className="prop"><div className="prop-label">By</div><div className="prop-val" style={{fontSize:'11px'}}>{el.by}</div></div>
+            </div>
+            <div className="section-title">Etymology</div>
+            <div style={{background:'var(--bg3)',border:'1px solid var(--border)',borderRadius:'5px',padding:'12px',fontSize:'13px',lineHeight:'1.7'}}>{el.ety}</div>
+            <div className="section-title" style={{marginTop:'14px'}}>Category</div>
+            <div style={{padding:'10px',background:`${cat.color}11`,border:`1px solid ${cat.color}44`,borderRadius:'5px',color:cat.color,fontSize:'13px',textTransform:'capitalize',fontWeight:'700'}}>{el.cat}</div>
+          </>}
         </div>
       </div>
     </div>
   );
 }
 
-// ─── COMPARE PANEL ────────────────────────────────────────────────────────────
+// ─── COMPARE ──────────────────────────────────────────────────────────────────
 function ComparePanel({list,onRemove,onClearAll,onOpenFull}){
-  if(list.length===0)return null;
+  if(!list.length)return null;
   return(
     <div className="compare-bar">
-      <div style={{fontSize:'10px',color:'var(--accent)',letterSpacing:'1px',textTransform:'uppercase',whiteSpace:'nowrap'}}>Compare</div>
-      {list.map(el=>{
-        const cat=CATEGORIES.find(c=>c.key===el.cat)||{color:'#888'};
-        return(
-          <div key={el.n} className="compare-slot">
-            <div className="sym" style={{color:cat.color}}>{el.s}</div>
-            <div><div className="nm">{el.name}</div><div style={{fontSize:'9px',color:'var(--muted)',fontFamily:'Share Tech Mono'}}>#{el.n}</div></div>
-            <button style={{background:'none',border:'none',color:'var(--muted)',cursor:'pointer',padding:'2px',marginLeft:'auto',fontSize:'12px'}} onClick={()=>onRemove(el)}>✕</button>
-          </div>
-        );
-      })}
-      {list.length>=2&&<button className="btn accent" onClick={onOpenFull} style={{whiteSpace:'nowrap',fontSize:'11px'}}>View Comparison</button>}
-      <button className="btn" onClick={onClearAll} style={{whiteSpace:'nowrap',fontSize:'11px'}}>Clear</button>
+      <div style={{fontSize:'11px',color:'var(--accent)',fontWeight:'700',textTransform:'uppercase',whiteSpace:'nowrap'}}>Compare</div>
+      {list.map(el=>{const cat=CATEGORIES.find(c=>c.key===el.cat)||{color:'#888'};return(
+        <div key={el.n} className="compare-slot">
+          <div className="sym" style={{color:cat.color}}>{el.s}</div>
+          <div><div className="nm">{el.name}</div><div style={{fontSize:'9px',color:'var(--muted)',fontFamily:'monospace'}}>#{el.n}</div></div>
+          <button style={{background:'none',border:'none',color:'var(--muted)',cursor:'pointer',padding:'2px',marginLeft:'auto',fontSize:'13px'}} onClick={()=>onRemove(el)}>✕</button>
+        </div>
+      );})}
+      {list.length>=2&&<button className="btn accent-btn" onClick={onOpenFull} style={{fontSize:'12px'}}>View Comparison</button>}
+      <button className="btn" onClick={onClearAll} style={{fontSize:'12px'}}>Clear</button>
     </div>
   );
 }
-
 function CompareFullModal({list,onClose}){
   if(!list||list.length<2)return null;
-  const rows=[
-    {l:'Atomic Mass',k:'mass',unit:'u'},
-    {l:'Electronegativity',k:'en',unit:''},
-    {l:'Atomic Radius',k:'ar',unit:'pm'},
-    {l:'Density',k:'d',unit:'g/cm³'},
-    {l:'Melting Point',k:'mp',unit:'K'},
-    {l:'Boiling Point',k:'bp',unit:'K'},
-  ];
+  const rows=[{l:'Atomic Mass',k:'mass',u:'u'},{l:'Electronegativity',k:'en',u:''},{l:'Atomic Radius',k:'ar',u:'pm'},{l:'Density',k:'d',u:'g/cm³'},{l:'Melting Point',k:'mp',u:'K'},{l:'Boiling Point',k:'bp',u:'K'}];
   return(
     <div className="compare-modal-overlay" onClick={onClose}>
       <div className="compare-modal" onClick={e=>e.stopPropagation()}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'16px'}}>
-          <div style={{fontSize:'11px',letterSpacing:'2px',color:'var(--muted)',textTransform:'uppercase'}}>Element Comparison</div>
+          <div style={{fontSize:'15px',fontWeight:'700'}}>Element Comparison</div>
           <button className="btn" onClick={onClose}>✕</button>
         </div>
         <table className="compare-table">
-          <thead>
-            <tr>
-              <th>Property</th>
-              {list.map(el=>{
-                const cat=CATEGORIES.find(c=>c.key===el.cat)||{color:'#888'};
-                return<th key={el.n} style={{color:cat.color}}>{el.s} — {el.name}</th>;
-              })}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map(row=>{
-              const vals=list.map(el=>el[row.k]);
-              const numVals=vals.filter(v=>v!=null);
-              const best=numVals.length?Math.max(...numVals):null;
-              const worst=numVals.length?Math.min(...numVals):null;
-              return(
-                <tr key={row.l}>
-                  <td style={{color:'var(--muted)',fontFamily:'Exo 2'}}>{row.l}</td>
-                  {vals.map((v,i)=>{
-                    let cls='';
-                    if(v!=null&&v===best&&best!==worst)cls='best';
-                    else if(v!=null&&v===worst&&best!==worst)cls='worst';
-                    return<td key={i} className={cls}>{v!=null?`${v} ${row.unit}`:'—'}</td>;
-                  })}
-                </tr>
-              );
-            })}
-          </tbody>
+          <thead><tr><th>Property</th>{list.map(el=>{const cat=CATEGORIES.find(c=>c.key===el.cat)||{color:'#888'};return<th key={el.n} style={{color:cat.color}}>{el.s} — {el.name}</th>;})}</tr></thead>
+          <tbody>{rows.map(row=>{
+            const vals=list.map(el=>el[row.k]);
+            const nv=vals.filter(v=>v!=null);
+            const best=nv.length?Math.max(...nv):null,worst=nv.length?Math.min(...nv):null;
+            return<tr key={row.l}><td style={{color:'var(--muted)',fontWeight:'700'}}>{row.l}</td>{vals.map((v,i)=>{let cls='';if(v!=null&&v===best&&best!==worst)cls='best';else if(v!=null&&v===worst&&best!==worst)cls='worst';return<td key={i} className={cls}>{v!=null?`${v} ${row.u}`:'—'}</td>;})}</tr>;
+          })}</tbody>
         </table>
       </div>
     </div>
@@ -645,16 +830,13 @@ function CompareFullModal({list,onClose}){
 }
 
 // ─── ELEMENT CARD ─────────────────────────────────────────────────────────────
-function ElementCard({el,dimmed,heatColor,phase,searchMatch,onClick}){
+function ElementCard({el,dimmed,heatColor,searchMatch,onClick}){
   const cat=CATEGORIES.find(c=>c.key===el.cat)||{color:'#888'};
   const bgColor=heatColor||`${cat.color}28`;
-  const borderColor=heatColor?`${heatColor}88`:searchMatch?'var(--accent)':'transparent';
-  const cls=['el',dimmed?'dimmed':'',searchMatch?'search-match':'',phase].filter(Boolean).join(' ');
+  const borderColor=searchMatch?'var(--accent)':heatColor?`${heatColor}88`:'transparent';
   return(
-    <div className={cls} style={{backgroundColor:bgColor,borderColor,gridColumn:el.g,gridRow:el.p}} onClick={onClick}>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
-        <span className="en">{el.n}</span>
-      </div>
+    <div className={['el',dimmed?'dimmed':'',searchMatch?'search-match':''].filter(Boolean).join(' ')} style={{backgroundColor:bgColor,borderColor}} onClick={onClick}>
+      <span className="en">{el.n}</span>
       <span className="es">{el.s}</span>
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-end'}}>
         <span className="ename">{el.name}</span>
@@ -668,75 +850,69 @@ function ElementCard({el,dimmed,heatColor,phase,searchMatch,onClick}){
 const App=()=>{
   const [activeFilter,setActiveFilter]=React.useState(null);
   const [heatProp,setHeatProp]=React.useState(null);
-  const [temp,setTemp]=React.useState(298);
+  const [tempK,setTempK]=React.useState(298);
+  const [tempUnit,setTempUnit]=React.useState('K');
   const [search,setSearch]=React.useState('');
   const [selected,setSelected]=React.useState(null);
   const [compareList,setCompareList]=React.useState([]);
   const [showCompare,setShowCompare]=React.useState(false);
   const [showMolar,setShowMolar]=React.useState(false);
+  const [animOn,setAnimOn]=React.useState(true);
 
   const heatRange=React.useMemo(()=>heatProp?getRange(ELEMENTS,heatProp):null,[heatProp]);
 
-  const addCompare=el=>{
-    setCompareList(prev=>{
-      if(prev.some(c=>c.n===el.n))return prev.filter(c=>c.n!==el.n);
-      if(prev.length>=3)return prev;
-      return[...prev,el];
-    });
-  };
+  const addCompare=el=>setCompareList(prev=>{
+    if(prev.some(c=>c.n===el.n))return prev.filter(c=>c.n!==el.n);
+    if(prev.length>=3)return prev;
+    return[...prev,el];
+  });
 
   const getPhase=el=>{
     if(el.mp==null)return '';
-    if(temp<el.mp)return 'solid';
-    if(el.bp==null||temp<el.bp)return 'liquid';
+    if(tempK<el.mp)return 'solid';
+    if(el.bp==null||tempK<el.bp)return 'liquid';
     return 'gas';
   };
 
-  // Position lanthanides row 8, actinides row 9
   const getPos=el=>{
     if(el.g!=null)return{col:el.g,row:el.p};
-    if(el.cat==='lanthanide'){return{col:el.n-54,row:8};}
-    if(el.cat==='actinide'){return{col:el.n-86,row:9};}
+    if(el.cat==='lanthanide')return{col:el.n-54,row:8};
+    if(el.cat==='actinide')return{col:el.n-86,row:9};
     return{col:1,row:1};
   };
 
-  // Phase summary for temp bar
   const phaseSummary=React.useMemo(()=>{
     const s=ELEMENTS.filter(e=>getPhase(e)==='solid').length;
     const l=ELEMENTS.filter(e=>getPhase(e)==='liquid').length;
     const g=ELEMENTS.filter(e=>getPhase(e)==='gas').length;
     return`${s} solid · ${l} liquid · ${g} gas`;
-  },[temp]);
+  },[tempK]);
 
-  const stateColors={solid:'rgba(180,200,255,0.12)',liquid:'rgba(100,200,255,0.18)',gas:'rgba(255,150,80,0.18)'};
+  const displayTemp=kToUnit(tempK,tempUnit);
+  const{min:sMin,max:sMax}=unitRange(tempUnit);
+  const handleTempSlider=v=>{const k=unitToK(v,tempUnit);if(!isNaN(k))setTempK(Math.max(0,Math.min(6000,k)));};
+  const handleTempNumber=v=>{const k=unitToK(v,tempUnit);if(!isNaN(k)&&k>=0&&k<=6000)setTempK(k);};
+
+  const stateColors={liquid:'rgba(100,200,255,0.14)',gas:'rgba(255,150,80,0.14)'};
 
   return(
-    <div style={{minHeight:'100vh',position:'relative',zIndex:1}}>
-      {/* HEADER */}
-      <div className="header">
-        <div className="logo">CUPX PERIODIC TABLE<span>Interactive Element Explorer</span></div>
-        <div className="header-actions">
-          <button className="btn" onClick={()=>setShowMolar(true)}>⚗ Molar Calc</button>
-          {compareList.length>=2&&<button className="btn accent" onClick={()=>setShowCompare(true)}>Compare ({compareList.length})</button>}
-        </div>
-      </div>
+    <div style={{minHeight:'60vh',position:'relative',zIndex:1,paddingBottom:compareList.length?'80px':'0'}}>
 
       {/* CONTROLS */}
       <div className="controls">
-        {/* Search */}
+        {/* Wide search */}
         <div className="search-wrap">
-          <input type="text" placeholder="Search elements..." value={search} onChange={e=>setSearch(e.target.value)}/>
+          <span className="search-icon">⌕</span>
+          <input type="text" placeholder="Search by name, symbol or atomic number..." value={search} onChange={e=>setSearch(e.target.value)}/>
         </div>
 
-        {/* Category Filters */}
+        {/* Category filters */}
         <div className="ctrl-group">
           <span className="ctrl-label">Filter</span>
           {CATEGORIES.map(cat=>(
             <button key={cat.key} className={`filter-btn ${activeFilter===cat.key?'active':''}`}
               style={activeFilter===cat.key?{borderColor:cat.color,color:cat.color,background:`${cat.color}18`}:{}}
-              onClick={()=>setActiveFilter(activeFilter===cat.key?null:cat.key)}>
-              {cat.label}
-            </button>
+              onClick={()=>setActiveFilter(activeFilter===cat.key?null:cat.key)}>{cat.label}</button>
           ))}
         </div>
 
@@ -748,98 +924,76 @@ const App=()=>{
           </select>
         </div>
 
-        {/* Temperature */}
-        <div className="ctrl-group">
-          <span className="ctrl-label">Temp</span>
-          <div className="temp-wrap">
-            <input type="range" min="0" max="6000" step="10" value={temp} onChange={e=>setTemp(+e.target.value)}/>
-            <span className="temp-val">{temp}K</span>
+        {/* Temperature — longer slider + number + K/C/F */}
+        <div className="ctrl-group" style={{flex:1,minWidth:'320px'}}>
+          <span className="ctrl-label">Temperature</span>
+          <div className="temp-block">
+            <div className="temp-controls">
+              <input type="range" min={sMin} max={sMax} step="1" value={displayTemp} onChange={e=>handleTempSlider(e.target.value)}/>
+              <input type="number" className="temp-number" value={displayTemp} onChange={e=>handleTempNumber(e.target.value)}/>
+              <div className="unit-toggle">
+                {['K','C','F'].map(u=><button key={u} className={tempUnit===u?'active':''} onClick={()=>setTempUnit(u)}>{u==='C'?'°C':u==='F'?'°F':'K'}</button>)}
+              </div>
+            </div>
+            <div className="phase-summary">{phaseSummary}</div>
           </div>
-          <span style={{fontSize:'10px',color:'var(--muted)'}}>{phaseSummary}</span>
+        </div>
+
+        {/* Tool buttons */}
+        <div className="ctrl-group">
+          <button className="btn" onClick={()=>setShowMolar(true)}>⚗ Calculator</button>
+          {compareList.length>=2&&<button className="btn accent-btn" onClick={()=>setShowCompare(true)}>Compare ({compareList.length})</button>}
         </div>
       </div>
 
-      {/* HEATMAP LEGEND */}
+      {/* Heatmap legend */}
       {heatProp&&heatRange&&(
         <div className="heatmap-bar">
-          <span className="heatmap-label">{HEATMAP_PROPS.find(p=>p.key===heatProp)?.label}</span>
-          <span style={{fontSize:'10px',color:'var(--muted)'}}>{heatRange.min.toFixed(1)}</span>
+          <span style={{fontFamily:'monospace',fontSize:'11px',color:'var(--accent)'}}>{HEATMAP_PROPS.find(p=>p.key===heatProp)?.label}</span>
+          <span>{heatRange.min.toFixed(1)}</span>
           <div className="gradient"/>
-          <span style={{fontSize:'10px',color:'var(--muted)'}}>{heatRange.max.toFixed(1)}</span>
+          <span>{heatRange.max.toFixed(1)}</span>
         </div>
       )}
 
-      {/* CATEGORY LEGEND */}
+      {/* Category legend */}
       <div className="legend">
-        {CATEGORIES.map(cat=>(
-          <div key={cat.key} className="legend-item">
-            <div className="legend-dot" style={{background:cat.color}}/>
-            {cat.label}
-          </div>
-        ))}
-        <div className="legend-item" style={{marginLeft:'10px'}}>
-          <div className="legend-dot" style={{border:'2px solid rgba(100,200,255,0.5)',background:'rgba(100,200,255,0.1)'}}/>Liquid
-        </div>
-        <div className="legend-item">
-          <div className="legend-dot" style={{border:'2px solid rgba(255,150,80,0.5)',background:'rgba(255,150,80,0.1)'}}/>Gas
-        </div>
+        {CATEGORIES.map(cat=><div key={cat.key} className="legend-item"><div className="legend-dot" style={{background:cat.color}}/>{cat.label}</div>)}
+        <div className="legend-item" style={{marginLeft:'8px'}}><div className="legend-dot" style={{border:'2px solid rgba(100,200,255,0.5)',background:'rgba(100,200,255,0.12)'}}/>Liquid</div>
+        <div className="legend-item"><div className="legend-dot" style={{border:'2px solid rgba(255,150,80,0.5)',background:'rgba(255,150,80,0.12)'}}/>Gas</div>
       </div>
 
-      {/* PERIODIC TABLE GRID */}
+      {/* TABLE */}
       <div className="table-scroll">
         <div className="pt-grid">
           {ELEMENTS.map(el=>{
             const pos=getPos(el);
-            const sq=search.toLowerCase();
+            const sq=search.toLowerCase().trim();
             const isMatch=sq&&(el.name.toLowerCase().includes(sq)||el.s.toLowerCase().includes(sq)||el.n.toString().includes(sq));
             const isDimmed=(activeFilter&&el.cat!==activeFilter)||(sq&&!isMatch);
             const heatColor=heatProp&&heatRange?getHeatColor(el[heatProp],heatRange.min,heatRange.max):null;
             const phase=getPhase(el);
+            const phaseBg=!isDimmed&&phase==='liquid'?stateColors.liquid:!isDimmed&&phase==='gas'?stateColors.gas:'transparent';
             return(
-              <div key={el.n} style={{
-                gridColumn:pos.col,
-                gridRow:pos.row,
-                background:isDimmed?'transparent':phase==='liquid'?stateColors.liquid:phase==='gas'?stateColors.gas:'transparent',
-                borderRadius:'3px',
-                padding:0,
-              }}>
-                <ElementCard
-                  el={{...el,g:1,p:1}}
-                  dimmed={isDimmed}
-                  heatColor={heatColor}
-                  phase={phase}
-                  searchMatch={!!isMatch}
-                  onClick={()=>setSelected(el)}
-                />
+              <div key={el.n} style={{gridColumn:pos.col,gridRow:pos.row,background:phaseBg,borderRadius:'4px'}}>
+                <ElementCard el={el} dimmed={isDimmed} heatColor={heatColor} searchMatch={!!isMatch} onClick={()=>setSelected(el)}/>
               </div>
             );
           })}
-          {/* Gap row between main table and lanthanide/actinide series */}
           <div style={{gridColumn:'1/19',gridRow:7,height:'6px'}}/>
-          {/* Series labels */}
-          <div style={{gridColumn:'1/3',gridRow:8,display:'flex',alignItems:'center',justifyContent:'flex-end',paddingRight:'4px'}}>
-            <span style={{fontSize:'7px',color:'var(--muted)',textAlign:'right',lineHeight:'1.3'}}>Lantha-<br/>nides</span>
+          <div style={{gridColumn:'1/3',gridRow:8,display:'flex',alignItems:'center',justifyContent:'flex-end',paddingRight:'5px'}}>
+            <span style={{fontSize:'8px',color:'var(--muted)',textAlign:'right',lineHeight:'1.4',fontWeight:'700'}}>Lantha-<br/>nides</span>
           </div>
-          <div style={{gridColumn:'1/3',gridRow:9,display:'flex',alignItems:'center',justifyContent:'flex-end',paddingRight:'4px'}}>
-            <span style={{fontSize:'7px',color:'var(--muted)',textAlign:'right',lineHeight:'1.3'}}>Acti-<br/>nides</span>
+          <div style={{gridColumn:'1/3',gridRow:9,display:'flex',alignItems:'center',justifyContent:'flex-end',paddingRight:'5px'}}>
+            <span style={{fontSize:'8px',color:'var(--muted)',textAlign:'right',lineHeight:'1.4',fontWeight:'700'}}>Acti-<br/>nides</span>
           </div>
         </div>
       </div>
 
-      {/* MODALS */}
-      {selected&&(
-        <DetailModal el={selected} onClose={()=>setSelected(null)} onCompare={addCompare} compareList={compareList}/>
-      )}
-      {showMolar&&<MolarCalc elements={ELEMENTS} onClose={()=>setShowMolar(false)}/>}
+      {selected&&<DetailModal el={selected} onClose={()=>setSelected(null)} onCompare={addCompare} compareList={compareList} animOn={animOn} setAnimOn={setAnimOn}/>}
+      {showMolar&&<MolarCalc onClose={()=>setShowMolar(false)}/>}
       {showCompare&&<CompareFullModal list={compareList} onClose={()=>setShowCompare(false)}/>}
-
-      {/* COMPARE BAR */}
-      <ComparePanel
-        list={compareList}
-        onRemove={el=>setCompareList(prev=>prev.filter(c=>c.n!==el.n))}
-        onClearAll={()=>setCompareList([])}
-        onOpenFull={()=>setShowCompare(true)}
-      />
+      <ComparePanel list={compareList} onRemove={el=>setCompareList(prev=>prev.filter(c=>c.n!==el.n))} onClearAll={()=>setCompareList([])} onOpenFull={()=>setShowCompare(true)}/>
     </div>
   );
 };
