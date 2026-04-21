@@ -1,912 +1,936 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>LLM Council | CupX Corporation</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet"/>
-<style>
-:root{
-  --bg:#04070e;--s1:#080d1a;--s2:#0c1220;
-  --border:rgba(56,189,248,.1);--border2:rgba(56,189,248,.22);
-  --accent:#38bdf8;--text:#e2e8f0;--muted:#475569;--muted2:#64748b;
-  --ok:#34d399;--warn:#fbbf24;--danger:#f87171;
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(56,189,248,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.022) 1px,transparent 1px);background-size:36px 36px;pointer-events:none;z-index:0;}
-body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 40% at 50% 0%,rgba(56,189,248,.055),transparent 60%);pointer-events:none;z-index:0;}
+                                --primary-dark: #0068c5;
+                                --secondary: #6c757d;
+                                --success: #28a745;
+                                --info: #17a2b8;
+                                --warning: #ffc107;
+                                --danger: #dc3545;
+                                --light: #f8f9fa;
+                                --dark: #343a40;
+                                --black: #000000;
+                            }
 
-nav{position:sticky;top:0;z-index:300;background:rgba(4,7,14,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:13px 26px;}
-.brand{font-family:'Space Mono',monospace;font-size:16px;font-weight:700;color:var(--accent);text-decoration:none;}
-.brand span{color:var(--text);}
-.back-btn{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);text-decoration:none;border:1px solid var(--border);padding:5px 13px;border-radius:4px;transition:.2s;}
-.back-btn:hover{color:var(--accent);border-color:var(--accent);}
+                            .group-marker {
+                                cursor: pointer;
+                            }
 
-main{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:46px 18px 110px;}
-.hdr{text-align:center;margin-bottom:48px;}
-.eyebrow{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.2em;color:var(--accent);opacity:.65;margin-bottom:12px;text-transform:uppercase;}
-.hdr h1{font-size:clamp(32px,6vw,58px);font-weight:700;line-height:1.05;letter-spacing:-.02em;margin-bottom:12px;}
-.hl{color:var(--accent);}
-.hdr p{font-size:14px;color:var(--muted2);max-width:520px;margin:0 auto;line-height:1.8;}
+                            .marker-tooltip {
+                                border-radius: 0.25rem;
+                                background-color: rgba(255, 255, 255, 0.9);
+                                box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+                                position: absolute;
+                                font-family: Tahoma, Geneva, sans-serif;
+                                font-size: 13px;
+                                padding: 10px 8px;
+                                z-index: 2;
+                                text-align: left;
+                                display: none;
+                            }
 
-.slbl{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted2);display:flex;align-items:center;gap:10px;margin-bottom:16px;}
-.slbl::after{content:'';flex:1;height:1px;background:var(--border);}
+                            .marker-tooltip div {
+                                line-height: 14px;
+                            }
 
-/* ── KEY CARDS ── */
-.keys-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;}
-@media(max-width:640px){.keys-grid{grid-template-columns:1fr;}}
+                            .dns-dropdown-menu {
+                                position: absolute;
+                                right: 20px;
+                                top: 21px;
+                                font-size: 13px;
+                            }
 
-.kcard{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:15px;transition:border-color .25s;}
-.kcard.on{border-color:var(--border2);}
-.kc-hdr{display:flex;align-items:center;gap:8px;margin-bottom:11px;}
-.kc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.kc-name{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;}
-.badge{font-family:'Space Mono',monospace;font-size:8px;padding:2px 6px;border-radius:5px;margin-left:auto;}
-.free-badge{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);color:var(--ok);}
-.paid-badge{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);color:var(--warn);}
-.kc-lbl{font-family:'Space Mono',monospace;font-size:8px;color:var(--muted);display:block;margin-bottom:5px;letter-spacing:.05em;}
-.kc-inp{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-family:'Space Mono',monospace;font-size:11px;color:var(--text);outline:none;transition:.2s;}
-.kc-inp:focus{border-color:var(--accent);}
-.kc-inp::placeholder{color:var(--muted);}
-.kc-link{font-family:'Space Mono',monospace;font-size:8px;color:var(--muted);margin-top:6px;display:block;}
-.kc-link a{color:var(--accent);text-decoration:none;}
-.kc-link a:hover{text-decoration:underline;}
+                            .dns-dropdown-menu .dropdown-menu {
+                                font-size: 13px;
+                            }
 
-/* ── PREMIUM DRAWER ── */
-.prem-toggle{display:flex;align-items:center;gap:8px;background:transparent;border:1px dashed rgba(251,191,36,.3);border-radius:8px;padding:9px 16px;font-family:'Space Mono',monospace;font-size:10px;color:var(--warn);cursor:pointer;transition:.2s;margin-bottom:28px;width:100%;}
-.prem-toggle:hover{border-color:rgba(251,191,36,.6);background:rgba(251,191,36,.04);}
-.prem-toggle .arrow{margin-left:auto;transition:transform .3s;}
-.prem-toggle.open .arrow{transform:rotate(180deg);}
-#prem-drawer{display:none;margin-bottom:28px;}
-#prem-drawer.open{display:block;}
-.prem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
-@media(max-width:640px){.prem-grid{grid-template-columns:1fr;}}
+                            .dns-dropdown-btn {
+                                padding: 10px 10px 8px 10px;
+                                border-radius: 0.25rem;
+                                border: 1px solid var(--dark);
+                                background-color: transparent;
+                            }
 
-/* ── PREVIEW ── */
-#preview{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:28px;}
-.prev-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
-.pm-chip{display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:7px 11px;}
-.pm-chip.on{border-color:var(--border2);}
-.pm-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
-.pm-name{font-size:9px;font-family:'Space Mono',monospace;}
-.pm-role{font-size:8px;color:var(--muted);font-family:'Space Mono',monospace;}
-.pm-arr{color:var(--muted);font-size:12px;flex-shrink:0;}
-.prev-empty{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);text-align:center;padding:8px 0;}
+                            .dns-dropdown-btn::after {
+                                display: none !important;
+                            }
 
-/* ── QUERY ── */
-.qwrap{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:24px;transition:.2s;}
-.qwrap:focus-within{border-color:var(--border2);}
-textarea#q{width:100%;background:transparent;border:none;outline:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;resize:none;line-height:1.75;min-height:66px;}
-textarea#q::placeholder{color:var(--muted);}
-.qbar{display:flex;align-items:center;justify-content:space-between;margin-top:11px;padding-top:11px;border-top:1px solid var(--border);gap:10px;flex-wrap:wrap;}
-.qhint{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);}
-#run-btn{background:var(--accent);color:var(--bg);border:none;border-radius:8px;padding:10px 26px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:.2s;}
-#run-btn:hover:not(:disabled){background:#7dd3fc;transform:translateY(-1px);}
-#run-btn:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+                            .dns-dropdown-btn .bar {
+                                width: 20px;
+                                line-height: 1px;
+                                height: 2px;
+                                background-color: var(--black);
+                                border-radius: 0.25rem;
+                                margin-bottom: 2px;
+                            }
 
-#err{display:none;background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.18);border-radius:8px;padding:12px 14px;color:#fca5a5;font-family:'Space Mono',monospace;font-size:10px;margin-bottom:20px;line-height:1.8;}
+                            .d-flex-center {
+                                display: flex;
+                                align-items: center;
+                            }
 
-/* ── FLOW ── */
-#flow-section{display:none;margin-bottom:40px;}
-.fcanvas{position:relative;background:var(--s1);border:1px solid var(--border);border-radius:15px;padding:26px 14px 20px;overflow:hidden;}
-.fcanvas::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(56,189,248,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.018) 1px,transparent 1px);background-size:22px 22px;pointer-events:none;}
-.node-row{display:flex;align-items:center;justify-content:space-between;gap:5px;position:relative;z-index:2;}
-.ncol{display:flex;flex-direction:column;gap:11px;align-items:center;}
-.fnode{display:flex;flex-direction:column;align-items:center;gap:4px;}
-.fcircle{width:44px;height:44px;border-radius:50%;border:2px solid var(--border);background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:16px;transition:border-color .3s,box-shadow .3s,transform .2s;flex-shrink:0;}
-.flbl{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:.03em;color:var(--muted);text-transform:uppercase;text-align:center;max-width:56px;line-height:1.4;}
-.fstat{font-family:'Space Mono',monospace;font-size:7px;color:var(--muted);text-align:center;min-width:48px;height:10px;}
-.farr{flex:1;display:flex;align-items:center;justify-content:center;min-width:12px;}
-.farr svg{width:100%;max-width:56px;}
-.aline{stroke:var(--border);stroke-width:1.5;fill:none;transition:stroke .4s;}
-.ahead{stroke:var(--border);stroke-width:1.5;fill:none;stroke-linecap:round;transition:stroke .4s;}
-.farr.lit .aline,.farr.lit .ahead{stroke:var(--accent);filter:drop-shadow(0 0 3px rgba(56,189,248,.45));}
-.farr.dn .aline,.farr.dn .ahead{stroke:rgba(52,211,153,.35);}
-.fcircle.s-send{border-color:var(--accent);box-shadow:0 0 12px rgba(56,189,248,.16);animation:np .9s ease-in-out infinite;}
-.fcircle.s-think{animation:rainbow 2s linear infinite;}
-.fcircle.s-ok{border-color:var(--ok);box-shadow:0 0 9px rgba(52,211,153,.14);}
-.fcircle.s-err{border-color:var(--danger);}
-.fcircle.s-rev{animation:np .9s ease-in-out infinite;}
-.fcircle.s-chair{border-color:var(--accent);box-shadow:0 0 0 4px rgba(56,189,248,.07),0 0 20px rgba(56,189,248,.25);animation:np .7s ease-in-out infinite;}
-.fcircle.s-final{border-color:var(--accent);box-shadow:0 0 18px rgba(56,189,248,.25);}
-@keyframes np{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
-@keyframes rainbow{0%{box-shadow:0 0 6px rgba(56,189,248,.15);}33%{box-shadow:0 0 8px rgba(251,146,60,.2);}66%{box-shadow:0 0 8px rgba(244,114,182,.2);}100%{box-shadow:0 0 6px rgba(56,189,248,.15);}}
-.pkt{position:absolute;width:8px;height:8px;border-radius:50%;pointer-events:none;z-index:20;opacity:0;left:0;top:0;transform:translate(calc(-50% + var(--sx)),calc(-50% + var(--sy)));}
-@keyframes pfly{0%{opacity:1;transform:translate(calc(-50% + var(--sx)),calc(-50% + var(--sy))) scale(1);}70%{opacity:.85;transform:translate(calc(-50% + var(--ex)),calc(-50% + var(--ey))) scale(1.4);}100%{opacity:0;transform:translate(calc(-50% + var(--ex)),calc(-50% + var(--ey))) scale(.1);}}
-.pkt.fly{animation:pfly .6s cubic-bezier(.4,0,.2,1) forwards;}
-.sbar{display:flex;margin-top:13px;border:1px solid var(--border);border-radius:7px;overflow:hidden;}
-.sb{flex:1;padding:7px 4px;text-align:center;font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.04em;color:var(--muted);background:var(--s2);border-right:1px solid var(--border);transition:all .3s;}
-.sb:last-child{border-right:none;}
-.sb.act{color:var(--accent);background:rgba(56,189,248,.055);}
-.sb.act::after{content:'';display:block;height:2px;background:var(--accent);margin-top:3px;animation:spulse .9s ease-in-out infinite;}
-.sb.dn{color:var(--ok);background:rgba(52,211,153,.04);}
-@keyframes spulse{0%,100%{opacity:1;}50%{opacity:.3;}}
-.logfeed{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:9px 12px;margin-top:11px;height:110px;overflow-y:auto;font-family:'Space Mono',monospace;font-size:9px;color:var(--muted2);line-height:2;}
-.logfeed::-webkit-scrollbar{width:2px;}
-.logfeed::-webkit-scrollbar-thumb{background:var(--border);}
-.le{display:block;}.le .ts{color:var(--muted);margin-right:6px;}
-.le.send .msg{color:var(--accent);}.le.recv .msg{color:var(--ok);}
-.le.chair .msg{color:var(--accent);}.le.warn .msg{color:var(--warn);}
-.le.err .msg{color:var(--danger);}.le.info .msg{color:var(--muted2);}
+                            .text-orange {
+                                color: var(--orange);
+                            }
 
-/* ── RESULTS ── */
-#results-section{display:none;}
-.rstage{margin-bottom:38px;}
-.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:11px;}
-.rtab{font-family:'Space Mono',monospace;font-size:10px;padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--s1);color:var(--muted2);cursor:pointer;transition:.2s;}
-.rtab.on{border-color:var(--accent);color:var(--accent);background:rgba(56,189,248,.07);}
-.rpanel{display:none;}.rpanel.on{display:block;}
-.rcard{background:var(--s1);border:1px solid var(--border);border-radius:11px;padding:20px;}
-.rcard-hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border);flex-wrap:wrap;}
-.rdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
-.rname{font-weight:700;font-size:13px;}
-.rmodel{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);margin-left:auto;}
-.rbody{font-size:14px;line-height:1.9;color:#cbd5e1;white-space:pre-wrap;}
-.revgrid{display:grid;gap:9px;}
-.revcard{background:var(--s1);border:1px solid var(--border);border-radius:9px;padding:13px 16px;}
-.revlbl{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:5px;}
-.revbody{font-size:13px;line-height:1.8;color:#94a3b8;white-space:pre-wrap;}
-.ch-verdict{background:linear-gradient(135deg,rgba(56,189,248,.055),rgba(129,140,248,.03));border:1px solid rgba(56,189,248,.2);border-radius:14px;padding:26px;position:relative;overflow:hidden;}
-.ch-verdict::before{content:'';position:absolute;top:-50px;right:-50px;width:160px;height:160px;background:radial-gradient(circle,rgba(56,189,248,.07),transparent 70%);pointer-events:none;}
-.cvhdr{display:flex;align-items:center;gap:10px;margin-bottom:15px;padding-bottom:12px;border-bottom:1px solid rgba(56,189,248,.1);flex-wrap:wrap;}
-.cvicon{width:30px;height:30px;border-radius:7px;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.17);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
-.cvtitle{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.08em;}
-.cvmodel{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted2);margin-top:2px;}
-.cvbody{font-size:15px;line-height:1.95;color:var(--text);white-space:pre-wrap;}
+                            .orange-dot {
+                                background-color: var(--orange);
+                                height: 5px;
+                                width: 5px;
+                                border-radius: 10px;
+                                margin-right: 5px;
+                            }
 
-#export-btn{display:none;margin-top:22px;width:100%;background:transparent;border:1px solid var(--border2);border-radius:9px;padding:12px;font-family:'Space Mono',monospace;font-size:11px;color:var(--accent);cursor:pointer;transition:.2s;align-items:center;justify-content:center;gap:8px;}
-#export-btn:hover{background:rgba(56,189,248,.07);}
+                            .text-green {
+                                color: var(--green);
+                            }
 
-.typing::after{content:'▋';animation:blink .65s step-end infinite;color:var(--accent);margin-left:1px;font-size:.75em;}
-@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
-::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+                            .green-dot {
+                                background-color: var(--green);
+                                height: 5px;
+                                width: 5px;
+                                border-radius: 10px;
+                                margin-right: 5px;
+                            }
+
+                            .text-red {
+                                color: var(--danger);
+                            }
+
+                            .red-dot {
+                                background-color: var(--danger);
+                                height: 5px;
+                                width: 5px;
+                                border-radius: 10px;
+                                margin-right: 5px;
+                            }
+
+                            .text-grey {
+                                color: rgb(116, 116, 116);
+                            }
+
+                            .marker,
+                            .ticks,
+                            .cross {
+                                cursor: pointer;
+                            }
+
+                            .clicked-legend {
+                                opacity: 0.3;
+                            }
+
+                            .btn-back-map {
+                                padding: 0.25rem 1rem;
+                                text-decoration: none;
+                                border: 1px solid rgba(0, 0, 0, 0.125);
+                                border-radius: 0.25rem;
+                                color: var(--primary);
+                            }
+
+                            .btn-back-map:hover {
+                                border-color: var(--primary);
+                                text-decoration: none;
+                            }
+
+                            #mapSvg .map_pre_container>div {
+                                height: 335px;
+                            }
+
+                            #mapSvg .map_pre_container>div pre {
+                                height: 100%;
+                            }
+
+                            .map_container {
+                                min-height: 480px;
+                            }
+
+                            .dark_mode #mapSvg text {
+                                fill: var(--clr-light-gray) !important;
+                            }
+
+                            .dark_mode .dns-dropdown-btn .bar {
+                                background-color: var(--clr-white);
+                            }
+
+                            @media screen and (max-width:1439px) {
+                                #mapSvg .map-label {
+                                    transform: translate(-90px, -25px);
+                                }
+                            }
+
+                            @media screen and (max-width:1199px) {
+                                #mapSvg .map-label {
+                                    transform: translate(-60px, -25px);
+                                }
+                            }
+</style>    label[for="cd_flag_checkbox"]::after {
+        top: 8px !important;
+    }
+
+    #collapseSetting .form-check {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+    }
+
+    #collapseSetting .form-check-label,
+    #collapseSetting .form-check-input {
+        cursor: pointer;
+        margin: 0;
+    }
+
+    #collapseSetting .form-check-input {
+        border: none;
+    }
+
+    #collapseSetting .form-check-input:checked[type=radio] {
+        background-image: none;
+    }
+
+    #collapseSetting .form-check-input:checked {
+        background-color: #309CCD;
+        border: 1px solid #b3b3b3;
+    }
+
+    #collapseSetting .form-check-input:focus {
+        box-shadow: none;
+    }
+
+    .table_custom_value tr td {
+        padding: 0px !important;
+    }
+
+    .cPlaces a {
+        color: #214C95 !important;
+    }
+
+    .cPlaces h6 {
+        font-size: 14px;
+        padding: 5px;
+        border-radius: 0px 5px 5px 0px;
+    }
+
+    .cPlaces .cType {
+        margin: 5px 0px;
+    }
+
+    .search_dns_list {
+        max-width: 245px;
+        height: 38px;
+        overflow: hidden;
+    }
+
+    .cSearch,
+    .cSearch:focus {
+        margin-right: -3px;
+        z-index: 1;
+    }
+
+    #basic-addon2 {
+        border: 1.5px solid #707070 !important;
+        margin: 0px;
+        border-radius: 0.25rem;
+        z-index: 10;
+        cursor: pointer;
+    }
+
+    .icon-colored.icon-checked-filled {
+        background-size: contain !important;
+        background-repeat: no-repeat;
+    }
+
+    #refresh_every {
+        color: #000000 !important;
+    }
+
+    .icon-globe-2 {
+        background-color: #929292 !important;
+    }
+
+    .cType {
+        font-size: 14px;
+    }
+
+    .countries_text_main img {
+        width: 17px;
+        vertical-align: sub;
+    }
+
+    @media screen and (max-width:575px) {
+        #s {
+            padding: 10px;
+        }
+
+        #t {
+            width: 75px;
+            min-width: 75px;
+            background-position: right 0rem center;
+            background-size: 13px 9px;
+        }
+    }
+
+    .dark_mode .countries_text_main {
+        color: #98D4F1;
+    }
+
+    .dark_mode #results td.result {
+        color: #A2E2FF !important;
+    }
+
+    .dark_mode #t element.style {
+        background: #373737 !important;
+        color: #E2E2E2 !important;
+    }
+
+    .dark_mode #results .icon-light-gray {
+        background-color: var(--light-gray) !important;
+    }
+
+    .dark_mode #basic-addon2 {
+        background-color: #373737 !important;
+    }
+
+    .dark_mode #collapseSetting .box_container {
+        background-color: #262626 !important;
+    }
+
+    .dark_mode #t {
+        background-color: #373737;
+        color: #E2E2E2;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='white' stroke-linecap='round'  stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    }
+
+    .dark_mode #c {
+        background-color: #656565;
+    }
+
+    .dark_mode #refresh_every {
+        color: #E2E2E2 !important;
+    }
+
+    .dark_mode code span {
+        color: #d63384 !important;
+    }
+
+    #AddDNSModal .modal-dialog {
+        max-width: 664px !important;
+    }
+
+    #AddDNSModal .modal-body .form-group label {
+        font-weight: 600;
+        font-size: 16px;
+        color: #000000;
+    }
+
+    #AddDNSModal .modal-body .form-group input {
+        font-weight: 400;
+        font-size: 16px;
+        color: #AFAFAF;
+        background: #E2E2E2;
+        box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.25);
+        border-radius: 2px;
+        border: none;
+    }
+
+    .dark_mode .modal-content {
+        background: #181818 !important;
+    }
+
+    .dark_mode .text-danger {
+        color: #DB2525 !important;
+    }
+
+    .dark_mode .marker-tooltip {
+        background-color: #191a1fe0;
+    }
 </style>
-</head>
-<body>
-<nav>
-  <a class="brand" href="/">Cup<span>X</span></a>
-  <a class="back-btn" href="/">← Home</a>
-</nav>
-<main>
-  <div class="hdr">
-    <div class="eyebrow">Experimental · Karpathy Council</div>
-    <h1>LLM <span class="hl">Council</span></h1>
-    <p>Add your API keys. The council auto-assembles from whatever you provide — even one key works. It will always find a working model.</p>
-  </div>
-
-  <!-- FREE KEYS -->
-  <div class="slbl">Free API Keys <span style="color:var(--ok);font-size:8px;margin-left:4px;">recommended</span></div>
-  <div class="keys-grid" style="margin-bottom:14px;">
-    <div class="kcard" id="kc-groq">
-      <div class="kc-hdr"><div class="kc-dot" style="background:#fb923c"></div><div class="kc-name" style="color:#fb923c">Groq</div><span class="badge free-badge">FREE</span></div>
-      <label class="kc-lbl">API KEY</label>
-      <input class="kc-inp" type="password" id="groq-key" placeholder="gsk_…" autocomplete="off" oninput="onKey()"/>
-      <span class="kc-link">→ <a href="https://console.groq.com" target="_blank">console.groq.com</a></span>
-    </div>
-    <div class="kcard" id="kc-google">
-      <div class="kc-hdr"><div class="kc-dot" style="background:#4ade80"></div><div class="kc-name" style="color:#4ade80">Google AI Studio</div><span class="badge free-badge">FREE</span></div>
-      <label class="kc-lbl">API KEY</label>
-      <input class="kc-inp" type="password" id="google-key" placeholder="AIza…" autocomplete="off" oninput="onKey()"/>
-      <span class="kc-link">→ <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a></span>
-    </div>
-    <div class="kcard" id="kc-openrouter">
-      <div class="kc-hdr"><div class="kc-dot" style="background:#f472b6"></div><div class="kc-name" style="color:#f472b6">OpenRouter</div><span class="badge free-badge">FREE</span></div>
-      <label class="kc-lbl">API KEY</label>
-      <input class="kc-inp" type="password" id="or-key" placeholder="sk-or-v1-…" autocomplete="off" oninput="onKey()"/>
-      <span class="kc-link">→ <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a></span>
-    </div>
-  </div>
-
-  <!-- PREMIUM DRAWER TOGGLE -->
-  <button class="prem-toggle" id="prem-toggle" onclick="togglePrem()">
-    ✦ Add Premium Keys — ChatGPT, Claude, Grok, Mistral, Cohere
-    <span class="arrow">▾</span>
-  </button>
-  <div id="prem-drawer">
-    <div class="slbl" style="margin-bottom:14px;">Premium API Keys <span style="color:var(--warn);font-size:8px;margin-left:4px;">billed by provider</span></div>
-    <div class="prem-grid">
-      <div class="kcard" id="kc-openai">
-        <div class="kc-hdr"><div class="kc-dot" style="background:#10b981"></div><div class="kc-name" style="color:#10b981">OpenAI</div><span class="badge paid-badge">PAID</span></div>
-        <label class="kc-lbl">API KEY</label>
-        <input class="kc-inp" type="password" id="openai-key" placeholder="sk-…" autocomplete="off" oninput="onKey()"/>
-        <span class="kc-link">→ <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a></span>
-      </div>
-      <div class="kcard" id="kc-anthropic">
-        <div class="kc-hdr"><div class="kc-dot" style="background:#c084fc"></div><div class="kc-name" style="color:#c084fc">Anthropic</div><span class="badge paid-badge">PAID</span></div>
-        <label class="kc-lbl">API KEY</label>
-        <input class="kc-inp" type="password" id="anthropic-key" placeholder="sk-ant-…" autocomplete="off" oninput="onKey()"/>
-        <span class="kc-link">→ <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a></span>
-      </div>
-      <div class="kcard" id="kc-xai">
-        <div class="kc-hdr"><div class="kc-dot" style="background:#e2e8f0"></div><div class="kc-name" style="color:#e2e8f0">xAI (Grok)</div><span class="badge paid-badge">PAID</span></div>
-        <label class="kc-lbl">API KEY</label>
-        <input class="kc-inp" type="password" id="xai-key" placeholder="xai-…" autocomplete="off" oninput="onKey()"/>
-        <span class="kc-link">→ <a href="https://console.x.ai" target="_blank">console.x.ai</a></span>
-      </div>
-      <div class="kcard" id="kc-mistral">
-        <div class="kc-hdr"><div class="kc-dot" style="background:#60a5fa"></div><div class="kc-name" style="color:#60a5fa">Mistral</div><span class="badge paid-badge">PAID</span></div>
-        <label class="kc-lbl">API KEY</label>
-        <input class="kc-inp" type="password" id="mistral-key" placeholder="…" autocomplete="off" oninput="onKey()"/>
-        <span class="kc-link">→ <a href="https://console.mistral.ai/api-keys" target="_blank">console.mistral.ai</a></span>
-      </div>
-      <div class="kcard" id="kc-cohere">
-        <div class="kc-hdr"><div class="kc-dot" style="background:#fb7185"></div><div class="kc-name" style="color:#fb7185">Cohere</div><span class="badge paid-badge">PAID</span></div>
-        <label class="kc-lbl">API KEY</label>
-        <input class="kc-inp" type="password" id="cohere-key" placeholder="…" autocomplete="off" oninput="onKey()"/>
-        <span class="kc-link">→ <a href="https://dashboard.cohere.com/api-keys" target="_blank">dashboard.cohere.com</a></span>
-      </div>
-    </div>
-  </div>
-
-  <!-- PREVIEW -->
-  <div id="preview">
-    <div class="slbl" style="margin-bottom:12px;">Council Preview</div>
-    <div class="prev-row" id="prev-row"><div class="prev-empty">Add at least one API key above</div></div>
-  </div>
-
-  <!-- QUERY -->
-  <div class="qwrap">
-    <textarea id="q" rows="3" placeholder="Ask the council anything — political, philosophical, scientific, economic…"></textarea>
-    <div class="qbar">
-      <span class="qhint">Ctrl+Enter to submit</span>
-      <button id="run-btn" onclick="startCouncil()">Convene Council ▶</button>
-    </div>
-  </div>
-  <div id="err"></div>
-
-  <!-- FLOW -->
-  <div id="flow-section">
-    <div class="slbl" style="margin-bottom:13px;">Live Data Flow</div>
-    <div class="fcanvas" id="fcanvas">
-      <div class="node-row" id="node-row"></div>
-      <div class="sbar" id="sbar"></div>
-      <div class="logfeed" id="log"></div>
-    </div>
-  </div>
-
-  <!-- RESULTS -->
-  <div id="results-section">
-    <div class="rstage">
-      <div class="slbl" style="margin-bottom:15px;">Stage 1 — First Opinions</div>
-      <div class="tabs" id="tabs1"></div>
-      <div id="panels1"></div>
-    </div>
-    <div class="rstage">
-      <div class="slbl" style="margin-bottom:15px;">Stage 2 — Peer Reviews</div>
-      <div class="revgrid" id="revgrid"></div>
-    </div>
-    <div class="rstage">
-      <div class="slbl" style="margin-bottom:15px;">Stage 3 — Chairman's Verdict</div>
-      <div class="ch-verdict">
-        <div class="cvhdr">
-          <div class="cvicon" id="cvicon">★</div>
-          <div>
-            <div class="cvtitle">CHAIRMAN — FINAL ANSWER</div>
-            <div class="cvmodel" id="cvmodel">Awaiting…</div>
-          </div>
+<script type="text/javascript">
+    window.addEventListener('DOMContentLoaded', () => {
+        let extra_flags_html = `
+        <div class="checkbox_style">
+           <input type="checkbox" class="align-text-top" id="cd_flag_checkbox" checked>
+           <label for="cd_flag_checkbox"></label>
         </div>
-        <div class="cvbody typing" id="r-chair">Awaiting deliberations…</div>
-      </div>
-      <button id="export-btn" onclick="exportPDF()">⬇ Export Full Session as PDF</button>
+
+        <span class="text-nowrap align-self-center" data-bs-toggle="tooltip" data-bs-placement="top" title="Ask DNS Server NOT to perform DNSSEC validation before replying">CD Flag</span>
+`;
+
+        let extra_flags_place = screen_size === 'xs' ? document.querySelector('#collapseSetting .box_container') : document.querySelector('#extra_flags');
+        extra_flags_place && extra_flags_place.insertAdjacentHTML('beforeend', extra_flags_html);
+    });
+</script>
+<!--Home Container-->                            <li><a title="Notepad Online" href="https://dnschecker.org/notepad-online.php">Notepad Online</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-widget">
+                        <h5 class="widget-title">More Tools</h5>
+                        <ul class="widget-list">
+                            <li><a title="QR Code Reader" href="https://dnschecker.org/qr-code-scanner.php">QR Code Scanner</a>
+                            <li><a title="Time Card Calculator with Break" href="https://dnschecker.org/time-card-calculator.php">Time Card Calculator</a>
+                            <li><a title="Morse Code Translator" href="https://dnschecker.org/morse-code-translator.php">Morse Code Translator</a></li>
+                            <li><a title="Image to Text" href="https://dnschecker.org/image-to-text-converter.php">Image to Text</a></li>
+                            <li><a title="Social Media Name Checker" href="https://dnschecker.org/social-media-name-checker.php">Social Media Name Checker</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-widget">
+                        <h5 class="widget-title">DNS Server Database</h5>
+                        <ul class="widget-list">
+                            <li><a href="https://dnschecker.org/dns/Global">Global DNS Providers</a></li>
+                            <li><a href="https://dnschecker.org/dns/Australia">Australian DNS Servers</a></li>
+                            <li><a href="https://dnschecker.org/dns/United-Kingdom">United Kingdom DNS Servers</a></li>
+                            <li><a href="https://dnschecker.org/dns/United-States-of-America">United States DNS Servers</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-widget">
+                        <h5 class="widget-title">Developer Tools</h5>
+                        <ul class="widget-list">
+                            <li><a href="https://dnschecker.org/password-generator.php">Password Generator</a></li>
+                            <li><a href="https://dnschecker.org/server-headers-check.php">Check HTTP Headers</a></li>
+                            <li><a href="https://dnschecker.org/website-server-software.php">Check Website OS</a></li>
+                            <li><a href="https://dnschecker.org/pagerank.php">Page rank Checker</a></li>
+
+                        </ul>
+                    </div>
+                    <div class="footer-widget">
+                        <h5 class="widget-title">Network Tools</h5>
+                        <ul class="widget-list">
+                            <li><a href="https://dnschecker.org/port-scanner.php">Port Checker</a></li>
+                            <li><a href="https://dnschecker.org/mac-lookup.php">MAC Address Lookup</a></li>
+                            <li><a href="https://dnschecker.org/asn-whois-lookup.php">ASN WHOIS Lookup</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-widget">
+                        <h5 class="widget-title">Email Tools</h5>
+                        <ul class="widget-list">
+                            <li><a href="https://dnschecker.org/smtp-test-tool.php">SMTP Test</a></li>
+                            <li><a href="https://dnschecker.org/email-header-analyzer.php">Trace Email</a></li>
+                            <li><a href="https://dnschecker.org/spf-record-validation.php">SPF Checker</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-widget">
+                        <h5 class="widget-title">IP Tools</h5>
+                        <ul class="widget-list">
+                            <li><a href="https://dnschecker.org/whats-my-ip-address.php">What is my IP</a></li>
+                            <li><a href="https://dnschecker.org/ip-location.php">IP Location Lookup</a></li>
+                            <li><a href="https://dnschecker.org/ip-blacklist-checker.php">IP Blacklist Check</a></li>
+                            <li><a href="https://dnschecker.org/ip-whois-lookup.php">IP WHOIS Lookup</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-widget">
+                        <h5 class="widget-title">Apps And Add-ons</h5>
+                        <div class="widget-list">
+                            <div class="mt-2">
+                                <a class="d-inline-block" target="_blank" href="https://dnschecker.org/out/dnschecker_gplay"><img alt="Get it on Google Play" src="https://dnschecker.org/themes/common/images/google-play.svg" style="width: 150px;" /></a>
+                            </div>
+                            <div class="mt-2">
+                                <a class="d-inline-block" rel="nofollow" target="_blank" href="https://chrome.google.com/webstore/detail/dns-checker/gegfpbhjnhegdnjdkghhnneaocdbbhjp"><i class="icon-colored icon-2x valign-middle icon-chrome-store me-2"></i>Get Chrome Extension</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="footer-widget">
+                        <div class="logo_footer mt-lg-5">
+                            <a href="https://dnschecker.org"><img src="https://dnschecker.org/themes/common/images/general/logo.svg" alt="DNS Checker"></a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!--Footer Wigets-->
+        </div>
     </div>
-  </div>
-</main>
+</div>
+<!--Footer Container-->
+
+<!--Footer Copyright Container-->
+<div class="container-fluid footer-copyright-container" style="padding-bottom: 90px;">
+    <!--Footer Inner Container-->
+    <div class="container footer-inner-container">
+        <div class="d-flex flex-wrap justify-content-center align-items-center mx-0 py-4 vr-between-items">
+            <!--Footer Wigets-->
+            <div class="px-0 copyright-text text-center text-lg-start">
+                <p class="text-dawn mb-0">Copyright © DNSChecker.org, All Rights Reserved.</p>
+                            </div>
+
+            <div class="px-0 text-lg-end contact-text">
+                <a href="https://dnschecker.org/contact.php">Contact us</a></li>
+            </div>
+
+            <div class="px-0 text-lg-end privacy-text">
+                <a href="https://dnschecker.org/privacy.php">Privacy</a>
+            </div>
+
+            <div class="px-0 text-lg-end contact-text text-center text-lg-start privacy-manager">
+                <!-- CSS for geo depending button -->
+                <style>
+                    #pmLink {
+                        visibility: hidden;
+                        color: #ddd;
+                        margin-bottom: 3px;
+                        display: inline-block;
+                        font-size: 12px;
+                        font-weight: 400;
+                        text-decoration: none;
+                        cursor: pointer;
+                        background: transparent;
+                    }
+
+                    #pmLink:hover {
+                        visibility: visible;
+                        color: grey;
+                    }
+                </style>
+                <!-- HTML for geo depending button -->
+                <button id="pmLink">Privacy Manager</button>
+            </div>
+            <!--Footer Wigets-->
+        </div>
+    </div>
+</div>
+<!--Footer Copyright Container-->
 
 <script>
-// ═══════════════════════════════════════════════════════════════
-// ALL MODELS — ordered by quality within each provider
-// The fallback system will walk this list top-to-bottom
-// until something actually works.
-// ═══════════════════════════════════════════════════════════════
-const ALL_MODELS = [
-  // GROQ — very reliable free tier
-  {pv:'groq',     id:'llama-3.3-70b-versatile',                   canon:'llama33-70b',   name:'LLaMA 3.3 70B',       emoji:'🦙', color:'#fb923c', chair:true},
-  {pv:'groq',     id:'mistral-saba-24b',                          canon:'mistral-saba',  name:'Mistral Saba 24B',    emoji:'🌊', color:'#60a5fa', chair:true},
-  {pv:'groq',     id:'gemma-3-27b-it',                            canon:'gemma3-27b',    name:'Gemma 3 27B',         emoji:'💎', color:'#4ade80', chair:true},
-  {pv:'groq',     id:'meta-llama/llama-4-scout-17b-16e-instruct', canon:'llama4-scout',  name:'LLaMA 4 Scout',       emoji:'🚀', color:'#f472b6', chair:false},
-  {pv:'groq',     id:'llama-3.1-8b-instant',                      canon:'llama31-8b',    name:'LLaMA 3.1 8B',        emoji:'⚡', color:'#a78bfa', chair:false},
-  {pv:'groq',     id:'gemma2-9b-it',                              canon:'gemma2-9b',     name:'Gemma 2 9B',          emoji:'🔷', color:'#34d399', chair:false},
-  // GOOGLE — great quality when working
-  {pv:'google',   id:'gemini-2.0-flash',                          canon:'gemini20',      name:'Gemini 2.0 Flash',    emoji:'✨', color:'#4ade80', chair:true},
-  {pv:'google',   id:'gemini-1.5-flash-latest',                   canon:'gemini15',      name:'Gemini 1.5 Flash',    emoji:'🌟', color:'#86efac', chair:true},
-  {pv:'google',   id:'gemini-1.5-flash-8b',                       canon:'gemini15-8b',   name:'Gemini 1.5 Flash 8B', emoji:'💫', color:'#bbf7d0', chair:false},
-  // OPENROUTER FREE — variable reliability, many fallbacks
-  {pv:'openrouter',id:'google/gemini-2.0-flash-exp:free',         canon:'gemini20',      name:'Gemini 2.0 Flash',    emoji:'✨', color:'#4ade80', chair:true},
-  {pv:'openrouter',id:'mistralai/mistral-small-3.1-24b-instruct:free',canon:'mistral31', name:'Mistral Small 3.1',   emoji:'🌊', color:'#93c5fd', chair:true},
-  {pv:'openrouter',id:'google/gemma-3-27b-it:free',               canon:'gemma3-27b',    name:'Gemma 3 27B',         emoji:'💎', color:'#86efac', chair:true},
-  {pv:'openrouter',id:'meta-llama/llama-3.3-70b-instruct:free',   canon:'llama33-70b',   name:'LLaMA 3.3 70B',       emoji:'🦙', color:'#fb923c', chair:false},
-  {pv:'openrouter',id:'deepseek/deepseek-r1:free',                canon:'deepseek-r1',   name:'DeepSeek R1',         emoji:'🧠', color:'#c084fc', chair:false},
-  {pv:'openrouter',id:'qwen/qwen3-8b:free',                       canon:'qwen3-8b',      name:'Qwen 3 8B',           emoji:'🐉', color:'#fb923c', chair:false},
-  // OPENAI PAID — high quality if key provided
-  {pv:'openai',   id:'gpt-4o',                                    canon:'gpt4o',         name:'GPT-4o',              emoji:'🟢', color:'#10b981', chair:true},
-  {pv:'openai',   id:'gpt-4o-mini',                               canon:'gpt4o-mini',    name:'GPT-4o Mini',         emoji:'🟩', color:'#6ee7b7', chair:true},
-  {pv:'openai',   id:'gpt-3.5-turbo',                             canon:'gpt35',         name:'GPT-3.5 Turbo',       emoji:'💚', color:'#34d399', chair:false},
-  // ANTHROPIC PAID
-  {pv:'anthropic',id:'claude-sonnet-4-5',                         canon:'claude-s45',    name:'Claude Sonnet 4.5',   emoji:'🔮', color:'#c084fc', chair:true},
-  {pv:'anthropic',id:'claude-haiku-4-5-20251001',                 canon:'claude-h45',    name:'Claude Haiku 4.5',    emoji:'🪄', color:'#a78bfa', chair:true},
-  {pv:'anthropic',id:'claude-3-5-sonnet-20241022',                canon:'claude-s35',    name:'Claude 3.5 Sonnet',   emoji:'💜', color:'#8b5cf6', chair:true},
-  // XAI PAID
-  {pv:'xai',      id:'grok-3-mini',                               canon:'grok3-mini',    name:'Grok 3 Mini',         emoji:'𝕏',  color:'#e2e8f0', chair:true},
-  {pv:'xai',      id:'grok-2-latest',                             canon:'grok2',         name:'Grok 2',              emoji:'𝕏',  color:'#cbd5e1', chair:true},
-  // MISTRAL PAID
-  {pv:'mistral',  id:'mistral-large-latest',                      canon:'mistral-large', name:'Mistral Large',       emoji:'🌊', color:'#60a5fa', chair:true},
-  {pv:'mistral',  id:'mistral-small-latest',                      canon:'mistral-small', name:'Mistral Small',       emoji:'💧', color:'#93c5fd', chair:false},
-  // COHERE PAID
-  {pv:'cohere',   id:'command-r-plus',                            canon:'cmd-r-plus',    name:'Command R+',          emoji:'🪸', color:'#fb7185', chair:true},
-  {pv:'cohere',   id:'command-r',                                 canon:'cmd-r',         name:'Command R',           emoji:'🌺', color:'#fda4af', chair:false},
-];
-
-const PV_LABEL = {
-  groq:'Groq', google:'Google AI Studio', openrouter:'OpenRouter',
-  openai:'OpenAI', anthropic:'Anthropic', xai:'xAI (Grok)',
-  mistral:'Mistral', cohere:'Cohere'
-};
-
-// ═══════════════════════════════════════════════════════════════
-// API CALLERS — one per provider
-// ═══════════════════════════════════════════════════════════════
-function withTimeout(p, ms, lbl){
-  return Promise.race([p, new Promise((_,rej)=>setTimeout(()=>rej(new Error(`${lbl} timeout after ${ms/1000}s`)),ms))]);
-}
-
-async function _groq(key,id,msgs){
-  const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
-    method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-    body:JSON.stringify({model:id,messages:msgs,max_tokens:700,temperature:0.7})});
-  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'Groq '+r.status);}
-  return (await r.json()).choices[0].message.content.trim();
-}
-async function _google(key,id,msgs){
-  const contents=msgs.map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]}));
-  const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${id}:generateContent?key=${key}`,{
-    method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({contents,generationConfig:{maxOutputTokens:700,temperature:0.7}})});
-  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'Google '+r.status);}
-  const d=await r.json();
-  const txt=d.candidates?.[0]?.content?.parts?.[0]?.text;
-  if(!txt) throw new Error('Google returned empty — model may be unavailable');
-  return txt.trim();
-}
-async function _openrouter(key,id,msgs){
-  const r=await fetch('https://openrouter.ai/api/v1/chat/completions',{
-    method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key,'HTTP-Referer':'https://cupx.in','X-Title':'CupX LLM Council'},
-    body:JSON.stringify({model:id,messages:msgs,max_tokens:700})});
-  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'OpenRouter '+r.status);}
-  const d=await r.json();
-  if(d.error) throw new Error(d.error.message||'OpenRouter model error');
-  const txt=d.choices?.[0]?.message?.content?.trim();
-  if(!txt) throw new Error('OpenRouter empty response');
-  return txt;
-}
-async function _openai(key,id,msgs){
-  const r=await fetch('https://api.openai.com/v1/chat/completions',{
-    method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-    body:JSON.stringify({model:id,messages:msgs,max_tokens:700,temperature:0.7})});
-  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'OpenAI '+r.status);}
-  return (await r.json()).choices[0].message.content.trim();
-}
-async function _anthropic(key,id,msgs){
-  const r=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:id,messages:msgs,max_tokens:700})});
-  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'Anthropic '+r.status);}
-  return (await r.json()).content[0].text.trim();
-}
-async function _xai(key,id,msgs){
-  const r=await fetch('https://api.x.ai/v1/chat/completions',{
-    method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-    body:JSON.stringify({model:id,messages:msgs,max_tokens:700,temperature:0.7})});
-  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'xAI '+r.status);}
-  return (await r.json()).choices[0].message.content.trim();
-}
-async function _mistral(key,id,msgs){
-  const r=await fetch('https://api.mistral.ai/v1/chat/completions',{
-    method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-    body:JSON.stringify({model:id,messages:msgs,max_tokens:700,temperature:0.7})});
-  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'Mistral '+r.status);}
-  return (await r.json()).choices[0].message.content.trim();
-}
-async function _cohere(key,id,msgs){
-  // Cohere v2 chat API
-  const r=await fetch('https://api.cohere.com/v2/chat',{
-    method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-    body:JSON.stringify({model:id,messages:msgs,max_tokens:700})});
-  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.message||'Cohere '+r.status);}
-  return (await r.json()).message?.content?.[0]?.text?.trim()||'';
-}
-
-const TIMEOUTS = {groq:18000,google:22000,openrouter:15000,openai:25000,anthropic:25000,xai:20000,mistral:20000,cohere:20000};
-const CALLERS  = {groq:_groq,google:_google,openrouter:_openrouter,openai:_openai,anthropic:_anthropic,xai:_xai,mistral:_mistral,cohere:_cohere};
-
-function callModel(m, key, msgs){
-  return withTimeout(CALLERS[m.pv](key, m.id, msgs), TIMEOUTS[m.pv], PV_LABEL[m.pv]);
-}
-
-// ═══════════════════════════════════════════════════════════════
-// KEY STORE — reads all inputs
-// ═══════════════════════════════════════════════════════════════
-function getKeys(){
-  return {
-    groq:      document.getElementById('groq-key').value.trim(),
-    google:    document.getElementById('google-key').value.trim(),
-    or:        document.getElementById('or-key').value.trim(),
-    openai:    document.getElementById('openai-key').value.trim(),
-    anthropic: document.getElementById('anthropic-key').value.trim(),
-    xai:       document.getElementById('xai-key').value.trim(),
-    mistral:   document.getElementById('mistral-key').value.trim(),
-    cohere:    document.getElementById('cohere-key').value.trim(),
-  };
-}
-
-// Build flat pool of {model, key} pairs that have keys set
-function buildPool(){
-  const k=getKeys();
-  const keyMap={groq:k.groq,google:k.google,openrouter:k.or,openai:k.openai,anthropic:k.anthropic,xai:k.xai,mistral:k.mistral,cohere:k.cohere};
-  return ALL_MODELS
-    .filter(m=>keyMap[m.pv])
-    .map(m=>({...m, key:keyMap[m.pv]}));
-}
-
-// ═══════════════════════════════════════════════════════════════
-// COUNCIL ASSEMBLY — pick 3 diverse members + best chairman
-// ═══════════════════════════════════════════════════════════════
-function assemble(){
-  const pool=buildPool();
-  if(!pool.length) return null;
-
-  const members=[], usedCanons=new Set(), usedPvs=new Set();
-  // Pass 1: one from each provider (diversity first)
-  for(const m of pool){
-    if(members.length>=3) break;
-    if(!usedPvs.has(m.pv)&&!usedCanons.has(m.canon)){
-      members.push(m); usedPvs.add(m.pv); usedCanons.add(m.canon);
-    }
-  }
-  // Pass 2: fill remaining seats, no canon repeat
-  for(const m of pool){
-    if(members.length>=3) break;
-    if(!usedCanons.has(m.canon)){members.push(m); usedCanons.add(m.canon);}
-  }
-  // Pass 3: if still less than 3 (only 1-2 unique models available), allow repeats
-  while(members.length<3 && pool.length>0){
-    members.push({...pool[members.length % pool.length]});
-  }
-  if(!members.length) return null;
-
-  // Chairman: best quality — prefer paid models, then Google, then OpenRouter, then Groq
-  const chairOrder=['anthropic','openai','xai','mistral','cohere','google','openrouter','groq'];
-  let chair=null;
-  for(const pv of chairOrder){
-    chair=pool.find(m=>m.pv===pv&&m.chair&&!usedCanons.has(m.canon));
-    if(chair) break;
-  }
-  // Allow canon reuse for chairman if needed
-  if(!chair) for(const pv of chairOrder){
-    chair=pool.find(m=>m.pv===pv&&m.chair);
-    if(chair) break;
-  }
-  if(!chair) chair=pool.find(m=>m.chair)||pool[0];
-  return {members, chair};
-}
-
-// ═══════════════════════════════════════════════════════════════
-// RESILIENT CALL
-// Tries primary. On any failure walks the ENTIRE pool until
-// something responds. Guarantees a result as long as any key works.
-// ═══════════════════════════════════════════════════════════════
-// usedIds = Set of model ids already successfully used by earlier slots.
-// Skips those in first pass so each slot gets a different model.
-// Falls back to allowing reuse only if truly no other option exists.
-async function resilient(primary, msgs, label, usedIds=null){
-  const pool=buildPool();
-  // Deduplicated order: primary first, then rest of pool
-  const seen=new Set();
-  const order=[];
-  for(const m of [primary,...pool]){
-    if(!seen.has(m.id)){seen.add(m.id);order.push(m);}
-  }
-
-  // Pass 1: skip already-used models
-  for(const m of order){
-    if(usedIds && usedIds.has(m.id)) continue;
-    const first=(m.id===primary.id);
-    if(!first) addLog(`↻ ${label} → ${m.emoji} ${m.name} (${PV_LABEL[m.pv]})`,'warn');
-    try{
-      const text=await callModel(m, m.key, msgs);
-      if(!first) addLog(`✓ ${m.emoji} ${m.name} succeeded`,'recv');
-      if(usedIds) usedIds.add(m.id);
-      return {text, model:m};
-    }catch(e){
-      addLog(`⚠ ${m.emoji} ${m.name}: ${e.message.slice(0,60)}`,'warn');
-    }
-  }
-
-  // Pass 2: allow reuse — better a duplicate than silence
-  addLog(`⚠ ${label}: all unique models exhausted, allowing reuse`,'warn');
-  for(const m of order){
-    try{
-      const text=await callModel(m, m.key, msgs);
-      return {text, model:m};
-    }catch(e){ /* keep trying */ }
-  }
-
-  throw new Error(`${label}: every available model failed. Check your API key(s).`);
-}
-
-// ═══════════════════════════════════════════════════════════════
-// PREMIUM DRAWER
-// ═══════════════════════════════════════════════════════════════
-function togglePrem(){
-  const t=document.getElementById('prem-toggle');
-  const d=document.getElementById('prem-drawer');
-  t.classList.toggle('open');
-  d.classList.toggle('open');
-}
-
-// ═══════════════════════════════════════════════════════════════
-// KEY INPUT HANDLER + PREVIEW
-// ═══════════════════════════════════════════════════════════════
-function onKey(){
-  const k=getKeys();
-  const map={groq:k.groq,google:k.google,'kc-openrouter':k.or,openai:k.openai,anthropic:k.anthropic,xai:k.xai,mistral:k.mistral,cohere:k.cohere};
-  // Update card border highlights
-  document.querySelectorAll('.kcard').forEach(card=>{
-    const inp=card.querySelector('.kc-inp');
-    if(inp) card.classList.toggle('on',!!inp.value.trim());
-  });
-  renderPreview();
-}
-
-function renderPreview(){
-  const c=assemble();
-  const row=document.getElementById('prev-row');
-  if(!c){row.innerHTML='<div class="prev-empty">Add at least one API key above</div>';return;}
-  const {members,chair}=c;
-  let h=members.map((m,i)=>`
-    <div class="pm-chip on">
-      <div class="pm-dot" style="background:${m.color}"></div>
-      <div><div class="pm-name" style="color:${m.color}">${m.emoji} ${m.name}</div>
-      <div class="pm-role">${PV_LABEL[m.pv]} · Member ${i+1}</div></div>
-    </div>${i<members.length-1?'<div class="pm-arr">→</div>':''}`).join('');
-  h+=`<div class="pm-arr" style="color:var(--accent)">→★</div>
-    <div class="pm-chip on" style="border-color:rgba(56,189,248,.3)">
-      <div class="pm-dot" style="background:var(--accent)"></div>
-      <div><div class="pm-name" style="color:var(--accent)">${chair.emoji} ${chair.name}</div>
-      <div class="pm-role">${PV_LABEL[chair.pv]} · Chairman</div></div>
-    </div>`;
-  row.innerHTML=h;
-}
-
-// ═══════════════════════════════════════════════════════════════
-// UTILS
-// ═══════════════════════════════════════════════════════════════
-const $=id=>document.getElementById(id);
-const wait=ms=>new Promise(r=>setTimeout(r,ms));
-
-function addLog(msg,type='info'){
-  const feed=$('log'),now=new Date();
-  const ts=`${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}.${String(now.getMilliseconds()).slice(0,2)}`;
-  const el=document.createElement('span'); el.className='le '+type;
-  el.innerHTML=`<span class="ts">[${ts}]</span><span class="msg"> ${msg}</span>`;
-  feed.appendChild(el); feed.scrollTop=feed.scrollHeight;
-}
-function stageBar(n){
-  $('sbar').innerHTML=['1 · Opinions','2 · Reviews','3 · Verdict'].map((l,i)=>{
-    const s=i+1; return `<div class="sb${s<n?' dn':s===n?' act':''}">${l}</div>`;
-  }).join('');
-}
-function setN(id,cls,st){
-  const c=$('nc-'+id),s=$('ns-'+id);
-  if(c) c.className='fcircle '+cls;
-  if(s&&st!==undefined) s.textContent=st;
-}
-function arrLit(id){const a=$(id);if(a){a.classList.add('lit');a.classList.remove('dn');}}
-function arrDn(id){const a=$(id);if(a){a.classList.remove('lit');a.classList.add('dn');}}
-function pkt(f,t,color){
-  const cv=$('fcanvas'),cr=cv.getBoundingClientRect();
-  const fe=$('nc-'+f),te=$('nc-'+t);
-  if(!fe||!te) return;
-  const fr=fe.getBoundingClientRect(),tr=te.getBoundingClientRect();
-  const p=document.createElement('div'); p.className='pkt';
-  p.style.cssText=`background:${color};box-shadow:0 0 8px ${color};--sx:${fr.left+fr.width/2-cr.left}px;--sy:${fr.top+fr.height/2-cr.top}px;--ex:${tr.left+tr.width/2-cr.left}px;--ey:${tr.top+tr.height/2-cr.top}px;`;
-  cv.appendChild(p); p.getBoundingClientRect(); p.classList.add('fly');
-  setTimeout(()=>p.remove(),700);
-}
-function burst(a,b,c,n=3){for(let i=0;i<n;i++) setTimeout(()=>pkt(a,b,c),i*170);}
-function typewrite(elId,txt,spd=5){
-  return new Promise(res=>{
-    const el=$(elId); el.classList.add('typing'); el.textContent='';
-    const clean=txt.replace(/<think>[\s\S]*?<\/think>/gi,'').trim();
-    let i=0;
-    const iv=setInterval(()=>{el.textContent+=clean[i++];if(i>=clean.length){clearInterval(iv);el.classList.remove('typing');res();}},spd);
-  });
-}
-
-// ═══════════════════════════════════════════════════════════════
-// BUILD FLOW + RESULTS HTML
-// ═══════════════════════════════════════════════════════════════
-function buildNodes(ms){
-  const row=$('node-row'); row.innerHTML='';
-  const nd=(id,emoji,lbl,color)=>`<div class="fnode"><div class="fcircle" id="nc-${id}">${emoji}</div><div class="flbl" style="color:${color}" id="nl-${id}">${lbl}</div><div class="fstat" id="ns-${id}"></div></div>`;
-  const ar=id=>`<div class="farr" id="${id}"><svg viewBox="0 0 50 12" preserveAspectRatio="none" style="height:12px;"><line x1="2" y1="6" x2="42" y2="6" class="aline"/><polyline points="36,2 44,6 36,10" class="ahead"/></svg></div>`;
-  row.innerHTML+=nd('user','👤','YOU','#38bdf8');
-  row.innerHTML+=ar('arr1');
-  row.innerHTML+=`<div class="ncol">${ms.map((m,i)=>nd('m'+i,m.emoji,m.name.split(' ').slice(0,2).join(' ').toUpperCase(),m.color)).join('')}</div>`;
-  row.innerHTML+=ar('arr2');
-  row.innerHTML+=`<div class="ncol">${ms.map((m,i)=>nd('r'+i,m.emoji,'REVIEW',m.color)).join('')}</div>`;
-  row.innerHTML+=ar('arr3');
-  row.innerHTML+=nd('chair','★','CHAIR','#38bdf8');
-}
-function buildResults(ms){
-  const tabs=$('tabs1'),pnls=$('panels1');
-  tabs.innerHTML=''; pnls.innerHTML='';
-  ms.forEach((m,i)=>{
-    tabs.innerHTML+=`<button class="rtab${i===0?' on':''}" id="rtab-${i}" onclick="switchTab(${i},${ms.length})">${m.emoji} ${m.name}</button>`;
-    pnls.innerHTML+=`<div class="rpanel${i===0?' on':''}" id="rpanel-${i}"><div class="rcard"><div class="rcard-hdr"><div class="rdot" id="rdot-${i}" style="background:${m.color}"></div><div class="rname" id="rname-${i}" style="color:${m.color}">${m.name}</div><div class="rmodel" id="rmodel-${i}">${m.id} · ${PV_LABEL[m.pv]}</div></div><div class="rbody typing" id="r-m${i}">Waiting…</div></div></div>`;
-  });
-  $('revgrid').innerHTML=ms.map((m,i)=>{
-    const oth=ms.filter((_,j)=>j!==i).map(o=>o.name).join(' + ');
-    return `<div class="revcard"><div class="revlbl" id="rlbl-${i}">${m.emoji} ${m.name} reviewing ${oth}</div><div class="revbody typing" id="rv-${i}">Waiting…</div></div>`;
-  }).join('');
-}
-function switchTab(idx,total){
-  for(let i=0;i<total;i++){$('rtab-'+i)?.classList.remove('on');$('rpanel-'+i)?.classList.remove('on');}
-  $('rtab-'+idx)?.classList.add('on'); $('rpanel-'+idx)?.classList.add('on');
-}
-
-// Always update UI with the actual model that responded
-function updateMemberUI(i,m){
-  const nc=$('nc-m'+i); if(nc) nc.textContent=m.emoji;
-  const nl=$('nl-m'+i); if(nl){nl.textContent=m.name.split(' ').slice(0,2).join(' ').toUpperCase();nl.style.color=m.color;}
-  const tab=$('rtab-'+i); if(tab) tab.textContent=`${m.emoji} ${m.name}`;
-  const dot=$('rdot-'+i); if(dot) dot.style.background=m.color;
-  const nm=$('rname-'+i); if(nm){nm.textContent=m.name;nm.style.color=m.color;}
-  const md=$('rmodel-'+i); if(md) md.textContent=`${m.id} · ${PV_LABEL[m.pv]}`;
-}
-function updateRevLbls(actual){
-  actual.forEach((m,i)=>{
-    const oth=actual.filter((_,j)=>j!==i).map(o=>o.name).join(' + ');
-    const lbl=$('rlbl-'+i); if(lbl) lbl.textContent=`${m.emoji} ${m.name} reviewing ${oth}`;
-  });
-}
-function updateChairUI(m){
-  const icon=$('cvicon'); if(icon) icon.textContent=m.emoji;
-  const nc=$('nc-chair'); if(nc) nc.textContent=m.emoji;
-  const nl=$('nl-chair'); if(nl){nl.textContent=m.name.split(' ').slice(0,2).join(' ').toUpperCase();nl.style.color=m.color;}
-  $('cvmodel').textContent=`${m.emoji} ${m.name} · ${PV_LABEL[m.pv]}`;
-}
-
-// ═══════════════════════════════════════════════════════════════
-// MAIN — CONVENE COUNCIL
-// ═══════════════════════════════════════════════════════════════
-async function startCouncil(){
-  const query=$('q').value.trim();
-  const errEl=$('err'); errEl.style.display='none';
-  const council=assemble();
-
-  if(!council){errEl.style.display='block';errEl.textContent='⚠ Add at least one API key to convene the council.';return;}
-  if(!query){errEl.style.display='block';errEl.textContent='⚠ Ask a question first.';return;}
-
-  // Clear query immediately on submit
-  $('q').value='';
-  $('export-btn').style.display='none';
-  window._session=null;
-
-  const {members,chair}=council;
-  const btn=$('run-btn');
-  btn.disabled=true; btn.textContent='Convening…';
-
-  $('flow-section').style.display='block';
-  $('results-section').style.display='block';
-  $('log').innerHTML='';
-  $('r-chair').textContent='Awaiting deliberations…';
-  $('r-chair').classList.add('typing');
-  $('cvmodel').textContent='Awaiting…';
-  $('cvicon').textContent='★';
-
-  buildNodes(members);
-  buildResults(members);
-  stageBar(0);
-  $('flow-section').scrollIntoView({behavior:'smooth',block:'start'});
-  await wait(500);
-
-  const actual=[...members]; // will be updated after each resilient call
-
-  try{
-    // ── STAGE 1: First Opinions ──
-    stageBar(1);
-    addLog('Council convened','info');
-    addLog(`Query: "${query.slice(0,55)}${query.length>55?'…':''}"`, 'send');
-    addLog(`Planned members: ${members.map(m=>m.name).join(' · ')}`,'info');
-    addLog(`Planned chair: ${chair.name}`,'info');
-
-    setN('user','s-send','sending…');
-    await wait(300); arrLit('arr1');
-    members.forEach((m,i)=>setTimeout(()=>burst('user','m'+i,m.color),i*110));
-    await wait(500);
-    setN('user','s-ok','sent ✓');
-    members.forEach((m,i)=>{setN('m'+i,'s-think','thinking…'); addLog(`→ ${m.emoji} ${m.name} processing`,'send');});
-
-    // Sequential — each slot waits for the previous to claim its model
-    // so the usedIds set is accurate before the next slot picks
-    const memberUsedIds = new Set();
-    const responses=[];
-    for(let i=0;i<members.length;i++){
-      const m=members[i];
-      try{
-        const {text,model}=await resilient(m,[{role:'user',content:query}],`Member ${i+1}`,memberUsedIds);
-        actual[i]=model;
-        updateMemberUI(i,model);
-        addLog(`← ${model.emoji} ${model.name} (${text.split(' ').length}w)`,'recv');
-        setN('m'+i,'s-ok','done ✓');
-        burst('m'+i,'user',model.color,2);
-        responses.push(text);
-      }catch(e){
-        addLog(`✗ Member ${i+1}: ${e.message.slice(0,60)}`,'err');
-        setN('m'+i,'s-err','error ✗');
-        responses.push(null);
-      }
-    }
-
-    await wait(300); arrDn('arr1');
-    if(responses.every(r=>r===null)) throw new Error('All council members failed. Check your API keys.');
-    await Promise.all(responses.map((res,i)=>typewrite('r-m'+i,res||'⚠ Unavailable',5)));
-
-    // ── STAGE 2: Peer Reviews ──
-    stageBar(2);
-    addLog('Stage 2: peer reviews initiated','info');
-    arrLit('arr2');
-    actual.forEach((m,i)=>setTimeout(()=>burst('m'+i,'r'+i,m.color),i*110));
-    await wait(500);
-    actual.forEach((_,i)=>setN('r'+i,'s-rev','reviewing…'));
-    updateRevLbls(actual); // update review labels to show actual models
-    addLog('→ Cross-reviewing each other','send');
-
-    const reviews=await Promise.all(actual.map(async(m,i)=>{
-      const others=actual.filter((_,j)=>j!==i)
-        .map(o=>`${o.name}:\n${responses[actual.indexOf(o)]||'[unavailable]'}`).join('\n\n');
-      const prompt=`The user asked: "${query}"\n\nOther council members responded:\n\n${others}\n\nAs ${m.name}, critically compare these responses. Which is strongest and why? What is each missing? Be direct. Max 100 words.`;
-      try{
-        const {text,model}=await resilient(m,[{role:'user',content:prompt}],`Review ${i+1}`);
-        addLog(`← ${model.emoji} ${model.name} review (${text.split(' ').length}w)`,'recv');
-        setN('r'+i,'s-ok','done ✓');
-        burst('r'+i,'chair',model.color,2);
-        return text;
-      }catch(e){
-        addLog(`✗ Review ${i+1} failed`,'warn');
-        setN('r'+i,'s-err','error ✗');
-        return null;
-      }
-    }));
-
-    await wait(300); arrDn('arr2');
-    await Promise.all(reviews.map((rv,i)=>typewrite('rv-'+i,rv||'⚠ Unavailable',6)));
-
-    // ── STAGE 3: Chairman ──
-    stageBar(3);
-    addLog(`Stage 3: ${chair.emoji} ${chair.name} synthesizing…`,'chair');
-    arrLit('arr3'); setN('chair','s-chair','synthesizing…');
-
-    const chairPrompt=`You are the Chairman of an AI Council. The user asked:\n"${query}"\n\nCouncil member opinions:\n\n${
-      actual.map((m,i)=>`${m.name}:\n${responses[i]||'[unavailable]'}`).join('\n\n')
-    }\n\nPeer reviews:\n${
-      actual.map((m,i)=>`${m.name} peer review:\n${reviews[i]||'[unavailable]'}`).join('\n\n')
-    }\n\nSynthesize the strongest insights into one clear, authoritative final answer. Be comprehensive, balanced, and direct.`;
-
-    const {text:verdict,model:usedChair}=await resilient(chair,[{role:'user',content:chairPrompt}],'Chairman');
-    updateChairUI(usedChair);
-    addLog(`← ${usedChair.emoji} ${usedChair.name} · ${PV_LABEL[usedChair.pv]} verdict (${verdict.split(' ').length}w)`,'chair');
-    arrDn('arr3');
-    setN('chair','s-final','verdict ★');
-    burst('chair','user','#38bdf8',3);
-    await wait(300); setN('user','s-final','received ★');
-    [...$('sbar').children].forEach(s=>s.className='sb dn');
-
-    await typewrite('r-chair',verdict,7);
-    $('r-chair').classList.remove('typing');
-    addLog('Session complete.','info');
-
-    window._session={query,actual,responses,reviews,verdict,usedChair};
-    $('export-btn').style.display='flex';
-
-  }catch(e){
-    errEl.style.display='block';
-    errEl.textContent='⚠ '+e.message;
-    addLog('ERROR: '+e.message,'err');
-  }
-  btn.disabled=false; btn.textContent='Convene Council ▶';
-}
-
-// ═══════════════════════════════════════════════════════════════
-// PDF EXPORT
-// ═══════════════════════════════════════════════════════════════
-function exportPDF(){
-  const s=window._session; if(!s) return;
-  const ts=new Date().toLocaleString();
-  const esc=t=>(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
-
-  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"/>
-<title>LLM Council — ${esc(s.query.slice(0,50))}</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a2e;padding:32px;max-width:860px;margin:0 auto;font-size:13px;line-height:1.7;background:#fff;}
-.cover{border-bottom:3px solid #38bdf8;padding-bottom:18px;margin-bottom:24px;}
-.brand{font-size:22px;font-weight:800;color:#38bdf8;}
-.brand span{color:#1a1a2e;}
-.rtitle{font-size:17px;font-weight:700;margin:8px 0 4px;}
-.meta{font-size:10px;color:#64748b;line-height:1.8;}
-.qbox{background:#f0f9ff;border-left:4px solid #38bdf8;padding:11px 15px;margin:18px 0;border-radius:4px;font-size:14px;font-style:italic;color:#0369a1;}
-.sh{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#64748b;border-bottom:1px solid #e2e8f0;padding-bottom:5px;margin:26px 0 14px;font-weight:700;}
-.card{margin-bottom:18px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;}
-.ch{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f8fafc;font-size:16px;}
-.cb{padding:14px;font-size:13px;color:#334155;}
-.rc{margin-bottom:12px;border:1px solid #e2e8f0;border-radius:7px;padding:12px 14px;}
-.rl{font-size:9px;color:#64748b;margin-bottom:5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
-.rb{font-size:13px;color:#475569;}
-.verdict{background:linear-gradient(135deg,#f0f9ff,#f5f3ff);border:2px solid #38bdf8;border-radius:10px;padding:20px;margin-top:8px;}
-.vh{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #bae6fd;}
-.vi{width:28px;height:28px;border-radius:7px;background:rgba(56,189,248,.12);border:1px solid #bae6fd;display:flex;align-items:center;justify-content:center;font-size:14px;}
-.vt{font-weight:800;font-size:13px;color:#0369a1;letter-spacing:.05em;}
-.vm{font-size:10px;color:#64748b;margin-top:2px;}
-.vb{font-size:14px;color:#1e293b;line-height:1.85;}
-.footer{margin-top:32px;padding-top:12px;border-top:1px solid #e2e8f0;font-size:10px;color:#94a3b8;text-align:center;}
-@media print{body{padding:16px;}}
-</style></head><body>
-<div class="cover">
-  <div class="brand">Cup<span>X</span> Corporation</div>
-  <div class="rtitle">LLM Council — Session Report</div>
-  <div class="meta">
-    Generated: ${ts}<br>
-    Members: ${s.actual.map(m=>`${m.emoji} ${m.name} (${PV_LABEL[m.pv]})`).join(' · ')}<br>
-    Chairman: ${s.usedChair.emoji} ${s.usedChair.name} (${PV_LABEL[s.usedChair.pv]})
-  </div>
-</div>
-<div class="qbox">"${esc(s.query)}"</div>
-
-<div class="sh">Stage 1 — First Opinions</div>
-${s.actual.map((m,i)=>`
-<div class="card">
-  <div class="ch" style="border-left:4px solid ${m.color}">
-    <span>${m.emoji}</span>
-    <div>
-      <div style="font-weight:700;color:${m.color};font-size:13px">${m.name}</div>
-      <div style="font-size:10px;color:#64748b">${m.id} · ${PV_LABEL[m.pv]}</div>
-    </div>
-  </div>
-  <div class="cb">${esc(s.responses[i]||'Unavailable')}</div>
-</div>`).join('')}
-
-<div class="sh">Stage 2 — Peer Reviews</div>
-${s.actual.map((m,i)=>{
-  const oth=s.actual.filter((_,j)=>j!==i).map(o=>o.name).join(' + ');
-  return `<div class="rc"><div class="rl">${m.emoji} ${m.name} reviewing ${oth}</div><div class="rb">${esc(s.reviews[i]||'Unavailable')}</div></div>`;
-}).join('')}
-
-<div class="sh">Stage 3 — Chairman's Verdict</div>
-<div class="verdict">
-  <div class="vh">
-    <div class="vi">${s.usedChair.emoji}</div>
-    <div>
-      <div class="vt">CHAIRMAN — FINAL ANSWER</div>
-      <div class="vm">${s.usedChair.name} · ${PV_LABEL[s.usedChair.pv]}</div>
-    </div>
-  </div>
-  <div class="vb">${esc(s.verdict)}</div>
-</div>
-<div class="footer">CupX Corporation · LLM Council · cupx.in</div>
-</body></html>`;
-
-  const w=window.open('','_blank');
-  w.document.write(html); w.document.close();
-  setTimeout(()=>w.print(),700);
-}
-
-document.getElementById('q').addEventListener('keydown',e=>{
-  if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)) startCouncil();
-});
+    let site_url = "https://dnschecker.org";
+    let ajax_url = "https://dnschecker.org/ajax_files";
+    let theme_common_url = "https://dnschecker.org/themes/common";
+    let theme_url = "https://dnschecker.org/themes/v2";
+    let CaptchaEnable = !!0;
+    let captchaId = "";
+    let captchaKey = "";
+    let captchaType = "";
+    let CaptchaVersion = "";
+    let sessionCookieExpirationTime = "14400";
+    let sessionCookiePath = "/";
+    let sessionCookieDomain = ".dnschecker.org";
 </script>
+
+<!-- jQuery first, then Popper.js, then Bootstrap JS-->
+<script src="https://dnschecker.org/themes/common/third-party/js/jquery.min.js"></script>
+<script src="https://dnschecker.org/themes/v2/third-party/js/bootstrap.bundle.min.js"></script>
+
+<!--Script Initialize-->
+<script src="https://dnschecker.org/themes/v2/js/main.js?v=0.46"></script>
+
+<!--Custom Scripts-->
+<!--HighCharts-->
+<div id="maps_scripts"></div>
+<script>
+var dns_json_array = [{"id":1,"ip":"208.67.222.220","provider":"OpenDNS","location":"San Francisco CA, United States","latitude":38,"longitude":-122,"country":"US"},{"id":4,"ip":"8.8.8.8","provider":" Google","location":"Mountain View CA, United States","latitude":37.4059,"longitude":-122.078,"country":"US"},{"id":78,"ip":"9.9.9.9","provider":"Quad9","location":"Berkeley, US","latitude":37.8793,"longitude":-122.265,"country":"US"},{"id":71,"ip":"204.12.225.227","provider":"WholeSale Internet, Inc.","location":"Kansas City, United States","latitude":39.1478,"longitude":-94.5688,"country":"US"},{"id":73,"ip":"205.171.202.66","provider":"CenturyLink","location":"United States","latitude":38,"longitude":-98,"country":"US"},{"id":75,"ip":"156.154.70.64","provider":"NeuStar","location":"Ashburn, United States","latitude":38.9977,"longitude":-77.4331,"country":"US"},{"id":79,"ip":"149.112.112.112","provider":"Quad9","location":"San Francisco, US","latitude":37.7969,"longitude":-122.463,"country":"US"},{"id":136,"ip":"208.91.112.53","provider":"Fortinet Inc","location":"Burnaby, Canada","latitude":49,"longitude":-123,"country":"CA"},{"id":25,"ip":"77.88.8.8","provider":"YANDEX LLC","location":"St Petersburg, Russia","latitude":60,"longitude":30,"country":"RU"},{"id":38,"ip":"5.11.11.5","provider":"Liquid Telecommunications Ltd","location":"Cullinan, South Africa","latitude":-26,"longitude":29,"country":"ZA"},{"id":234,"ip":"80.80.80.80","provider":"OpenTLD BV","location":"Amsterdam, Netherlands","latitude":52.374,"longitude":4.8896,"country":"NL"},{"id":18,"ip":"84.236.142.130","provider":"ServiHosting Networks S.L.","location":"Paterna de Rivera, Spain","latitude":37,"longitude":-6,"country":"ES"},{"id":214,"ip":"83.137.41.9","provider":"nemox.net","location":"Innsbruck, Austria","latitude":47.2626,"longitude":11.3945,"country":"AT"},{"id":459,"ip":"31.192.98.158","provider":"Wavenet Limited","location":"Salford, United Kingdom","latitude":53.4877,"longitude":-2.2904,"country":"GB"},{"id":122,"ip":"139.18.25.33","provider":"Universitaet Leipzig","location":"Leipzig, Germany","latitude":51.3396,"longitude":12.3712,"country":"DE"},{"id":455,"ip":"200.33.3.123","provider":"Universidad LatinoAmericana S.C.","location":"Mexico City, Mexico","latitude":19.4284,"longitude":-99.1276,"country":"MX"},{"id":300,"ip":"200.221.11.100","provider":"Universo Online S.A","location":"Sao Paulo, Brazil","latitude":-23.5475,"longitude":-46.6361,"country":"BR"},{"id":24,"ip":"1.1.1.1","provider":"Cloudflare Inc","location":"Research, Australia","latitude":-38,"longitude":145,"country":"AU"},{"id":27,"ip":"61.8.0.113","provider":"Pacific Internet","location":"Melbourne, Australia","latitude":-33.8678,"longitude":151.207,"country":"AU"},{"id":387,"ip":"139.59.219.245","provider":"DigitalOcean LLC","location":"Singapore","latitude":1.2896,"longitude":103.85,"country":"SG"},{"id":460,"ip":"203.236.1.12","provider":"SK Telecom","location":"Seoul, South Korea","latitude":37.566,"longitude":126.978,"country":"KR"},{"id":364,"ip":"223.5.5.5","provider":"Aliyun Computing Co. Ltd","location":"Hangzhou, China","latitude":30.2936,"longitude":120.161,"country":"CN"},{"id":9,"ip":"31.7.37.37","provider":"Teknet Yazlim","location":"Antalya, Turkey","latitude":36.9081,"longitude":30.6955,"country":"TR"},{"id":273,"ip":"103.99.150.10","provider":"Skylink Fibernet Private Limited","location":"Coimbatore, India","latitude":11,"longitude":77,"country":"IN"},{"id":67,"ip":"209.150.154.1","provider":"CMPak Limited","location":"Islamabad, Pakistan","latitude":34,"longitude":73,"country":"PK"},{"id":213,"ip":"194.125.133.10","provider":"Indigo","location":"Dublin, Ireland","latitude":53.3439,"longitude":-6.2671,"country":"IE"},{"id":429,"ip":"103.157.237.34","provider":"Md Masud Rana Roni","location":"Kaharole, Bangladesh","latitude":25.6271,"longitude":88.6386,"country":"BD"}];
+let dns_key = "ip";
+let dns_value = "4";
+var maps_el = document.querySelector('#maps_scripts');
+if(screen_size == 'lg') {
+    (function() {
+        var scriptNames = [
+            "https://dnschecker.org/themes/common/third-party/js/d3.v7.min.js",
+            "https://dnschecker.org/themes/common/third-party/js/topojson.min.js",
+            "https://dnschecker.org/themes/v2/js/draw_chart.js?v=0.02",
+            "https://dnschecker.org/themes/v2/js/index.js?v=0.14"
+        ];
+        for (var i = 0; i < scriptNames.length; i++) {
+            var script = document.createElement('script');
+            script.src = scriptNames[i];
+            script.async = false; // This is required for synchronous execution
+            script.defer = true;
+            maps_el.appendChild(script);
+        }
+    })();
+
+} else {
+    var script = document.createElement('script');
+    script.src = "https://dnschecker.org/themes/v2/js/index.js?v=0.14";
+    script.async = false; // This is required for synchronous execution
+    script.defer = true;
+    maps_el.appendChild(script);
+}
+</script>
+
+<!--Custom Styles-->
+
+<!-- Google Tag Manager -->
+<script>
+    (function(w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({
+            'gtm.start': new Date().getTime(),
+            event: 'gtm.js'
+        });
+        var f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s),
+            dl = l != 'dataLayer' ? '&l=' + l : '';
+        j.defer = true;
+        j.src =
+            '//www.googletagmanager.com/gtm.js?id=' + i + dl;
+        f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-5TB9PHL');
+</script>
+<!-- End Google Tag Manager -->
+
+<!--Custom Style-->
+<link rel="stylesheet" href="https://dnschecker.org/themes/common/css/icons.css?v=2.05" />
+
+<div aria-live="polite" aria-atomic="true" style="right: auto; z-index: 1080; bottom: 100px;" class="fixed-bottom col-6 col-sm-5 col-md-4 col-lg-3 col-xl-2 px-2" id="toasts_container"></div>
+
+<span style="display:none;" id="chk_hst_160349758325_3027856"></span>
+
 </body>
+
+</html>                                <div class="modal-header border-0 p-0 pe-2 mb-3">
+                                    <h5 class="modal-title all_tools_h1" id="AddDNSModalTitle">Add Your Custom DNS</h5>
+                                    <button type="button" class="btn-close" style="background-size: cover;height:0.5rem;width:0.5rem;" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body p-0">
+                                    <div class="row">
+                                        <div class="col-lg-12" id="AddDNSModalAlert"></div>
+                                        <div class="col-lg-12">
+                                            <div class="form-group mb-3">
+                                                <label class="h6" for="add_dns_name">DNS Name <span class="text-danger">*</span></label>
+                                                <input name="add_dns_name" id="add_dns_name" value="" class="form-control form-control-sm bg_gray_light" type="text" placeholder="Mountain View CA, United States" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12">
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group mb-3">
+                                                        <label class="h6" for="add_dns_ip">DNS IP <span class="text-danger">*</span></label>
+                                                        <input name="add_dns_ip" id="add_dns_ip" value="" class="form-control form-control-sm bg_gray_light" type="text" placeholder="8.8.8.8" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group mb-3">
+                                                        <label class="h6" for="add_dns_ip">DNS Provider</label>
+                                                        <input name="add_dns_provider" id="add_dns_provider" value="" class="form-control form-control-sm bg_gray_light" type="text" placeholder="Sprint" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12">
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="h6" for="add_dns_latitude">DNS Map Latitude</label>
+                                                        <input name="add_dns_latitude" id="add_dns_latitude" value="" class="form-control form-control-sm bg_gray_light" type="text" placeholder="37" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="h6" for="add_dns_longitude">DNS Map Longitude</label>
+                                                        <input name="add_dns_longitude" id="add_dns_longitude" value="" class="form-control form-control-sm bg_gray_light" type="text" placeholder="-122" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12">
+                                            <p class="mt-2 mb-0"><span class="text-danger">*</span> <em>Should not be empty</em></p>
+                                        </div>
+
+
+                                        <div class="col-lg-12 pt-2">
+                                            <div class="checkbox_style">
+                                                <input type="checkbox" class="align-text-middle" id="add_dns_public">
+                                                <label class="d-flex gap-2" style="padding-top: 3px;" for="add_dns_public">Add this DNS server to public DNS List</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer rounded-0 border-0 justify-content-center gap-4">
+                                    <button type="button" class="btn btn-sm bg_blue px-4 py-2 text-white rounded-3" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-sm bg_green px-4 py-2 text-white rounded-3" id="add_custom_dns_form_button" style="min-width:150px;">Yes, Add this DNS</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!--ADD CUSTOM DNS MODEL END-->
+                <div class="descriptions box_container mb-4 main_page_text_content_column">
+                    <div class="mx-0 row py-1 mb-2">
+                        <div class="col-lg-12 text-start px-0">
+                            <div class="main_page_text_content">
+<h2>DNS Propagation Checker - How to Check DNS Propagation Globally?</h2>
+<p>Perform a quick DNS propagation lookup for any domain. Our DNS Propagation Test tool features a comprehensive list of 100+ global DNS servers, which makes global DNS checks more effortless than ever. It is designed to collect, parse, and display all the DNS propagation results on the map, going beyond text-based propagation reports.</p>
+<p>It visually represents how your DNS changes are propagated across different DNS servers in different regions globally. This enhances your understanding and makes identifying any regional variations or issues easier. Now monitor and manage your DNS records effectively.</p>
+<!-- <div class="col-lg-5 col-md-6 col-12 my-3 aspect-ratio[379/213] mx-auto google_ad">
+<div id="FreeStarVideoAdContainer">
+<div id="freestar-video-parent">
+<div id="freestar-video-child"></div>
+</div>
+</div>
+</div> -->
+                                    </div>
+                                </div>
+                            </div>
+                            <!--AD END-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-0 ps-xl-2 col-lg-2 side_ad_column side_ad_160x600 mb-3">
+                
+<style>
+#dnschecker_home_side_ad_vertical {height:600px}
+@media(max-width:1280px){#dnschecker_home_side_ad_vertical{display:none;}}
+</style>
+<!-- Tag ID: dnschecker_home_side_ad_vertical -->
+<div class="d-flex align-items-center justify-content-center" data-freestar-ad="__160x600" id="dnschecker_home_side_ad_vertical">
+  <script data-cfasync="false" type="text/javascript">
+    freestar.config.enabled_slots.push({ placementName: "dnschecker_home_side_ad_vertical", slotId: "dnschecker_home_side_ad_vertical" });
+  </script>
+</div>
+            </div>
+
+
+
+
+
+
+        </div>
+
+
+
+        <!--Home Inner Container-->
+    </div>
+</div>
+<!--Home Container-->
+<!--Footer Container-->
+<div class="container-fluid bg-dark footer-container">
+    <!--Footer Inner Container-->
+    <div class="container footer-inner-container">
+        <div class="row mx-0">
+            <!--Footer Wigets-->
+            <div class="px-0 col-lg-12">
+
+                <div class="footer-widget-container mx-0">
+
+                    <div class="footer-widget">
+                        <h5 class="widget-title">DNS Check Tools</h5>
+                        <ul class="widget-list">
+                            <li><a href="https://dnschecker.org">DNS Checker</a></li>
+                            <li><a href="https://dnschecker.org/domain-health-checker.php">Complete DNS Health Report</a></li>
+                            <li><a href="https://dnschecker.org/reverse-dns.php">Reverse IP Lookup</a></li>
+                            <li><a href="https://dnschecker.org/all-dns-records-of-domain.php">DNS Lookup</a></li>
+                            <li><a href="https://dnschecker.org/ns-lookup.php">NS Lookup</a></li>
+                            <li><a href="https://dnschecker.org/mx-lookup.php">MX Lookup</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-widget">
+                        <h5 class="widget-title">Productivity</h5>
+                        <ul class="widget-list">
+                            <li><a title="Binary Translator" href="https://dnschecker.org/binary-to-text-translator.php">Binary Translator</a></li>
+                            <li><a title="Reverse Image Search" href="https://dnschecker.org/reverse-image-search.php">Reverse Image Search</a></li>
+                            <li><a title="CC Checker" href="https://dnschecker.org/credit-card-validator.php">CC Checker</a></li>
+                            <li><a title="Notepad Online" href="https://dnschecker.org/notepad-online.php">Notepad Online</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-widget">
+                        <h5 class="widget-title">More Tools</h5>
+                        <ul class="widget-list">
+                            <li><a title="QR Code Reader" href="https://dnschecker.org/qr-code-scanner.php">QR Code Scanner</a>
+                            <li><a title="Time Card Calculator with Break" href="https://dnschecker.org/time-card-calculator.php">Time Card Calculator</a>
+                            <li><a title="Morse Code Translator" href="https://dnschecker.org/morse-code-translator.php">Morse Code Translator</a></li>
+                            <li><a title="Image to Text" href="https://dnschecker.org/image-to-text-converter.php">Image to Text</a></li>
+                            <li><a title="Social Media Name Checker" href="https://dnschecker.org/social-media-name-checker.php">Social Media Name Checker</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-widget">
+                        <h5 class="widget-title">DNS Server Database</h5>
+                        <ul class="widget-list">
+                            <li><a href="https://dnschecker.org/dns/Global">Global DNS Providers</a></li>
+                            <li><a href="https://dnschecker.org/dns/Australia">Australian DNS Servers</a></li>
+                            <li><a href="https://dnschecker.org/dns/United-Kingdom">United Kingdom DNS Servers</a></li>
+                            <li><a href="https://dnschecker.org/dns/United-States-of-America">United States DNS Servers</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-widget">
+                        <h5 class="widget-title">Developer Tools</h5>
+                        <ul class="widget-list">
+                            <li><a href="https://dnschecker.org/password-generator.php">Password Generator</a></li>
+                            <li><a href="https://dnschecker.org/server-headers-check.php">Check HTTP Headers</a></li>
+                            <li><a href="https://dnschecker.org/website-server-software.php">Check Website OS</a></li>
+                            <li><a href="https://dnschecker.org/pagerank.php">Page rank Checker</a></li>
+
+                        </ul>
+                    </div>
+                    <div class="footer-widget">
+                        <h5 class="widget-title">Network Tools</h5>
+                        <ul class="widget-list">
+                            <li><a href="https://dnschecker.org/port-scanner.php">Port Checker</a></li>
+                            <li><a href="https://dnschecker.org/mac-lookup.php">MAC Address Lookup</a></li>
+                            <li><a href="https://dnschecker.org/asn-whois-lookup.php">ASN WHOIS Lookup</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-widget">
+                        <h5 class="widget-title">Email Tools</h5>
+                        <ul class="widget-list">
+                            <li><a href="https://dnschecker.org/smtp-test-tool.php">SMTP Test</a></li>
+                            <li><a href="https://dnschecker.org/email-header-analyzer.php">Trace Email</a></li>
+                            <li><a href="https://dnschecker.org/spf-record-validation.php">SPF Checker</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-widget">
+                        <h5 class="widget-title">IP Tools</h5>
+                        <ul class="widget-list">
+                            <li><a href="https://dnschecker.org/whats-my-ip-address.php">What is my IP</a></li>
+                            <li><a href="https://dnschecker.org/ip-location.php">IP Location Lookup</a></li>
+                            <li><a href="https://dnschecker.org/ip-blacklist-checker.php">IP Blacklist Check</a></li>
+                            <li><a href="https://dnschecker.org/ip-whois-lookup.php">IP WHOIS Lookup</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-widget">
+                        <h5 class="widget-title">Apps And Add-ons</h5>
+                        <div class="widget-list">
+                            <div class="mt-2">
+                                <a class="d-inline-block" target="_blank" href="https://dnschecker.org/out/dnschecker_gplay"><img alt="Get it on Google Play" src="https://dnschecker.org/themes/common/images/google-play.svg" style="width: 150px;" /></a>
+                            </div>
+                            <div class="mt-2">
+                                <a class="d-inline-block" rel="nofollow" target="_blank" href="https://chrome.google.com/webstore/detail/dns-checker/gegfpbhjnhegdnjdkghhnneaocdbbhjp"><i class="icon-colored icon-2x valign-middle icon-chrome-store me-2"></i>Get Chrome Extension</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="footer-widget">
+                        <div class="logo_footer mt-lg-5">
+                            <a href="https://dnschecker.org"><img src="https://dnschecker.org/themes/common/images/general/logo.svg" alt="DNS Checker"></a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!--Footer Wigets-->
+        </div>
+    </div>
+</div>
+<!--Footer Container-->
+
+<!--Footer Copyright Container-->
+<div class="container-fluid footer-copyright-container" style="padding-bottom: 90px;">
+    <!--Footer Inner Container-->
+    <div class="container footer-inner-container">
+        <div class="d-flex flex-wrap justify-content-center align-items-center mx-0 py-4 vr-between-items">
+            <!--Footer Wigets-->
+            <div class="px-0 copyright-text text-center text-lg-start">
+                <p class="text-dawn mb-0">Copyright © DNSChecker.org, All Rights Reserved.</p>
+                            </div>
+
+            <div class="px-0 text-lg-end contact-text">
+                <a href="https://dnschecker.org/contact.php">Contact us</a></li>
+            </div>
+
+            <div class="px-0 text-lg-end privacy-text">
+                <a href="https://dnschecker.org/privacy.php">Privacy</a>
+            </div>
+
+            <div class="px-0 text-lg-end contact-text text-center text-lg-start privacy-manager">
+                <!-- CSS for geo depending button -->
+                <style>
+                    #pmLink {
+                        visibility: hidden;
+                        color: #ddd;
+                        margin-bottom: 3px;
+                        display: inline-block;
+                        font-size: 12px;
+                        font-weight: 400;
+                        text-decoration: none;
+                        cursor: pointer;
+                        background: transparent;
+                    }
+
+                    #pmLink:hover {
+                        visibility: visible;
+                        color: grey;
+                    }
+                </style>
+                <!-- HTML for geo depending button -->
+                <button id="pmLink">Privacy Manager</button>
+            </div>
+            <!--Footer Wigets-->
+        </div>
+    </div>
+</div>
+<!--Footer Copyright Container-->
+
+<script>
+    let site_url = "https://dnschecker.org";
+    let ajax_url = "https://dnschecker.org/ajax_files";
+    let theme_common_url = "https://dnschecker.org/themes/common";
+    let theme_url = "https://dnschecker.org/themes/v2";
+    let CaptchaEnable = !!0;
+    let captchaId = "";
+    let captchaKey = "";
+    let captchaType = "";
+    let CaptchaVersion = "";
+    let sessionCookieExpirationTime = "14400";
+    let sessionCookiePath = "/";
+    let sessionCookieDomain = ".dnschecker.org";
+</script>
+
+<!-- jQuery first, then Popper.js, then Bootstrap JS-->
+<script src="https://dnschecker.org/themes/common/third-party/js/jquery.min.js"></script>
+<script src="https://dnschecker.org/themes/v2/third-party/js/bootstrap.bundle.min.js"></script>
+
+<!--Script Initialize-->
+<script src="https://dnschecker.org/themes/v2/js/main.js?v=0.46"></script>
+
+<!--Custom Scripts-->
+<!--HighCharts-->
+<div id="maps_scripts"></div>
+<script>var dns_json_array = [{"id":1,"ip":"208.67.222.220","provider":"OpenDNS","location":"San Francisco CA, United States","latitude":38,"longitude":-122,"country":"US"},{"id":4,"ip":"8.8.8.8","provider":" Google","location":"Mountain View CA, United States","latitude":37.4059,"longitude":-122.078,"country":"US"},{"id":78,"ip":"9.9.9.9","provider":"Quad9","location":"Berkeley, US","latitude":37.8793,"longitude":-122.265,"country":"US"},{"id":71,"ip":"204.12.225.227","provider":"WholeSale Internet, Inc.","location":"Kansas City, United States","latitude":39.1478,"longitude":-94.5688,"country":"US"},{"id":73,"ip":"205.171.202.66","provider":"CenturyLink","location":"United States","latitude":38,"longitude":-98,"country":"US"},{"id":75,"ip":"156.154.70.64","provider":"NeuStar","location":"Ashburn, United States","latitude":38.9977,"longitude":-77.4331,"country":"US"},{"id":79,"ip":"149.112.112.112","provider":"Quad9","location":"San Francisco, US","latitude":37.7969,"longitude":-122.463,"country":"US"},{"id":136,"ip":"208.91.112.53","provider":"Fortinet Inc","location":"Burnaby, Canada","latitude":49,"longitude":-123,"country":"CA"},{"id":25,"ip":"77.88.8.8","provider":"YANDEX LLC","location":"St Petersburg, Russia","latitude":60,"longitude":30,"country":"RU"},{"id":38,"ip":"5.11.11.5","provider":"Liquid Telecommunications Ltd","location":"Cullinan, South Africa","latitude":-26,"longitude":29,"country":"ZA"},{"id":234,"ip":"80.80.80.80","provider":"OpenTLD BV","location":"Amsterdam, Netherlands","latitude":52.374,"longitude":4.8896,"country":"NL"},{"id":18,"ip":"84.236.142.130","provider":"ServiHosting Networks S.L.","location":"Paterna de Rivera, Spain","latitude":37,"longitude":-6,"country":"ES"},{"id":214,"ip":"83.137.41.9","provider":"nemox.net","location":"Innsbruck, Austria","latitude":47.2626,"longitude":11.3945,"country":"AT"},{"id":459,"ip":"31.192.98.158","provider":"Wavenet Limited","location":"Salford, United Kingdom","latitude":53.4877,"longitude":-2.2904,"country":"GB"},{"id":122,"ip":"139.18.25.33","provider":"Universitaet Leipzig","location":"Leipzig, Germany","latitude":51.3396,"longitude":12.3712,"country":"DE"},{"id":455,"ip":"200.33.3.123","provider":"Universidad LatinoAmericana S.C.","location":"Mexico City, Mexico","latitude":19.4284,"longitude":-99.1276,"country":"MX"},{"id":300,"ip":"200.221.11.100","provider":"Universo Online S.A","location":"Sao Paulo, Brazil","latitude":-23.5475,"longitude":-46.6361,"country":"BR"},{"id":24,"ip":"1.1.1.1","provider":"Cloudflare Inc","location":"Research, Australia","latitude":-38,"longitude":145,"country":"AU"},{"id":27,"ip":"61.8.0.113","provider":"Pacific Internet","location":"Melbourne, Australia","latitude":-33.8678,"longitude":151.207,"country":"AU"},{"id":387,"ip":"139.59.219.245","provider":"DigitalOcean LLC","location":"Singapore","latitude":1.2896,"longitude":103.85,"country":"SG"},{"id":460,"ip":"203.236.1.12","provider":"SK Telecom","location":"Seoul, South Korea","latitude":37.566,"longitude":126.978,"country":"KR"},{"id":364,"ip":"223.5.5.5","provider":"Aliyun Computing Co. Ltd","location":"Hangzhou, China","latitude":30.2936,"longitude":120.161,"country":"CN"},{"id":9,"ip":"31.7.37.37","provider":"Teknet Yazlim","location":"Antalya, Turkey","latitude":36.9081,"longitude":30.6955,"country":"TR"},{"id":273,"ip":"103.99.150.10","provider":"Skylink Fibernet Private Limited","location":"Coimbatore, India","latitude":11,"longitude":77,"country":"IN"},{"id":67,"ip":"209.150.154.1","provider":"CMPak Limited","location":"Islamabad, Pakistan","latitude":34,"longitude":73,"country":"PK"},{"id":213,"ip":"194.125.133.10","provider":"Indigo","location":"Dublin, Ireland","latitude":53.3439,"longitude":-6.2671,"country":"IE"},{"id":429,"ip":"103.157.237.34","provider":"Md Masud Rana Roni","location":"Kaharole, Bangladesh","latitude":25.6271,"longitude":88.6386,"country":"BD"}];
+let dns_key = "ip";
+let dns_value = "4";
+var maps_el = document.querySelector('#maps_scripts');
+if(screen_size == 'lg') {
+    (function() {
+        var scriptNames = [
+            "https://dnschecker.org/themes/common/third-party/js/d3.v7.min.js",
+            "https://dnschecker.org/themes/common/third-party/js/topojson.min.js",
+            "https://dnschecker.org/themes/v2/js/draw_chart.js?v=0.02",
+            "https://dnschecker.org/themes/v2/js/index.js?v=0.14"
+        ];
+        for (var i = 0; i < scriptNames.length; i++) {
+            var script = document.createElement('script');
+            script.src = scriptNames[i];
+            script.async = false; // This is required for synchronous execution
+            script.defer = true;
+            maps_el.appendChild(script);
+        }
+    })();
+
+} else {
+    var script = document.createElement('script');
+    script.src = "https://dnschecker.org/themes/v2/js/index.js?v=0.14";
+    script.async = false; // This is required for synchronous execution
+    script.defer = true;
+    maps_el.appendChild(script);
+}
+</script>
+
+<!--Custom Styles-->
+
+<!-- Google Tag Manager -->
+<script>
+    (function(w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({
+            'gtm.start': new Date().getTime(),
+            event: 'gtm.js'
+        });
+        var f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s),
+            dl = l != 'dataLayer' ? '&l=' + l : '';
+        j.defer = true;
+        j.src =
+            '//www.googletagmanager.com/gtm.js?id=' + i + dl;
+        f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-5TB9PHL');
+</script>
+<!-- End Google Tag Manager -->
+
+<!--Custom Style-->
+<link rel="stylesheet" href="https://dnschecker.org/themes/common/css/icons.css?v=2.05" />
+
+<div aria-live="polite" aria-atomic="true" style="right: auto; z-index: 1080; bottom: 100px;" class="fixed-bottom col-6 col-sm-5 col-md-4 col-lg-3 col-xl-2 px-2" id="toasts_container"></div>
+
+<span style="display:none;" id="chk_hst_160349758325_3027856"></span>
+
+</body>
+
 </html>
