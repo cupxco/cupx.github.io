@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Periodic Table — CupX Corporation</title>
+<meta name="description" content="Interactive periodic table with heatmaps, phase states, molar mass, normality, molarity, molality calculator and animated Bohr models. Built by CupX Corporation."/>
+<meta name="keywords" content="periodic table, interactive, elements, chemistry, physics, molar mass, normality, molarity, molality, n-factor, equivalent weight, CupX"/>
+<meta name="author" content="CupX Corporation"/>
+<link rel="canonical" href="https://cupx.in/periodictable/"/>
+<meta property="og:title" content="Periodic Table — CupX Corporation"/>
+<meta property="og:description" content="Explore all 118 elements with heatmaps, phase states, molar mass, normality, molarity, molality calculators and animated atomic models."/>
+<meta property="og:url" content="https://cupx.in/periodictable/"/>
+<meta property="og:type" content="website"/>
+<link rel="icon" type="image/png" href="/favicon.png"/>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f172a;--bg2:#020617;--bg3:#1e293b;
+  --accent:#38bdf8;--accent2:#f59e0b;
+  --text:#e2e8f0;--muted:#64748b;--border:#1e3a5f;
+  --card:#0f1e33;--shadow:rgba(0,0,0,0.5);
+  --green:#4ade80;--red:#f87171;--orange:#fb923c;
+}
+@media(prefers-color-scheme:light){
+  :root{
+    --bg:#f1f5f9;--bg2:#ffffff;--bg3:#e2e8f0;
+    --accent:#0284c7;--accent2:#d97706;
+    --text:#0f172a;--muted:#64748b;--border:#cbd5e1;
+    --card:#ffffff;--shadow:rgba(0,0,0,0.12);
+  }
+  body::before{display:none}
+  .el .en{color:rgba(0,0,0,0.4)}
+  .el .es{color:#0f172a}
+  .el .ename{color:rgba(0,0,0,0.5)}
+  .el .emass{color:rgba(0,0,0,0.3)}
+  .modal,.modal-header{background:#fff}
+  .prop,.econfig{background:#f8fafc}
+  .compare-bar,.compare-slot{background:#fff}
+  .molar-box,.compare-modal{background:#fff}
+  ::-webkit-scrollbar-track{background:#e2e8f0}
+  ::-webkit-scrollbar-thumb{background:#94a3b8}
+}
+body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 15% 15%,rgba(56,189,248,0.05) 0%,transparent 55%),radial-gradient(ellipse at 85% 85%,rgba(245,158,11,0.04) 0%,transparent 55%);pointer-events:none;z-index:0}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* HEADER */
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background-color:#020617;position:relative;z-index:20;border-bottom:1px solid rgba(56,189,248,0.15)}
+.logo-block{display:flex;flex-direction:column;gap:1px}
+.logo-title{font-size:22px;font-weight:900;color:#38bdf8;line-height:1.2;display:block;letter-spacing:0.3px}
+.logo-sub{font-size:13.3px;font-weight:400;color:#64748b;line-height:1.2;display:block}
+header a{color:#38bdf8;text-decoration:none;font-size:14px;font-weight:700}
+header a:hover{text-decoration:underline}
+
+/* BUTTONS */
+.btn{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:7px 14px;border-radius:6px;cursor:pointer;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;transition:all 0.18s;white-space:nowrap}
+.btn:hover,.btn.active{border-color:var(--accent);color:var(--accent);background:rgba(56,189,248,0.08)}
+.btn.accent-btn{background:var(--accent);color:#020617;border-color:var(--accent);font-weight:900}
+.btn.accent-btn:hover{opacity:0.88}
+
+/* CONTROLS */
+.controls{position:relative;z-index:10;padding:12px 20px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start}
+.search-wrap{position:relative;flex:1;min-width:260px;max-width:460px}
+.search-wrap input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px 14px 10px 40px;border-radius:6px;font-family:'Lato',sans-serif;font-size:14px;font-weight:400;outline:none;transition:border-color 0.2s}
+.search-wrap input:focus{border-color:var(--accent)}
+.search-wrap input::placeholder{color:var(--muted)}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:17px;pointer-events:none}
+.ctrl-group{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.ctrl-label{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-right:2px;white-space:nowrap}
+.filter-btn{background:transparent;border:1px solid var(--border);color:var(--muted);padding:5px 11px;border-radius:4px;cursor:pointer;font-size:11px;font-family:'Lato',sans-serif;font-weight:700;transition:all 0.15s;white-space:nowrap}
+.filter-btn:hover{border-color:var(--text);color:var(--text)}
+.filter-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(56,189,248,0.1)}
+select{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-family:'Lato',sans-serif;font-size:13px;font-weight:400;outline:none;cursor:pointer}
+select:focus{border-color:var(--accent)}
+
+/* TEMPERATURE */
+.temp-block{display:flex;flex-direction:column;gap:5px;flex:1;min-width:320px;max-width:580px}
+.temp-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.temp-controls input[type=range]{flex:1;min-width:200px;accent-color:var(--accent);cursor:pointer;height:5px}
+.temp-number{width:78px;background:var(--bg);border:1px solid var(--border);color:var(--accent);padding:7px 8px;border-radius:5px;font-family:monospace;font-size:13px;text-align:center;outline:none}
+.temp-number:focus{border-color:var(--accent)}
+.unit-toggle{display:flex;border:1px solid var(--border);border-radius:5px;overflow:hidden}
+.unit-toggle button{background:transparent;border:none;color:var(--muted);padding:6px 10px;cursor:pointer;font-family:'Lato',sans-serif;font-size:12px;font-weight:700;transition:all 0.15s}
+.unit-toggle button.active{background:var(--accent);color:#020617}
+.phase-summary{font-size:11px;color:var(--muted);font-weight:400}
+
+/* TABLE */
+.table-scroll{overflow-x:auto;padding:12px 20px 6px;position:relative;z-index:5}
+.pt-grid{display:grid;grid-template-columns:repeat(18,minmax(52px,1fr));gap:3px;min-width:980px;max-width:1400px;margin:0 auto}
+
+/* ELEMENT CARD */
+.el{aspect-ratio:1;padding:4px 3px 3px;cursor:pointer;border:1px solid transparent;border-radius:4px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;transition:transform 0.15s,border-color 0.15s,box-shadow 0.15s,opacity 0.2s,filter 0.2s;background:var(--card)}
+.el:hover{transform:scale(1.18);z-index:50;border-color:rgba(255,255,255,0.5)!important;box-shadow:0 0 22px var(--shadow)}
+.el.dimmed{opacity:0.07;filter:grayscale(1);pointer-events:none}
+.el.search-match{border-color:var(--accent)!important;box-shadow:0 0 10px rgba(56,189,248,0.4)}
+.el .en{font-size:9px;color:rgba(255,255,255,0.45);font-family:monospace;line-height:1}
+.el .es{font-size:17px;font-weight:900;text-align:center;line-height:1.1;color:#fff}
+.el .ename{font-size:7px;text-align:center;color:rgba(255,255,255,0.55);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.el .emass{font-size:7px;text-align:right;color:rgba(255,255,255,0.35);font-family:monospace}
+
+/* LEGEND */
+.legend{display:flex;flex-wrap:wrap;gap:8px;padding:8px 20px;border-bottom:1px solid var(--border);position:relative;z-index:5}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);font-weight:400}
+.legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+
+/* HEATMAP BAR */
+.heatmap-bar{padding:7px 20px;display:flex;align-items:center;gap:10px;font-size:11px;color:var(--muted);border-bottom:1px solid var(--border)}
+.heatmap-bar .gradient{flex:1;max-width:300px;height:6px;border-radius:3px;background:linear-gradient(to right,#313695,#74add1,#ffffbf,#f46d43,#a50026)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:flex;align-items:flex-start;justify-content:flex-end}
+.modal{width:385px;height:100vh;background:var(--bg2);border-left:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column;animation:slideIn 0.22s ease}
+@keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+.modal-header{padding:20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg2);z-index:10;display:flex;justify-content:space-between;align-items:flex-start}
+.modal-symbol-big{font-size:60px;font-weight:900;line-height:1}
+.modal-meta{text-align:right}
+.modal-name{font-size:17px;font-weight:700;color:var(--accent)}
+.modal-num{font-size:12px;color:var(--muted);font-family:monospace}
+.modal-cat{display:inline-block;padding:3px 8px;border-radius:3px;font-size:10px;text-transform:uppercase;margin-top:6px;font-weight:700}
+.modal-tabs{display:flex;border-bottom:1px solid var(--border)}
+.tab{flex:1;padding:10px;text-align:center;font-size:12px;text-transform:uppercase;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all 0.2s;font-weight:700;letter-spacing:0.3px}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.modal-body{padding:16px;flex:1}
+.prop-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.prop{background:var(--bg3);padding:8px 10px;border-radius:5px;border:1px solid var(--border)}
+.prop-label{font-size:9px;color:var(--muted);text-transform:uppercase;margin-bottom:3px;font-weight:700;letter-spacing:0.4px}
+.prop-val{font-family:monospace;font-size:13px;color:var(--text)}
+.prop-val.accent{color:var(--accent)}
+.section-title{font-size:10px;text-transform:uppercase;color:var(--muted);margin:12px 0 8px;display:flex;align-items:center;gap:8px;font-weight:700;letter-spacing:0.5px}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.econfig{font-family:monospace;font-size:12px;color:var(--accent);background:var(--bg3);padding:10px;border-radius:5px;border:1px solid var(--border);word-break:break-all;line-height:1.7}
+.bohr{display:flex;justify-content:center;align-items:center;margin:8px 0;height:170px}
+.bohr svg{overflow:visible}
+.bohr-controls{display:flex;justify-content:center;margin-bottom:4px}
+
+/* COMPARE */
+.compare-bar{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:2px solid var(--accent);z-index:900;padding:12px 20px;display:flex;align-items:center;gap:12px;animation:slideUp 0.2s ease;flex-wrap:wrap}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.compare-slot{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:8px 12px;display:flex;align-items:center;gap:8px;min-width:120px}
+.compare-slot .sym{font-weight:900;font-size:17px}
+.compare-slot .nm{font-size:10px;color:var(--muted)}
+.compare-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}
+.compare-table th{text-align:left;padding:6px 8px;color:var(--muted);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);font-weight:700}
+.compare-table td{padding:6px 8px;border-bottom:1px solid var(--border);font-family:monospace}
+.compare-table td.best{color:var(--green)}
+.compare-table td.worst{color:var(--red)}
+.compare-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:1100;display:flex;align-items:center;justify-content:center;padding:20px}
+.compare-modal{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:20px;max-width:720px;width:100%;max-height:90vh;overflow-y:auto}
+
+/* MOLAR CALC */
+.molar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:1100;display:flex;align-items:center;justify-content:center;padding:20px}
+.molar-box{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:0;max-width:520px;width:100%;max-height:90vh;overflow-y:auto}
+.molar-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.molar-tabs{display:flex;border-bottom:1px solid var(--border)}
+.molar-tab{flex:1;padding:10px;text-align:center;font-size:12px;text-transform:uppercase;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all 0.2s;font-weight:700;letter-spacing:0.3px}
+.molar-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.molar-content{padding:18px 20px}
+.molar-input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:11px 14px;border-radius:6px;font-family:monospace;font-size:17px;outline:none;margin-bottom:12px;transition:border-color 0.2s}
+.molar-input:focus{border-color:var(--accent)}
+.molar-input-sm{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:5px;font-family:'Lato',sans-serif;font-size:13px;outline:none;transition:border-color 0.2s;margin-bottom:0}
+.molar-input-sm:focus{border-color:var(--accent)}
+.molar-result{font-family:monospace;font-size:22px;color:var(--accent);margin:10px 0;min-height:30px;font-weight:400}
+.molar-breakdown{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.molar-breakdown th{text-align:left;padding:5px 8px;color:var(--muted);font-size:10px;border-bottom:1px solid var(--border);font-weight:700;text-transform:uppercase}
+.molar-breakdown td{padding:5px 8px;font-family:monospace;border-bottom:1px solid var(--border)}
+.molar-error{color:var(--red);font-size:13px;margin-top:8px;font-weight:700}
+.input-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.input-label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:10px}
+.badge-green{background:rgba(74,222,128,0.15);color:var(--green);border:1px solid rgba(74,222,128,0.3)}
+.badge-orange{background:rgba(251,146,60,0.15);color:var(--orange);border:1px solid rgba(251,146,60,0.3)}
+.badge-grey{background:rgba(100,116,139,0.15);color:var(--muted);border:1px solid rgba(100,116,139,0.3)}
+.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.result-card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px 12px}
+.result-card.highlight{border-color:rgba(56,189,248,0.4);background:rgba(56,189,248,0.06)}
+.result-label{font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:700;letter-spacing:0.4px;margin-bottom:4px}
+.result-val{font-family:monospace;font-size:15px;color:var(--text)}
+.result-val.accent{color:var(--accent)}
+.result-val.accent2{color:var(--accent2)}
+.medium-select{background:var(--bg);border:1px solid var(--orange);color:var(--text);padding:6px 10px;border-radius:5px;font-family:'Lato',sans-serif;font-size:12px;outline:none;cursor:pointer;width:100%;margin-bottom:8px}
+
+/* FOOTER */
+footer{text-align:center;padding:20px;font-size:13px;background-color:#020617;color:#64748b;margin-top:40px;font-weight:400;border-top:1px solid rgba(56,189,248,0.1)}
+
+@media(max-width:700px){
+  .modal{width:100vw}
+  .controls{padding:8px 12px}
+  .search-wrap{min-width:180px}
+  header{padding:10px 14px}
+  .logo-title{font-size:18px}
+  .logo-sub{font-size:12px}
+  .temp-controls input[type=range]{min-width:100px}
+  .temp-block{min-width:220px}
+  .results-grid{grid-template-columns:1fr}
+  .input-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-block">
+    <span class="logo-title">Periodic Table</span>
+    <span class="logo-sub">by CupX Corporation</span>
+  </div>
+  <a href="/">← Back to Home</a>
+</header>
+
+<div id="root"></div>
+
+<footer>© 2026 CupX Corporation · All rights reserved</footer>
+
+<script type="text/babel">
+
+// ─── ELEMENT DATA ─────────────────────────────────────────────────────────────
+const ELEMENTS=[
+  {n:1,s:"H",name:"Hydrogen",mass:1.008,g:1,p:1,cat:"nonmetal",c:"#a8d8ea",mp:14.01,bp:20.28,en:2.20,ar:53,d:0.00009,ec:"1s¹",eps:[1],ox:[1,-1],disc:"1766",by:"Henry Cavendish",ety:"Greek: hydro+genes (water-forming)"},
+  {n:2,s:"He",name:"Helium",mass:4.003,g:18,p:1,cat:"noble gas",c:"#d4e6ff",mp:0.95,bp:4.22,en:null,ar:31,d:0.000178,ec:"1s²",eps:[2],ox:[0],disc:"1868",by:"Janssen/Lockyer",ety:"Greek: Helios (sun)"},
+  {n:3,s:"Li",name:"Lithium",mass:6.941,g:1,p:2,cat:"alkali metal",c:"#ff6b6b",mp:453.69,bp:1615,en:0.98,ar:167,d:0.534,ec:"[He] 2s¹",eps:[2,1],ox:[1],disc:"1817",by:"Johan Arfvedson",ety:"Greek: lithos (stone)"},
+  {n:4,s:"Be",name:"Beryllium",mass:9.012,g:2,p:2,cat:"alkaline earth",c:"#ffa94d",mp:1560,bp:2742,en:1.57,ar:112,d:1.85,ec:"[He] 2s²",eps:[2,2],ox:[2],disc:"1798",by:"Louis Vauquelin",ety:"Greek: beryllos (beryl gem)"},
+  {n:5,s:"B",name:"Boron",mass:10.811,g:13,p:2,cat:"metalloid",c:"#69db7c",mp:2349,bp:4200,en:2.04,ar:87,d:2.34,ec:"[He] 2s² 2p¹",eps:[2,3],ox:[3],disc:"1808",by:"Gay-Lussac/Thenard",ety:"Arabic: buraq (borax)"},
+  {n:6,s:"C",name:"Carbon",mass:12.011,g:14,p:2,cat:"nonmetal",c:"#a8d8ea",mp:3823,bp:4300,en:2.55,ar:77,d:2.267,ec:"[He] 2s² 2p²",eps:[2,4],ox:[4,-4],disc:"ancient",by:"Known since antiquity",ety:"Latin: carbo (coal)"},
+  {n:7,s:"N",name:"Nitrogen",mass:14.007,g:15,p:2,cat:"nonmetal",c:"#a8d8ea",mp:63.15,bp:77.36,en:3.04,ar:75,d:0.00125,ec:"[He] 2s² 2p³",eps:[2,5],ox:[-3,3,5],disc:"1772",by:"Daniel Rutherford",ety:"Greek: nitron+genes (nitre-forming)"},
+  {n:8,s:"O",name:"Oxygen",mass:15.999,g:16,p:2,cat:"nonmetal",c:"#a8d8ea",mp:54.36,bp:90.20,en:3.44,ar:73,d:0.00143,ec:"[He] 2s² 2p⁴",eps:[2,6],ox:[-2],disc:"1774",by:"Carl Scheele/Priestley",ety:"Greek: oxys+genes (acid-forming)"},
+  {n:9,s:"F",name:"Fluorine",mass:18.998,g:17,p:2,cat:"halogen",c:"#74c0fc",mp:53.53,bp:85.03,en:3.98,ar:71,d:0.00170,ec:"[He] 2s² 2p⁵",eps:[2,7],ox:[-1],disc:"1886",by:"Henri Moissan",ety:"Latin: fluere (to flow)"},
+  {n:10,s:"Ne",name:"Neon",mass:20.180,g:18,p:2,cat:"noble gas",c:"#d4e6ff",mp:24.56,bp:27.07,en:null,ar:69,d:0.000900,ec:"[He] 2s² 2p⁶",eps:[2,8],ox:[0],disc:"1898",by:"Ramsay/Travers",ety:"Greek: neos (new)"},
+  {n:11,s:"Na",name:"Sodium",mass:22.990,g:1,p:3,cat:"alkali metal",c:"#ff6b6b",mp:370.87,bp:1156,en:0.93,ar:190,d:0.968,ec:"[Ne] 3s¹",eps:[2,8,1],ox:[1],disc:"1807",by:"Humphry Davy",ety:"English: soda; Symbol from Latin: natrium"},
+  {n:12,s:"Mg",name:"Magnesium",mass:24.305,g:2,p:3,cat:"alkaline earth",c:"#ffa94d",mp:923,bp:1363,en:1.31,ar:145,d:1.738,ec:"[Ne] 3s²",eps:[2,8,2],ox:[2],disc:"1755",by:"Joseph Black",ety:"Magnesia, district in Greece"},
+  {n:13,s:"Al",name:"Aluminum",mass:26.982,g:13,p:3,cat:"post-transition",c:"#b0c4de",mp:933.47,bp:2792,en:1.61,ar:118,d:2.70,ec:"[Ne] 3s² 3p¹",eps:[2,8,3],ox:[3],disc:"1825",by:"Hans Oersted",ety:"Latin: alumen (alum)"},
+  {n:14,s:"Si",name:"Silicon",mass:28.086,g:14,p:3,cat:"metalloid",c:"#69db7c",mp:1687,bp:3538,en:1.90,ar:111,d:2.329,ec:"[Ne] 3s² 3p²",eps:[2,8,4],ox:[4,-4],disc:"1824",by:"Jons Berzelius",ety:"Latin: silex (flint)"},
+  {n:15,s:"P",name:"Phosphorus",mass:30.974,g:15,p:3,cat:"nonmetal",c:"#a8d8ea",mp:317.30,bp:553,en:2.19,ar:106,d:1.82,ec:"[Ne] 3s² 3p³",eps:[2,8,5],ox:[-3,3,5],disc:"1669",by:"Hennig Brand",ety:"Greek: phosphoros (light-bearer)"},
+  {n:16,s:"S",name:"Sulfur",mass:32.065,g:16,p:3,cat:"nonmetal",c:"#a8d8ea",mp:388.36,bp:717.87,en:2.58,ar:105,d:2.067,ec:"[Ne] 3s² 3p⁴",eps:[2,8,6],ox:[-2,2,4,6],disc:"ancient",by:"Known since antiquity",ety:"Latin: sulphur"},
+  {n:17,s:"Cl",name:"Chlorine",mass:35.453,g:17,p:3,cat:"halogen",c:"#74c0fc",mp:171.6,bp:239.11,en:3.16,ar:102,d:0.00321,ec:"[Ne] 3s² 3p⁵",eps:[2,8,7],ox:[-1,1,3,5,7],disc:"1774",by:"Carl Scheele",ety:"Greek: chloros (pale green)"},
+  {n:18,s:"Ar",name:"Argon",mass:39.948,g:18,p:3,cat:"noble gas",c:"#d4e6ff",mp:83.80,bp:87.30,en:null,ar:106,d:0.00178,ec:"[Ne] 3s² 3p⁶",eps:[2,8,8],ox:[0],disc:"1894",by:"Rayleigh/Ramsay",ety:"Greek: argos (inactive)"},
+  {n:19,s:"K",name:"Potassium",mass:39.098,g:1,p:4,cat:"alkali metal",c:"#ff6b6b",mp:336.53,bp:1032,en:0.82,ar:243,d:0.862,ec:"[Ar] 4s¹",eps:[2,8,8,1],ox:[1],disc:"1807",by:"Humphry Davy",ety:"English: potash; Symbol from Latin: kalium"},
+  {n:20,s:"Ca",name:"Calcium",mass:40.078,g:2,p:4,cat:"alkaline earth",c:"#ffa94d",mp:1115,bp:1757,en:1.00,ar:194,d:1.54,ec:"[Ar] 4s²",eps:[2,8,8,2],ox:[2],disc:"1808",by:"Humphry Davy",ety:"Latin: calx (lime)"},
+  {n:21,s:"Sc",name:"Scandium",mass:44.956,g:3,p:4,cat:"transition metal",c:"#f0c040",mp:1814,bp:3109,en:1.36,ar:184,d:2.99,ec:"[Ar] 3d¹ 4s²",eps:[2,8,9,2],ox:[3],disc:"1879",by:"Lars Nilson",ety:"Scandinavia"},
+  {n:22,s:"Ti",name:"Titanium",mass:47.867,g:4,p:4,cat:"transition metal",c:"#f0c040",mp:1941,bp:3560,en:1.54,ar:176,d:4.506,ec:"[Ar] 3d² 4s²",eps:[2,8,10,2],ox:[4,3,2],disc:"1791",by:"William Gregor",ety:"Greek: Titans (mythological giants)"},
+  {n:23,s:"V",name:"Vanadium",mass:50.942,g:5,p:4,cat:"transition metal",c:"#f0c040",mp:2183,bp:3680,en:1.63,ar:171,d:6.0,ec:"[Ar] 3d³ 4s²",eps:[2,8,11,2],ox:[5,4,3,2],disc:"1801",by:"Andres del Rio",ety:"Norse goddess Vanadis (Freya)"},
+  {n:24,s:"Cr",name:"Chromium",mass:51.996,g:6,p:4,cat:"transition metal",c:"#f0c040",mp:2180,bp:2944,en:1.66,ar:166,d:7.15,ec:"[Ar] 3d⁵ 4s¹",eps:[2,8,13,1],ox:[6,3,2],disc:"1797",by:"Louis Vauquelin",ety:"Greek: chroma (color)"},
+  {n:25,s:"Mn",name:"Manganese",mass:54.938,g:7,p:4,cat:"transition metal",c:"#f0c040",mp:1519,bp:2334,en:1.55,ar:161,d:7.21,ec:"[Ar] 3d⁵ 4s²",eps:[2,8,13,2],ox:[7,4,2],disc:"1774",by:"Carl Scheele",ety:"Magnesia, district in Greece"},
+  {n:26,s:"Fe",name:"Iron",mass:55.845,g:8,p:4,cat:"transition metal",c:"#f0c040",mp:1811,bp:3134,en:1.83,ar:156,d:7.874,ec:"[Ar] 3d⁶ 4s²",eps:[2,8,14,2],ox:[3,2],disc:"ancient",by:"Known since antiquity",ety:"Anglo-Saxon: iren; Symbol from Latin: ferrum"},
+  {n:27,s:"Co",name:"Cobalt",mass:58.933,g:9,p:4,cat:"transition metal",c:"#f0c040",mp:1768,bp:3200,en:1.88,ar:152,d:8.90,ec:"[Ar] 3d⁷ 4s²",eps:[2,8,15,2],ox:[3,2],disc:"1735",by:"Georg Brandt",ety:"German: Kobold (goblin)"},
+  {n:28,s:"Ni",name:"Nickel",mass:58.693,g:10,p:4,cat:"transition metal",c:"#f0c040",mp:1728,bp:3186,en:1.91,ar:149,d:8.908,ec:"[Ar] 3d⁸ 4s²",eps:[2,8,16,2],ox:[2],disc:"1751",by:"Axel Cronstedt",ety:"German: Nickel (devil's copper)"},
+  {n:29,s:"Cu",name:"Copper",mass:63.546,g:11,p:4,cat:"transition metal",c:"#f0c040",mp:1357.77,bp:2835,en:1.90,ar:145,d:8.96,ec:"[Ar] 3d¹⁰ 4s¹",eps:[2,8,18,1],ox:[2,1],disc:"ancient",by:"Known since antiquity",ety:"Latin: cuprum (Cyprus island)"},
+  {n:30,s:"Zn",name:"Zinc",mass:65.38,g:12,p:4,cat:"transition metal",c:"#f0c040",mp:692.68,bp:1180,en:1.65,ar:142,d:7.133,ec:"[Ar] 3d¹⁰ 4s²",eps:[2,8,18,2],ox:[2],disc:"1746",by:"Andreas Marggraf",ety:"German: Zink"},
+  {n:31,s:"Ga",name:"Gallium",mass:69.723,g:13,p:4,cat:"post-transition",c:"#b0c4de",mp:302.91,bp:2477,en:1.81,ar:136,d:5.907,ec:"[Ar] 3d¹⁰ 4s² 4p¹",eps:[2,8,18,3],ox:[3],disc:"1875",by:"Paul Lecoq",ety:"Latin: Gallia (France)"},
+  {n:32,s:"Ge",name:"Germanium",mass:72.630,g:14,p:4,cat:"metalloid",c:"#69db7c",mp:1211.40,bp:3106,en:2.01,ar:125,d:5.323,ec:"[Ar] 3d¹⁰ 4s² 4p²",eps:[2,8,18,4],ox:[4],disc:"1886",by:"Clemens Winkler",ety:"Latin: Germania (Germany)"},
+  {n:33,s:"As",name:"Arsenic",mass:74.922,g:15,p:4,cat:"metalloid",c:"#69db7c",mp:1090,bp:887,en:2.18,ar:114,d:5.727,ec:"[Ar] 3d¹⁰ 4s² 4p³",eps:[2,8,18,5],ox:[-3,3,5],disc:"1250",by:"Albertus Magnus",ety:"Greek: arsenikon (yellow orpiment)"},
+  {n:34,s:"Se",name:"Selenium",mass:78.971,g:16,p:4,cat:"nonmetal",c:"#a8d8ea",mp:494,bp:958,en:2.55,ar:103,d:4.81,ec:"[Ar] 3d¹⁰ 4s² 4p⁴",eps:[2,8,18,6],ox:[-2,4,6],disc:"1817",by:"Jons Berzelius",ety:"Greek: Selene (moon goddess)"},
+  {n:35,s:"Br",name:"Bromine",mass:79.904,g:17,p:4,cat:"halogen",c:"#74c0fc",mp:265.8,bp:332.0,en:2.96,ar:94,d:3.102,ec:"[Ar] 3d¹⁰ 4s² 4p⁵",eps:[2,8,18,7],ox:[-1,1,3,5],disc:"1826",by:"Antoine Balard",ety:"Greek: bromos (stench)"},
+  {n:36,s:"Kr",name:"Krypton",mass:83.798,g:18,p:4,cat:"noble gas",c:"#d4e6ff",mp:115.79,bp:119.93,en:null,ar:88,d:0.00375,ec:"[Ar] 3d¹⁰ 4s² 4p⁶",eps:[2,8,18,8],ox:[0],disc:"1898",by:"Ramsay/Travers",ety:"Greek: kryptos (hidden)"},
+  {n:37,s:"Rb",name:"Rubidium",mass:85.468,g:1,p:5,cat:"alkali metal",c:"#ff6b6b",mp:312.46,bp:961,en:0.82,ar:265,d:1.532,ec:"[Kr] 5s¹",eps:[2,8,18,8,1],ox:[1],disc:"1861",by:"Bunsen/Kirchhoff",ety:"Latin: rubidus (deep red)"},
+  {n:38,s:"Sr",name:"Strontium",mass:87.62,g:2,p:5,cat:"alkaline earth",c:"#ffa94d",mp:1050,bp:1655,en:0.95,ar:219,d:2.64,ec:"[Kr] 5s²",eps:[2,8,18,8,2],ox:[2],disc:"1790",by:"Adair Crawford",ety:"Strontian, village in Scotland"},
+  {n:39,s:"Y",name:"Yttrium",mass:88.906,g:3,p:5,cat:"transition metal",c:"#f0c040",mp:1799,bp:3609,en:1.22,ar:212,d:4.469,ec:"[Kr] 4d¹ 5s²",eps:[2,8,18,9,2],ox:[3],disc:"1794",by:"Johan Gadolin",ety:"Ytterby, village in Sweden"},
+  {n:40,s:"Zr",name:"Zirconium",mass:91.224,g:4,p:5,cat:"transition metal",c:"#f0c040",mp:2128,bp:4682,en:1.33,ar:206,d:6.52,ec:"[Kr] 4d² 5s²",eps:[2,8,18,10,2],ox:[4],disc:"1789",by:"Martin Klaproth",ety:"Persian: zargun (gold-colored)"},
+  {n:41,s:"Nb",name:"Niobium",mass:92.906,g:5,p:5,cat:"transition metal",c:"#f0c040",mp:2750,bp:5017,en:1.6,ar:198,d:8.57,ec:"[Kr] 4d⁴ 5s¹",eps:[2,8,18,12,1],ox:[5,3],disc:"1801",by:"Charles Hatchett",ety:"Greek: Niobe (daughter of Tantalus)"},
+  {n:42,s:"Mo",name:"Molybdenum",mass:95.96,g:6,p:5,cat:"transition metal",c:"#f0c040",mp:2896,bp:4912,en:2.16,ar:190,d:10.22,ec:"[Kr] 4d⁵ 5s¹",eps:[2,8,18,13,1],ox:[6,4,2],disc:"1781",by:"Carl Scheele",ety:"Greek: molybdos (lead)"},
+  {n:43,s:"Tc",name:"Technetium",mass:98,g:7,p:5,cat:"transition metal",c:"#f0c040",mp:2430,bp:4538,en:1.9,ar:183,d:11.5,ec:"[Kr] 4d⁵ 5s²",eps:[2,8,18,13,2],ox:[7,4],disc:"1937",by:"Perrier/Segre",ety:"Greek: technetos (artificial)"},
+  {n:44,s:"Ru",name:"Ruthenium",mass:101.07,g:8,p:5,cat:"transition metal",c:"#f0c040",mp:2607,bp:4423,en:2.2,ar:178,d:12.37,ec:"[Kr] 4d⁷ 5s¹",eps:[2,8,18,15,1],ox:[4,3,2],disc:"1844",by:"Karl Ernst Claus",ety:"Latin: Ruthenia (Russia)"},
+  {n:45,s:"Rh",name:"Rhodium",mass:102.906,g:9,p:5,cat:"transition metal",c:"#f0c040",mp:2237,bp:3968,en:2.28,ar:173,d:12.41,ec:"[Kr] 4d⁸ 5s¹",eps:[2,8,18,16,1],ox:[3],disc:"1803",by:"William Wollaston",ety:"Greek: rhodon (rose)"},
+  {n:46,s:"Pd",name:"Palladium",mass:106.42,g:10,p:5,cat:"transition metal",c:"#f0c040",mp:1828.05,bp:3236,en:2.20,ar:169,d:12.02,ec:"[Kr] 4d¹⁰",eps:[2,8,18,18],ox:[2,4],disc:"1803",by:"William Wollaston",ety:"Asteroid Pallas"},
+  {n:47,s:"Ag",name:"Silver",mass:107.868,g:11,p:5,cat:"transition metal",c:"#f0c040",mp:1234.93,bp:2435,en:1.93,ar:165,d:10.501,ec:"[Kr] 4d¹⁰ 5s¹",eps:[2,8,18,18,1],ox:[1],disc:"ancient",by:"Known since antiquity",ety:"Anglo-Saxon: seolfor; Symbol from Latin: argentum"},
+  {n:48,s:"Cd",name:"Cadmium",mass:112.411,g:12,p:5,cat:"transition metal",c:"#f0c040",mp:594.22,bp:1040,en:1.69,ar:161,d:8.65,ec:"[Kr] 4d¹⁰ 5s²",eps:[2,8,18,18,2],ox:[2],disc:"1817",by:"Karl Hermann",ety:"Latin: cadmia (calamine)"},
+  {n:49,s:"In",name:"Indium",mass:114.818,g:13,p:5,cat:"post-transition",c:"#b0c4de",mp:429.75,bp:2345,en:1.78,ar:156,d:7.31,ec:"[Kr] 4d¹⁰ 5s² 5p¹",eps:[2,8,18,18,3],ox:[3],disc:"1863",by:"Reich/Richter",ety:"Indigo (spectral line color)"},
+  {n:50,s:"Sn",name:"Tin",mass:118.710,g:14,p:5,cat:"post-transition",c:"#b0c4de",mp:505.08,bp:2875,en:1.96,ar:145,d:7.265,ec:"[Kr] 4d¹⁰ 5s² 5p²",eps:[2,8,18,18,4],ox:[4,2],disc:"ancient",by:"Known since antiquity",ety:"Anglo-Saxon: tin; Symbol from Latin: stannum"},
+  {n:51,s:"Sb",name:"Antimony",mass:121.760,g:15,p:5,cat:"metalloid",c:"#69db7c",mp:903.78,bp:1860,en:2.05,ar:133,d:6.697,ec:"[Kr] 4d¹⁰ 5s² 5p³",eps:[2,8,18,18,5],ox:[-3,3,5],disc:"ancient",by:"Known since antiquity",ety:"Greek: anti+monos; Symbol from Latin: stibium"},
+  {n:52,s:"Te",name:"Tellurium",mass:127.60,g:16,p:5,cat:"metalloid",c:"#69db7c",mp:722.66,bp:1261,en:2.1,ar:123,d:6.24,ec:"[Kr] 4d¹⁰ 5s² 5p⁴",eps:[2,8,18,18,6],ox:[-2,4,6],disc:"1782",by:"Franz Muller",ety:"Latin: tellus (earth)"},
+  {n:53,s:"I",name:"Iodine",mass:126.904,g:17,p:5,cat:"halogen",c:"#74c0fc",mp:386.85,bp:457.4,en:2.66,ar:115,d:4.933,ec:"[Kr] 4d¹⁰ 5s² 5p⁵",eps:[2,8,18,18,7],ox:[-1,1,3,5,7],disc:"1811",by:"Bernard Courtois",ety:"Greek: iodes (violet)"},
+  {n:54,s:"Xe",name:"Xenon",mass:131.293,g:18,p:5,cat:"noble gas",c:"#d4e6ff",mp:161.4,bp:165.03,en:null,ar:108,d:0.00589,ec:"[Kr] 4d¹⁰ 5s² 5p⁶",eps:[2,8,18,18,8],ox:[0],disc:"1898",by:"Ramsay/Travers",ety:"Greek: xenos (stranger)"},
+  {n:55,s:"Cs",name:"Cesium",mass:132.905,g:1,p:6,cat:"alkali metal",c:"#ff6b6b",mp:301.59,bp:944,en:0.79,ar:298,d:1.93,ec:"[Xe] 6s¹",eps:[2,8,18,18,8,1],ox:[1],disc:"1860",by:"Bunsen/Kirchhoff",ety:"Latin: caesius (sky blue)"},
+  {n:56,s:"Ba",name:"Barium",mass:137.327,g:2,p:6,cat:"alkaline earth",c:"#ffa94d",mp:1000,bp:2170,en:0.89,ar:253,d:3.51,ec:"[Xe] 6s²",eps:[2,8,18,18,8,2],ox:[2],disc:"1808",by:"Humphry Davy",ety:"Greek: barys (heavy)"},
+  {n:57,s:"La",name:"Lanthanum",mass:138.905,g:null,p:6,cat:"lanthanide",c:"#cc88ff",mp:1193,bp:3737,en:1.10,ar:240,d:6.145,ec:"[Xe] 5d¹ 6s²",eps:[2,8,18,18,9,2],ox:[3],disc:"1839",by:"Carl Mosander",ety:"Greek: lanthanein (to lie hidden)"},
+  {n:58,s:"Ce",name:"Cerium",mass:140.116,g:null,p:6,cat:"lanthanide",c:"#cc88ff",mp:1068,bp:3716,en:1.12,ar:235,d:6.77,ec:"[Xe] 4f¹ 5d¹ 6s²",eps:[2,8,18,19,9,2],ox:[4,3],disc:"1803",by:"Berzelius/Hisinger",ety:"Dwarf planet Ceres"},
+  {n:59,s:"Pr",name:"Praseodymium",mass:140.908,g:null,p:6,cat:"lanthanide",c:"#cc88ff",mp:1208,bp:3793,en:1.13,ar:239,d:6.773,ec:"[Xe] 4f³ 6s²",eps:[2,8,18,21,8,2],ox:[3],disc:"1885",by:"Carl Auer",ety:"Greek: prasios+didymos (green twin)"},
+  {n:60,s:"Nd",name:"Neodymium",mass:144.242,g:null,p:6,cat:"lanthanide",c:"#cc88ff",mp:1297,bp:3347,en:1.14,ar:229,d:7.007,ec:"[Xe] 4f⁴ 6s²",eps:[2,8,18,22,8,2],ox:[3],disc:"1885",by:"Carl Auer",ety:"Greek: neos+didymos (new twin)"},
+  {n:61,s:"Pm",name:"Promethium",mass:145,g:null,p:6,cat:"lanthanide",c:"#cc88ff",mp:1315,bp:3273,en:1.13,ar:236,d:7.26,ec:"[Xe] 4f⁵ 6s²",eps:[2,8,18,23,8,2],ox:[3],disc:"1945",by:"Marinsky/Cabell",ety:"Greek Titan Prometheus"},
+  {n:62,s:"Sm",name:"Samarium",mass:150.36,g:null,p:6,cat:"lanthanide",c:"#cc88ff",mp:1345,bp:2067,en:1.17,ar:229,d:7.52,ec:"[Xe] 4f⁶ 6s²",eps:[2,8,18,24,8,2],ox:[3,2],disc:"1879",by:"Paul Lecoq",ety:"Mineral samarskite"},
+  {n:63,s:"Eu",name:"Europium",mass:151.964,g:null,p:6,cat:"lanthanide",c:"#cc88ff",mp:1099,bp:1802,en:1.2,ar:233,d:5.243,ec:"[Xe] 4f⁷ 6s²",eps:[2,8,18,25,8,2],ox:[3,2],disc:"1901",by:"Eugene Demarcay",ety:"Continent Europe"},
+  {n:64,s:"Gd",name:"Gadolinium",mass:157.25,g:null,p:6,cat:"lanthanide",c:"#cc88ff",mp:1585,bp:3546,en:1.20,ar:237,d:7.895,ec:"[Xe] 4f⁷ 5d¹ 6s²",eps:[2,8,18,25,9,2],ox:[3],disc:"1880",by:"Jean de Marignac",ety:"Mineral gadolinite"},
+  {n:65,s:"Tb",name:"Terbium",mass:158.925,g:null,p:6,cat:"lanthanide",c:"#cc88ff",mp:1629,bp:3503,en:1.1,ar:221,d:8.229,ec:"[Xe] 4f⁹ 6s²",eps:[2,8,18,27,8,2],ox:[3],disc:"1843",by:"Carl Mosander",ety:"Ytterby, village in Sweden"},
+  {n:66,s:"Dy",name:"Dysprosium",mass:162.500,g:null,p:6,cat:"lanthanide",c:"#cc88ff",mp:1680,bp:2840,en:1.22,ar:229,d:8.55,ec:"[Xe] 4f¹⁰ 6s²",eps:[2,8,18,28,8,2],ox:[3],disc:"1886",by:"Paul Lecoq",ety:"Greek: dysprositos (hard to get)"},
+  {n:67,s:"Ho",name:"Holmium",mass:164.930,g:null,p:6,cat:"lanthanide",c:"#cc88ff",mp:1734,bp:2993,en:1.23,ar:216,d:8.795,ec:"[Xe] 4f¹¹ 6s²",eps:[2,8,18,29,8,2],ox:[3],disc:"1878",by:"Marc Delafontaine",ety:"Latin: Holmia (Stockholm)"},
+  {n:68,s:"Er",name:"Erbium",mass:167.259,g:null,p:6,cat:"lanthanide",c:"#cc88ff",mp:1802,bp:3141,en:1.24,ar:235,d:9.066,ec:"[Xe] 4f¹² 6s²",eps:[2,8,18,30,8,2],ox:[3],disc:"1843",by:"Carl Mosander",ety:"Ytterby, village in Sweden"},
+  {n:69,s:"Tm",name:"Thulium",mass:168.934,g:null,p:6,cat:"lanthanide",c:"#cc88ff",mp:1818,bp:2223,en:1.25,ar:227,d:9.321,ec:"[Xe] 4f¹³ 6s²",eps:[2,8,18,31,8,2],ox:[3],disc:"1879",by:"Per Cleve",ety:"Thule, mythological northern island"},
+  {n:70,s:"Yb",name:"Ytterbium",mass:173.054,g:null,p:6,cat:"lanthanide",c:"#cc88ff",mp:1097,bp:1469,en:1.1,ar:242,d:6.965,ec:"[Xe] 4f¹⁴ 6s²",eps:[2,8,18,32,8,2],ox:[3,2],disc:"1878",by:"Jean de Marignac",ety:"Ytterby, village in Sweden"},
+  {n:71,s:"Lu",name:"Lutetium",mass:174.967,g:3,p:6,cat:"lanthanide",c:"#cc88ff",mp:1925,bp:3675,en:1.27,ar:221,d:9.84,ec:"[Xe] 4f¹⁴ 5d¹ 6s²",eps:[2,8,18,32,9,2],ox:[3],disc:"1907",by:"Georges Urbain",ety:"Latin: Lutetia (Paris)"},
+  {n:72,s:"Hf",name:"Hafnium",mass:178.49,g:4,p:6,cat:"transition metal",c:"#f0c040",mp:2506,bp:4876,en:1.3,ar:212,d:13.31,ec:"[Xe] 4f¹⁴ 5d² 6s²",eps:[2,8,18,32,10,2],ox:[4],disc:"1923",by:"Coster/Hevesy",ety:"Latin: Hafnia (Copenhagen)"},
+  {n:73,s:"Ta",name:"Tantalum",mass:180.948,g:5,p:6,cat:"transition metal",c:"#f0c040",mp:3290,bp:5731,en:1.5,ar:217,d:16.654,ec:"[Xe] 4f¹⁴ 5d³ 6s²",eps:[2,8,18,32,11,2],ox:[5],disc:"1802",by:"Anders Ekeberg",ety:"Greek King Tantalus"},
+  {n:74,s:"W",name:"Tungsten",mass:183.84,g:6,p:6,cat:"transition metal",c:"#f0c040",mp:3695,bp:5828,en:2.36,ar:210,d:19.25,ec:"[Xe] 4f¹⁴ 5d⁴ 6s²",eps:[2,8,18,32,12,2],ox:[6,4],disc:"1783",by:"de Elhuyar brothers",ety:"Swedish: tung sten (heavy stone); Symbol from German: Wolfram"},
+  {n:75,s:"Re",name:"Rhenium",mass:186.207,g:7,p:6,cat:"transition metal",c:"#f0c040",mp:3459,bp:5869,en:1.9,ar:217,d:21.02,ec:"[Xe] 4f¹⁴ 5d⁵ 6s²",eps:[2,8,18,32,13,2],ox:[7,4],disc:"1925",by:"Noddack/Berg",ety:"Latin: Rhenus (Rhine river)"},
+  {n:76,s:"Os",name:"Osmium",mass:190.23,g:8,p:6,cat:"transition metal",c:"#f0c040",mp:3306,bp:5285,en:2.2,ar:216,d:22.59,ec:"[Xe] 4f¹⁴ 5d⁶ 6s²",eps:[2,8,18,32,14,2],ox:[4,3],disc:"1803",by:"Smithson Tennant",ety:"Greek: osme (smell)"},
+  {n:77,s:"Ir",name:"Iridium",mass:192.217,g:9,p:6,cat:"transition metal",c:"#f0c040",mp:2719,bp:4701,en:2.20,ar:202,d:22.56,ec:"[Xe] 4f¹⁴ 5d⁷ 6s²",eps:[2,8,18,32,15,2],ox:[4,3],disc:"1803",by:"Smithson Tennant",ety:"Latin: iris (rainbow)"},
+  {n:78,s:"Pt",name:"Platinum",mass:195.084,g:10,p:6,cat:"transition metal",c:"#f0c040",mp:2041.4,bp:4098,en:2.28,ar:209,d:21.45,ec:"[Xe] 4f¹⁴ 5d⁹ 6s¹",eps:[2,8,18,32,17,1],ox:[4,2],disc:"1735",by:"Antonio de Ulloa",ety:"Spanish: platina (little silver)"},
+  {n:79,s:"Au",name:"Gold",mass:196.967,g:11,p:6,cat:"transition metal",c:"#f0c040",mp:1337.33,bp:3129,en:2.54,ar:166,d:19.282,ec:"[Xe] 4f¹⁴ 5d¹⁰ 6s¹",eps:[2,8,18,32,18,1],ox:[3,1],disc:"ancient",by:"Known since antiquity",ety:"Anglo-Saxon: gold; Symbol from Latin: aurum"},
+  {n:80,s:"Hg",name:"Mercury",mass:200.592,g:12,p:6,cat:"transition metal",c:"#f0c040",mp:234.32,bp:629.88,en:2.00,ar:209,d:13.534,ec:"[Xe] 4f¹⁴ 5d¹⁰ 6s²",eps:[2,8,18,32,18,2],ox:[2,1],disc:"ancient",by:"Known since antiquity",ety:"Planet Mercury; Symbol from Latin: hydrargyrum"},
+  {n:81,s:"Tl",name:"Thallium",mass:204.383,g:13,p:6,cat:"post-transition",c:"#b0c4de",mp:577,bp:1746,en:1.62,ar:196,d:11.85,ec:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p¹",eps:[2,8,18,32,18,3],ox:[3,1],disc:"1861",by:"William Crookes",ety:"Greek: thallos (green shoot)"},
+  {n:82,s:"Pb",name:"Lead",mass:207.2,g:14,p:6,cat:"post-transition",c:"#b0c4de",mp:600.61,bp:2022,en:2.33,ar:202,d:11.34,ec:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p²",eps:[2,8,18,32,18,4],ox:[4,2],disc:"ancient",by:"Known since antiquity",ety:"Anglo-Saxon: lead; Symbol from Latin: plumbum"},
+  {n:83,s:"Bi",name:"Bismuth",mass:208.980,g:15,p:6,cat:"post-transition",c:"#b0c4de",mp:544.55,bp:1837,en:2.02,ar:207,d:9.807,ec:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p³",eps:[2,8,18,32,18,5],ox:[3],disc:"1753",by:"Claude Geoffroy",ety:"German: Wismut (white mass)"},
+  {n:84,s:"Po",name:"Polonium",mass:209,g:16,p:6,cat:"post-transition",c:"#b0c4de",mp:527,bp:1235,en:2.0,ar:197,d:9.32,ec:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁴",eps:[2,8,18,32,18,6],ox:[4,2],disc:"1898",by:"Marie Curie",ety:"Latin: Polonia (Poland)"},
+  {n:85,s:"At",name:"Astatine",mass:210,g:17,p:6,cat:"halogen",c:"#74c0fc",mp:575,bp:610,en:2.2,ar:202,d:7,ec:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁵",eps:[2,8,18,32,18,7],ox:[-1,1],disc:"1940",by:"Corson/MacKenzie",ety:"Greek: astatos (unstable)"},
+  {n:86,s:"Rn",name:"Radon",mass:222,g:18,p:6,cat:"noble gas",c:"#d4e6ff",mp:202,bp:211.5,en:null,ar:220,d:0.00973,ec:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁶",eps:[2,8,18,32,18,8],ox:[0],disc:"1900",by:"Friedrich Dorn",ety:"Radium (parent element)"},
+  {n:87,s:"Fr",name:"Francium",mass:223,g:1,p:7,cat:"alkali metal",c:"#ff6b6b",mp:300,bp:950,en:0.7,ar:348,d:1.87,ec:"[Rn] 7s¹",eps:[2,8,18,32,18,8,1],ox:[1],disc:"1939",by:"Marguerite Perey",ety:"France"},
+  {n:88,s:"Ra",name:"Radium",mass:226,g:2,p:7,cat:"alkaline earth",c:"#ffa94d",mp:973,bp:2010,en:0.9,ar:283,d:5.5,ec:"[Rn] 7s²",eps:[2,8,18,32,18,8,2],ox:[2],disc:"1898",by:"Marie/Pierre Curie",ety:"Latin: radius (ray)"},
+  {n:89,s:"Ac",name:"Actinium",mass:227,g:null,p:7,cat:"actinide",c:"#ff9966",mp:1323,bp:3471,en:1.1,ar:260,d:10.07,ec:"[Rn] 6d¹ 7s²",eps:[2,8,18,32,18,9,2],ox:[3],disc:"1899",by:"Andre Debierne",ety:"Greek: aktinos (ray)"},
+  {n:90,s:"Th",name:"Thorium",mass:232.038,g:null,p:7,cat:"actinide",c:"#ff9966",mp:2023,bp:5061,en:1.3,ar:237,d:11.72,ec:"[Rn] 6d² 7s²",eps:[2,8,18,32,18,10,2],ox:[4],disc:"1829",by:"Jons Berzelius",ety:"Norse god Thor"},
+  {n:91,s:"Pa",name:"Protactinium",mass:231.036,g:null,p:7,cat:"actinide",c:"#ff9966",mp:1841,bp:4300,en:1.5,ar:243,d:15.37,ec:"[Rn] 5f² 6d¹ 7s²",eps:[2,8,18,32,20,9,2],ox:[5,4],disc:"1913",by:"Fajans/Gohring",ety:"Greek: protos+actinium (before actinium)"},
+  {n:92,s:"U",name:"Uranium",mass:238.029,g:null,p:7,cat:"actinide",c:"#ff9966",mp:1405.3,bp:4404,en:1.38,ar:240,d:19.1,ec:"[Rn] 5f³ 6d¹ 7s²",eps:[2,8,18,32,21,9,2],ox:[6,5,4,3],disc:"1789",by:"Martin Klaproth",ety:"Planet Uranus"},
+  {n:93,s:"Np",name:"Neptunium",mass:237,g:null,p:7,cat:"actinide",c:"#ff9966",mp:917,bp:4175,en:1.36,ar:221,d:20.2,ec:"[Rn] 5f⁴ 6d¹ 7s²",eps:[2,8,18,32,22,9,2],ox:[5,4,3],disc:"1940",by:"McMillan/Abelson",ety:"Planet Neptune"},
+  {n:94,s:"Pu",name:"Plutonium",mass:244,g:null,p:7,cat:"actinide",c:"#ff9966",mp:912.5,bp:3501,en:1.28,ar:243,d:19.7,ec:"[Rn] 5f⁶ 7s²",eps:[2,8,18,32,24,8,2],ox:[4,3],disc:"1940",by:"Seaborg et al.",ety:"Dwarf planet Pluto"},
+  {n:95,s:"Am",name:"Americium",mass:243,g:null,p:7,cat:"actinide",c:"#ff9966",mp:1449,bp:2880,en:1.13,ar:244,d:13.78,ec:"[Rn] 5f⁷ 7s²",eps:[2,8,18,32,25,8,2],ox:[3],disc:"1944",by:"Seaborg et al.",ety:"Americas continent"},
+  {n:96,s:"Cm",name:"Curium",mass:247,g:null,p:7,cat:"actinide",c:"#ff9966",mp:1613,bp:3383,en:1.28,ar:245,d:13.51,ec:"[Rn] 5f⁷ 6d¹ 7s²",eps:[2,8,18,32,25,9,2],ox:[3],disc:"1944",by:"Seaborg et al.",ety:"Marie and Pierre Curie"},
+  {n:97,s:"Bk",name:"Berkelium",mass:247,g:null,p:7,cat:"actinide",c:"#ff9966",mp:1259,bp:2900,en:1.3,ar:244,d:14.78,ec:"[Rn] 5f⁹ 7s²",eps:[2,8,18,32,27,8,2],ox:[3],disc:"1949",by:"Seaborg et al.",ety:"Berkeley, California"},
+  {n:98,s:"Cf",name:"Californium",mass:251,g:null,p:7,cat:"actinide",c:"#ff9966",mp:1173,bp:1743,en:1.3,ar:245,d:15.1,ec:"[Rn] 5f¹⁰ 7s²",eps:[2,8,18,32,28,8,2],ox:[3],disc:"1950",by:"Seaborg et al.",ety:"State of California"},
+  {n:99,s:"Es",name:"Einsteinium",mass:252,g:null,p:7,cat:"actinide",c:"#ff9966",mp:1133,bp:1269,en:1.3,ar:245,d:8.84,ec:"[Rn] 5f¹¹ 7s²",eps:[2,8,18,32,29,8,2],ox:[3],disc:"1952",by:"Ghiorso et al.",ety:"Albert Einstein"},
+  {n:100,s:"Fm",name:"Fermium",mass:257,g:null,p:7,cat:"actinide",c:"#ff9966",mp:1800,bp:null,en:1.3,ar:245,d:null,ec:"[Rn] 5f¹² 7s²",eps:[2,8,18,32,30,8,2],ox:[3],disc:"1952",by:"Ghiorso et al.",ety:"Enrico Fermi"},
+  {n:101,s:"Md",name:"Mendelevium",mass:258,g:null,p:7,cat:"actinide",c:"#ff9966",mp:1100,bp:null,en:1.3,ar:246,d:null,ec:"[Rn] 5f¹³ 7s²",eps:[2,8,18,32,31,8,2],ox:[3],disc:"1955",by:"Ghiorso et al.",ety:"Dmitri Mendeleev"},
+  {n:102,s:"No",name:"Nobelium",mass:259,g:null,p:7,cat:"actinide",c:"#ff9966",mp:1100,bp:null,en:1.3,ar:246,d:null,ec:"[Rn] 5f¹⁴ 7s²",eps:[2,8,18,32,32,8,2],ox:[2],disc:"1958",by:"Ghiorso et al.",ety:"Alfred Nobel"},
+  {n:103,s:"Lr",name:"Lawrencium",mass:262,g:3,p:7,cat:"actinide",c:"#ff9966",mp:1900,bp:null,en:1.3,ar:246,d:null,ec:"[Rn] 5f¹⁴ 7s² 7p¹",eps:[2,8,18,32,32,8,3],ox:[3],disc:"1961",by:"Ghiorso et al.",ety:"Ernest Lawrence"},
+  {n:104,s:"Rf",name:"Rutherfordium",mass:267,g:4,p:7,cat:"transition metal",c:"#f0c040",mp:2400,bp:5800,en:null,ar:null,d:23.2,ec:"[Rn] 5f¹⁴ 6d² 7s²",eps:[2,8,18,32,32,10,2],ox:[4],disc:"1969",by:"Dubna/Berkeley",ety:"Ernest Rutherford"},
+  {n:105,s:"Db",name:"Dubnium",mass:268,g:5,p:7,cat:"transition metal",c:"#f0c040",mp:null,bp:null,en:null,ar:null,d:29.3,ec:"[Rn] 5f¹⁴ 6d³ 7s²",eps:[2,8,18,32,32,11,2],ox:[5],disc:"1970",by:"Dubna/Berkeley",ety:"Dubna, Russia"},
+  {n:106,s:"Sg",name:"Seaborgium",mass:271,g:6,p:7,cat:"transition metal",c:"#f0c040",mp:null,bp:null,en:null,ar:null,d:35,ec:"[Rn] 5f¹⁴ 6d⁴ 7s²",eps:[2,8,18,32,32,12,2],ox:[6],disc:"1974",by:"Ghiorso et al.",ety:"Glenn T. Seaborg"},
+  {n:107,s:"Bh",name:"Bohrium",mass:272,g:7,p:7,cat:"transition metal",c:"#f0c040",mp:null,bp:null,en:null,ar:null,d:37.1,ec:"[Rn] 5f¹⁴ 6d⁵ 7s²",eps:[2,8,18,32,32,13,2],ox:[7],disc:"1981",by:"GSI Darmstadt",ety:"Niels Bohr"},
+  {n:108,s:"Hs",name:"Hassium",mass:277,g:8,p:7,cat:"transition metal",c:"#f0c040",mp:null,bp:null,en:null,ar:null,d:40.7,ec:"[Rn] 5f¹⁴ 6d⁶ 7s²",eps:[2,8,18,32,32,14,2],ox:[8],disc:"1984",by:"GSI Darmstadt",ety:"Latin: Hassia (Hesse, Germany)"},
+  {n:109,s:"Mt",name:"Meitnerium",mass:278,g:9,p:7,cat:"transition metal",c:"#f0c040",mp:null,bp:null,en:null,ar:null,d:37.4,ec:"[Rn] 5f¹⁴ 6d⁷ 7s²",eps:[2,8,18,32,32,15,2],ox:[6],disc:"1982",by:"GSI Darmstadt",ety:"Lise Meitner"},
+  {n:110,s:"Ds",name:"Darmstadtium",mass:281,g:10,p:7,cat:"transition metal",c:"#f0c040",mp:null,bp:null,en:null,ar:null,d:34.8,ec:"[Rn] 5f¹⁴ 6d⁹ 7s¹",eps:[2,8,18,32,32,17,1],ox:[6],disc:"1994",by:"GSI Darmstadt",ety:"Darmstadt, Germany"},
+  {n:111,s:"Rg",name:"Roentgenium",mass:282,g:11,p:7,cat:"transition metal",c:"#f0c040",mp:null,bp:null,en:null,ar:null,d:28.7,ec:"[Rn] 5f¹⁴ 6d¹⁰ 7s¹",eps:[2,8,18,32,32,18,1],ox:[3],disc:"1994",by:"GSI Darmstadt",ety:"Wilhelm Roentgen"},
+  {n:112,s:"Cn",name:"Copernicium",mass:285,g:12,p:7,cat:"transition metal",c:"#f0c040",mp:null,bp:357,en:null,ar:null,d:23.7,ec:"[Rn] 5f¹⁴ 6d¹⁰ 7s²",eps:[2,8,18,32,32,18,2],ox:[2],disc:"1996",by:"GSI Darmstadt",ety:"Nicolaus Copernicus"},
+  {n:113,s:"Nh",name:"Nihonium",mass:286,g:13,p:7,cat:"post-transition",c:"#b0c4de",mp:700,bp:1430,en:null,ar:null,d:16,ec:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p¹",eps:[2,8,18,32,32,18,3],ox:[1],disc:"2004",by:"RIKEN Japan",ety:"Japanese: Nihon (Japan)"},
+  {n:114,s:"Fl",name:"Flerovium",mass:289,g:14,p:7,cat:"post-transition",c:"#b0c4de",mp:200,bp:210,en:null,ar:null,d:14,ec:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p²",eps:[2,8,18,32,32,18,4],ox:[2],disc:"1999",by:"Dubna",ety:"Flerov Laboratory"},
+  {n:115,s:"Mc",name:"Moscovium",mass:290,g:15,p:7,cat:"post-transition",c:"#b0c4de",mp:700,bp:1400,en:null,ar:null,d:13.5,ec:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p³",eps:[2,8,18,32,32,18,5],ox:[1],disc:"2003",by:"Dubna/Livermore",ety:"Moscow Oblast"},
+  {n:116,s:"Lv",name:"Livermorium",mass:293,g:16,p:7,cat:"post-transition",c:"#b0c4de",mp:709,bp:1085,en:null,ar:null,d:12.9,ec:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁴",eps:[2,8,18,32,32,18,6],ox:[2],disc:"2000",by:"Dubna/Livermore",ety:"Lawrence Livermore Lab"},
+  {n:117,s:"Ts",name:"Tennessine",mass:294,g:17,p:7,cat:"halogen",c:"#74c0fc",mp:700,bp:883,en:null,ar:null,d:7.2,ec:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁵",eps:[2,8,18,32,32,18,7],ox:[-1,1],disc:"2010",by:"Dubna/ORNL",ety:"Tennessee, USA"},
+  {n:118,s:"Og",name:"Oganesson",mass:294,g:18,p:7,cat:"noble gas",c:"#d4e6ff",mp:325,bp:450,en:null,ar:null,d:5,ec:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶",eps:[2,8,18,32,32,18,8],ox:[0],disc:"2002",by:"Dubna/Livermore",ety:"Yuri Oganessian"},
+];
+
+const CATEGORIES=[
+  {key:"alkali metal",label:"Alkali Metal",color:"#ff6b6b"},
+  {key:"alkaline earth",label:"Alkaline Earth",color:"#ffa94d"},
+  {key:"transition metal",label:"Transition Metal",color:"#f0c040"},
+  {key:"post-transition",label:"Post-Transition",color:"#b0c4de"},
+  {key:"metalloid",label:"Metalloid",color:"#69db7c"},
+  {key:"nonmetal",label:"Nonmetal",color:"#a8d8ea"},
+  {key:"halogen",label:"Halogen",color:"#74c0fc"},
+  {key:"noble gas",label:"Noble Gas",color:"#d4e6ff"},
+  {key:"lanthanide",label:"Lanthanide",color:"#cc88ff"},
+  {key:"actinide",label:"Actinide",color:"#ff9966"},
+];
+const HEATMAP_PROPS=[
+  {key:null,label:"None"},{key:"mass",label:"Atomic Mass"},
+  {key:"en",label:"Electronegativity"},{key:"ar",label:"Atomic Radius"},
+  {key:"mp",label:"Melting Point"},{key:"bp",label:"Boiling Point"},{key:"d",label:"Density"},
+];
+
+// ─── UTILS ────────────────────────────────────────────────────────────────────
+function lerpColor(t,a,b){
+  const p=s=>parseInt(s,16);
+  const r=Math.round(p(a.slice(1,3))+(p(b.slice(1,3))-p(a.slice(1,3)))*t);
+  const g=Math.round(p(a.slice(3,5))+(p(b.slice(3,5))-p(a.slice(3,5)))*t);
+  const bl=Math.round(p(a.slice(5,7))+(p(b.slice(5,7))-p(a.slice(5,7)))*t);
+  return`rgb(${r},${g},${bl})`;
+}
+function getHeatColor(val,min,max){
+  if(val==null||min==null||max==null||min===max)return null;
+  const t=(val-min)/(max-min);
+  return t<=0.5?lerpColor(t*2,'#313695','#ffffbf'):lerpColor((t-0.5)*2,'#ffffbf','#a50026');
+}
+function getRange(els,key){
+  const vals=els.map(e=>e[key]).filter(v=>v!=null&&!isNaN(v));
+  return{min:Math.min(...vals),max:Math.max(...vals)};
+}
+
+// ─── TEMP CONVERSIONS ─────────────────────────────────────────────────────────
+function kToUnit(k,u){
+  if(u==='C')return+(k-273.15).toFixed(1);
+  if(u==='F')return+((k-273.15)*9/5+32).toFixed(1);
+  return k;
+}
+function unitToK(v,u){
+  if(u==='C')return Math.round(+v+273.15);
+  if(u==='F')return Math.round((+v-32)*5/9+273.15);
+  return Math.round(+v);
+}
+function unitRange(u){
+  if(u==='C')return{min:-273,max:5727};
+  if(u==='F')return{min:-460,max:10340};
+  return{min:0,max:6000};
+}
+
+// ─── FORMULA PARSER ───────────────────────────────────────────────────────────
+function parseFormula(f,elMap){
+  let i=0;
+  function parse(){
+    const c={};
+    while(i<f.length){
+      if(f[i]==='('){i++;const inn=parse();if(f[i]===')'){i++;}const n=rd()||1;for(const k in inn)c[k]=(c[k]||0)+inn[k]*n;}
+      else if(f[i]===')'){break;}
+      else if(f[i]>='A'&&f[i]<='Z'){let s=f[i++];while(i<f.length&&f[i]>='a'&&f[i]<='z')s+=f[i++];const n=rd()||1;c[s]=(c[s]||0)+n;}
+      else i++;
+    }
+    return c;
+  }
+  function rd(){let s='';while(i<f.length&&f[i]>='0'&&f[i]<='9')s+=f[i++];return s?parseInt(s):0;}
+  return parse();
+}
+
+// ─── N-FACTOR DETECTION ───────────────────────────────────────────────────────
+// Returns { nFactor, tier, label, needsMedium, symbol }
+function detectNFactor(formula,elMap,medium){
+  if(!formula.trim())return null;
+  let counts;
+  try{ counts=parseFormula(formula,elMap); }catch(e){ return null; }
+
+  const syms=Object.keys(counts);
+  const up=formula.toUpperCase();
+
+  // Tier 2 — variable oxidation state compounds (check first for specific formulas)
+  const tier2={
+    'KMNO4':{Acidic:5,Basic:3,Neutral:1},
+    'K2CR2O7':{Acidic:6,Basic:6,Neutral:6},
+    'K2CRO4':{Acidic:6,Basic:6,Neutral:6},
+    'NA2CR2O7':{Acidic:6,Basic:6,Neutral:6},
+  };
+  const normKey=formula.replace(/\d/g,'').replace(/[()]/g,'').toUpperCase().split('').sort().join('');
+  for(const key in tier2){
+    const kn=key.replace(/\d/g,'').split('').sort().join('');
+    if(normKey===kn||up.includes(key.replace(/\d/g,''))){
+      const med=medium||'Acidic';
+      return{nFactor:tier2[key][med]||tier2[key]['Acidic'],tier:2,label:`Guided (${med} medium): n = ${tier2[key][med]||tier2[key]['Acidic']}`,needsMedium:true};
+    }
+  }
+  // Tier 2 — elements with variable oxidation
+  const variableEls=['Fe','Mn','Cr','V','Co','Cu','Pb','Sn'];
+  const hasVariable=syms.find(s=>variableEls.includes(s));
+  if(hasVariable){
+    const el=elMap[hasVariable];
+    const med=medium||'default';
+    let nf=el&&el.ox&&el.ox.length>0?Math.abs(el.ox[0]):1;
+    // context-specific overrides
+    if(hasVariable==='Fe'&&med==='Basic')nf=1;
+    else if(hasVariable==='Fe')nf=3;
+    else if(hasVariable==='Mn'&&med==='Basic')nf=3;
+    else if(hasVariable==='Mn'&&med==='Neutral')nf=1;
+    else if(hasVariable==='Mn')nf=5;
+    else if(hasVariable==='Cr')nf=3;
+    else if(hasVariable==='Cu')nf=2;
+    return{nFactor:nf,tier:2,label:`Guided (${med}): n = ${nf}`,needsMedium:true,symbol:hasVariable};
+  }
+
+  // Tier 1 — Acids: starts with H and has ionisable H
+  if(counts['H']&&syms[0]==='H'){
+    const nf=counts['H'];
+    return{nFactor:nf,tier:1,label:`Auto-detected (acid, H count): n = ${nf}`,needsMedium:false};
+  }
+  // Tier 1 — Bases: contains OH
+  const ohCount=formula.match(/OH/g);
+  if(ohCount){
+    const nf=ohCount.length;
+    return{nFactor:nf,tier:1,label:`Auto-detected (base, OH count): n = ${nf}`,needsMedium:false};
+  }
+  // Tier 1 — Salts: find metal, use its primary oxidation state
+  const metals=['Na','K','Ca','Mg','Al','Fe','Zn','Cu','Ag','Ba','Li','Sr','Cs','Rb','Be'];
+  const metal=syms.find(s=>metals.includes(s));
+  if(metal){
+    const el=elMap[metal];
+    if(el&&el.ox&&el.ox.length>0){
+      const nf=Math.abs(el.ox[0]);
+      return{nFactor:nf,tier:1,label:`Auto-detected (salt, ${metal} oxidation state): n = ${nf}`,needsMedium:false};
+    }
+  }
+
+  // Tier 3 — fallback
+  return{nFactor:null,tier:3,label:'Could not auto-detect',needsMedium:false};
+}
+
+// ─── MOLAR MASS CALCULATOR (with Solution tab) ────────────────────────────────
+function MolarCalc({onClose}){
+  const [activeTab,setActiveTab]=React.useState('molar');
+  const [formula,setFormula]=React.useState('');
+  const [givenMass,setGivenMass]=React.useState('');
+  const [volume,setVolume]=React.useState('');
+  const [solventMass,setSolventMass]=React.useState('');
+  const [manualN,setManualN]=React.useState('');
+  const [medium,setMedium]=React.useState('Acidic');
+
+  const elMap=React.useMemo(()=>{const m={};ELEMENTS.forEach(e=>m[e.s]=e);return m;},[]);
+
+  // Molar mass calc
+  const molarResult=React.useMemo(()=>{
+    if(!formula.trim())return null;
+    try{
+      const counts=parseFormula(formula,elMap);
+      let total=0;const rows=[];
+      for(const sym in counts){
+        const el=elMap[sym];
+        if(!el)return{error:`Unknown element: ${sym}`};
+        const sub=el.mass*counts[sym];total+=sub;
+        rows.push({sym,name:el.name,count:counts[sym],mass:el.mass,sub:sub.toFixed(4)});
+      }
+      return{total:total.toFixed(4),rows};
+    }catch(e){return{error:e.message};}
+  },[formula,elMap]);
+
+  // N-factor detection
+  const nInfo=React.useMemo(()=>detectNFactor(formula,elMap,medium),[formula,elMap,medium]);
+  const nFactor=nInfo&&nInfo.tier<3?nInfo.nFactor:(manualN?+manualN:null);
+
+  // Solution calculations
+  const sol=React.useMemo(()=>{
+    if(!molarResult||molarResult.error||!molarResult.total)return null;
+    const M=+molarResult.total;
+    const gm=givenMass?+givenMass:null;
+    const volL=volume?+volume/1000:null;
+    const solKg=solventMass?+solventMass/1000:null;
+    const nf=nFactor;
+    const fmt=v=>v!=null&&isFinite(v)?v.toFixed(4):'—';
+    const moles=gm&&M?gm/M:null;
+    const eqWt=nf&&M?M/nf:null;
+    const gramEq=gm&&eqWt?gm/eqWt:null;
+    const molarity=moles&&volL?moles/volL:null;
+    const normality=gramEq&&volL?gramEq/volL:null;
+    const molality=moles&&solKg?moles/solKg:null;
+    const moleFracSolute=moles&&solKg?(moles/(moles+(solKg*1000/18))):null;
+    return{
+      molarMass:fmt(M),
+      nFactor:nf!=null?nf:'—',
+      eqWt:fmt(eqWt),
+      moles:fmt(moles),
+      gramEq:fmt(gramEq),
+      molarity:fmt(molarity),
+      normality:fmt(normality),
+      molality:fmt(molality),
+      moleFrac:fmt(moleFracSolute),
+    };
+  },[molarResult,givenMass,volume,solventMass,nFactor]);
+
+  const f=v=>(v&&v!=='—')?<span style={{color:'var(--accent)'}}>{v}</span>:'—';
+  const fH=v=>(v&&v!=='—')?<span style={{color:'var(--accent)',fontSize:'17px',fontWeight:'400'}}>{v}</span>:'—';
+
+  return(
+    <div className="molar-overlay" onClick={onClose}>
+      <div className="molar-box" onClick={e=>e.stopPropagation()}>
+        <div className="molar-header">
+          <span style={{fontSize:'15px',fontWeight:'700'}}>Chemistry Calculator</span>
+          <button className="btn" onClick={onClose}>✕</button>
+        </div>
+        <div className="molar-tabs">
+          <div className={`molar-tab ${activeTab==='molar'?'active':''}`} onClick={()=>setActiveTab('molar')}>Molar Mass</div>
+          <div className={`molar-tab ${activeTab==='solution'?'active':''}`} onClick={()=>setActiveTab('solution')}>Solution</div>
+        </div>
+        <div className="molar-content">
+          {/* Shared formula input */}
+          <div className="input-label">Chemical Formula</div>
+          <input className="molar-input" placeholder="e.g. H2SO4 or Ca(OH)2 or KMnO4" value={formula} onChange={e=>setFormula(e.target.value)} autoFocus/>
+
+          {/* ── MOLAR MASS TAB ── */}
+          {activeTab==='molar'&&<>
+            {molarResult&&!molarResult.error&&<>
+              <div className="molar-result">{molarResult.total} g/mol</div>
+              <table className="molar-breakdown">
+                <thead><tr><th>Symbol</th><th>Name</th><th>Count</th><th>Atomic Mass</th><th>Subtotal</th></tr></thead>
+                <tbody>{molarResult.rows.map(r=>(
+                  <tr key={r.sym}>
+                    <td style={{color:'var(--accent)'}}>{r.sym}</td>
+                    <td>{r.name}</td><td>{r.count}</td>
+                    <td style={{fontFamily:'monospace'}}>{r.mass}</td>
+                    <td style={{color:'var(--accent2)'}}>{r.sub}</td>
+                  </tr>
+                ))}</tbody>
+              </table>
+            </>}
+            {molarResult&&molarResult.error&&<div className="molar-error">⚠ {molarResult.error}</div>}
+            {!molarResult&&<div style={{color:'var(--muted)',fontSize:'13px'}}>Type a chemical formula above</div>}
+          </>}
+
+          {/* ── SOLUTION TAB ── */}
+          {activeTab==='solution'&&<>
+
+            {/* N-factor section */}
+            <div className="input-label" style={{marginBottom:'6px'}}>n-factor Detection</div>
+            {nInfo&&nInfo.tier===1&&<div className="badge badge-green">✓ {nInfo.label}</div>}
+            {nInfo&&nInfo.tier===2&&<>
+              <div className="badge badge-orange">⚡ {nInfo.label}</div>
+              {nInfo.needsMedium&&(
+                <select className="medium-select" value={medium} onChange={e=>setMedium(e.target.value)}>
+                  <option>Acidic</option>
+                  <option>Basic</option>
+                  <option>Neutral</option>
+                </select>
+              )}
+            </>}
+            {nInfo&&nInfo.tier===3&&<>
+              <div className="badge badge-grey">Manual input required</div>
+              <div className="input-label" style={{marginTop:'8px'}}>Enter n-factor manually</div>
+              <input className="molar-input-sm" type="number" min="1" step="1" placeholder="e.g. 2"
+                value={manualN} onChange={e=>setManualN(e.target.value)} style={{marginBottom:'10px'}}/>
+            </>}
+            {!nInfo&&formula&&<div style={{color:'var(--muted)',fontSize:'12px',marginBottom:'8px'}}>Enter a valid formula above</div>}
+
+            {/* Input fields */}
+            <div style={{marginTop:'10px'}}>
+              <div className="input-row">
+                <div>
+                  <div className="input-label">Given Mass (g)</div>
+                  <input className="molar-input-sm" type="number" placeholder="e.g. 4.9" value={givenMass} onChange={e=>setGivenMass(e.target.value)}/>
+                </div>
+                <div>
+                  <div className="input-label">Volume of Solution (mL)</div>
+                  <input className="molar-input-sm" type="number" placeholder="e.g. 500" value={volume} onChange={e=>setVolume(e.target.value)}/>
+                </div>
+              </div>
+              <div className="input-row">
+                <div>
+                  <div className="input-label">Mass of Solvent (g)</div>
+                  <input className="molar-input-sm" type="number" placeholder="e.g. 250" value={solventMass} onChange={e=>setSolventMass(e.target.value)}/>
+                </div>
+                <div>
+                  <div className="input-label" style={{marginBottom:'4px'}}>Molar Mass</div>
+                  <div style={{fontFamily:'monospace',fontSize:'14px',color:'var(--accent)',paddingTop:'8px'}}>
+                    {molarResult&&!molarResult.error?`${molarResult.total} g/mol`:'—'}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Results */}
+            {sol&&<>
+              <div className="section-title" style={{marginTop:'14px'}}>Results</div>
+              <div className="results-grid">
+                <div className="result-card highlight">
+                  <div className="result-label">Molarity (M)</div>
+                  <div className="result-val accent">{fH(sol.molarity)} mol/L</div>
+                </div>
+                <div className="result-card highlight">
+                  <div className="result-label">Normality (N)</div>
+                  <div className="result-val accent">{fH(sol.normality)} eq/L</div>
+                </div>
+                <div className="result-card highlight">
+                  <div className="result-label">Molality (m)</div>
+                  <div className="result-val accent">{fH(sol.molality)} mol/kg</div>
+                </div>
+                <div className="result-card">
+                  <div className="result-label">Moles of Solute</div>
+                  <div className="result-val">{f(sol.moles)} mol</div>
+                </div>
+                <div className="result-card">
+                  <div className="result-label">n-factor</div>
+                  <div className="result-val">{sol.nFactor}</div>
+                </div>
+                <div className="result-card">
+                  <div className="result-label">Equivalent Weight</div>
+                  <div className="result-val">{f(sol.eqWt)} g/eq</div>
+                </div>
+                <div className="result-card">
+                  <div className="result-label">Gram Equivalents</div>
+                  <div className="result-val">{f(sol.gramEq)} eq</div>
+                </div>
+                <div className="result-card">
+                  <div className="result-label">Mole Fraction (solute)</div>
+                  <div className="result-val">{f(sol.moleFrac)}</div>
+                </div>
+              </div>
+              <div style={{marginTop:'10px',fontSize:'11px',color:'var(--muted)',lineHeight:'1.6'}}>
+                Formulas: M = n/V(L) · N = geq/V(L) · m = n/kg(solvent) · EqWt = MM/n-factor
+              </div>
+            </>}
+            {!formula&&<div style={{color:'var(--muted)',fontSize:'13px'}}>Enter a formula to begin</div>}
+          </>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── BOHR MODEL — slow animation ──────────────────────────────────────────────
+function BohrModel({eps,color,animOn}){
+  const shells=eps||[];
+  const cx=85,cy=85;
+  const radii=shells.map((_,i)=>18+i*(62/Math.max(shells.length,1)));
+  const [tick,setTick]=React.useState(0);
+  React.useEffect(()=>{
+    if(!animOn)return;
+    const id=setInterval(()=>setTick(t=>t+1),80); // slow: 80ms tick, 0.012 speed
+    return()=>clearInterval(id);
+  },[animOn]);
+  return(
+    <svg width="170" height="170" style={{overflow:'visible'}}>
+      <circle cx={cx} cy={cy} r={10} fill={color||'#38bdf8'} opacity={0.9}/>
+      {radii.map((r,si)=>(
+        <g key={si}>
+          <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1"/>
+          {Array.from({length:shells[si]}).map((_,ei)=>{
+            const speed=(si+1)*0.012;
+            const base=(ei/shells[si])*Math.PI*2;
+            const angle=base+(animOn?tick*speed*(si%2===0?1:-1):0);
+            return<circle key={ei} cx={cx+r*Math.cos(angle)} cy={cy+r*Math.sin(angle)} r={2.5} fill="#38bdf8" opacity={0.85}/>;
+          })}
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+// ─── DETAIL MODAL ─────────────────────────────────────────────────────────────
+function DetailModal({el,onClose,onCompare,compareList,animOn,setAnimOn}){
+  const [tab,setTab]=React.useState('overview');
+  React.useEffect(()=>{
+    setTab('overview');
+    const fn=e=>{if(e.key==='Escape')onClose()};
+    document.addEventListener('keydown',fn);
+    return()=>document.removeEventListener('keydown',fn);
+  },[el]);
+  if(!el)return null;
+  const cat=CATEGORIES.find(c=>c.key===el.cat)||{color:'#888'};
+  const inCompare=compareList.some(c=>c.n===el.n);
+  const props=[
+    {l:'Atomic Mass',v:`${el.mass} u`},{l:'Electronegativity',v:el.en!=null?`${el.en} (Pauling)`:'—'},
+    {l:'Atomic Radius',v:el.ar!=null?`${el.ar} pm`:'—'},{l:'Density',v:el.d!=null?`${el.d} g/cm³`:'—'},
+    {l:'Melting Point',v:el.mp!=null?`${el.mp} K`:'—'},{l:'Boiling Point',v:el.bp!=null?`${el.bp} K`:'—'},
+    {l:'Oxidation States',v:el.ox?el.ox.join(', '):'—'},{l:'Discovered',v:el.disc||'—'},
+  ];
+  return(
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={e=>e.stopPropagation()}>
+        <div className="modal-header">
+          <div className="modal-symbol-big" style={{color:cat.color}}>{el.s}</div>
+          <div className="modal-meta">
+            <div className="modal-name">{el.name}</div>
+            <div className="modal-num">#{el.n} · {el.mass} u</div>
+            <div className="modal-cat" style={{background:`${cat.color}22`,color:cat.color}}>{el.cat}</div>
+            <div style={{marginTop:'8px',display:'flex',gap:'6px',justifyContent:'flex-end'}}>
+              <button className={`btn ${inCompare?'active':''}`} onClick={()=>onCompare(el)} style={{fontSize:'11px',padding:'5px 10px'}}>{inCompare?'✓ Added':'+ Compare'}</button>
+              <button className="btn" onClick={onClose}>✕</button>
+            </div>
+          </div>
+        </div>
+        <div className="modal-tabs">
+          {['overview','nucleus','history'].map(t=><div key={t} className={`tab ${tab===t?'active':''}`} onClick={()=>setTab(t)}>{t.charAt(0).toUpperCase()+t.slice(1)}</div>)}
+        </div>
+        <div className="modal-body">
+          {tab==='overview'&&<>
+            <div style={{display:'flex',justifyContent:'center',marginBottom:'4px'}}>
+              <button className={`btn ${animOn?'active':''}`} onClick={()=>setAnimOn(!animOn)} style={{fontSize:'11px',padding:'4px 10px'}}>{animOn?'⏸ Pause':'▶ Play'} Orbit</button>
+            </div>
+            <div className="bohr"><BohrModel eps={el.eps} color={cat.color} animOn={animOn}/></div>
+            <div className="section-title">Electron Configuration</div>
+            <div className="econfig">{el.ec}</div>
+            <div className="section-title" style={{marginTop:'14px'}}>Properties</div>
+            <div className="prop-grid">{props.map(p=><div key={p.l} className="prop"><div className="prop-label">{p.l}</div><div className="prop-val accent">{p.v}</div></div>)}</div>
+          </>}
+          {tab==='nucleus'&&<>
+            <div className="prop-grid">
+              <div className="prop"><div className="prop-label">Protons</div><div className="prop-val accent">{el.n}</div></div>
+              <div className="prop"><div className="prop-label">Electrons</div><div className="prop-val accent">{el.n}</div></div>
+              <div className="prop"><div className="prop-label">Neutrons</div><div className="prop-val accent">{Math.round(el.mass)-el.n}</div></div>
+              <div className="prop"><div className="prop-label">Mass Number</div><div className="prop-val accent">{Math.round(el.mass)}</div></div>
+            </div>
+            <div className="section-title">Electron Shells</div>
+            <div style={{display:'flex',gap:'8px',flexWrap:'wrap',marginTop:'6px'}}>
+              {(el.eps||[]).map((c,i)=><div key={i} style={{background:'var(--bg3)',border:'1px solid var(--border)',borderRadius:'5px',padding:'8px 12px',textAlign:'center'}}><div style={{fontSize:'9px',color:'var(--muted)',fontWeight:'700'}}>Shell {i+1}</div><div style={{fontFamily:'monospace',fontSize:'18px',color:'var(--accent)'}}>{c}</div><div style={{fontSize:'9px',color:'var(--muted)'}}>e⁻</div></div>)}
+            </div>
+            <div className="section-title" style={{marginTop:'14px'}}>Oxidation States</div>
+            <div style={{display:'flex',gap:'6px',flexWrap:'wrap'}}>
+              {(el.ox||[]).map(ox=><div key={ox} style={{padding:'4px 10px',background:'var(--bg3)',border:`1px solid ${ox>0?'#4ade80':ox<0?'#f87171':'var(--border)'}`,borderRadius:'4px',fontFamily:'monospace',fontSize:'13px',color:ox>0?'#4ade80':ox<0?'#f87171':'var(--muted)'}}>{ox>0?`+${ox}`:ox}</div>)}
+            </div>
+          </>}
+          {tab==='history'&&<>
+            <div className="prop-grid">
+              <div className="prop"><div className="prop-label">Discovered</div><div className="prop-val accent">{el.disc}</div></div>
+              <div className="prop"><div className="prop-label">By</div><div className="prop-val" style={{fontSize:'11px'}}>{el.by}</div></div>
+            </div>
+            <div className="section-title">Etymology</div>
+            <div style={{background:'var(--bg3)',border:'1px solid var(--border)',borderRadius:'5px',padding:'12px',fontSize:'13px',lineHeight:'1.7'}}>{el.ety}</div>
+            <div className="section-title" style={{marginTop:'14px'}}>Category</div>
+            <div style={{padding:'10px',background:`${cat.color}11`,border:`1px solid ${cat.color}44`,borderRadius:'5px',color:cat.color,fontSize:'13px',textTransform:'capitalize',fontWeight:'700'}}>{el.cat}</div>
+          </>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── COMPARE ──────────────────────────────────────────────────────────────────
+function ComparePanel({list,onRemove,onClearAll,onOpenFull}){
+  if(!list.length)return null;
+  return(
+    <div className="compare-bar">
+      <div style={{fontSize:'11px',color:'var(--accent)',fontWeight:'700',textTransform:'uppercase',whiteSpace:'nowrap'}}>Compare</div>
+      {list.map(el=>{const cat=CATEGORIES.find(c=>c.key===el.cat)||{color:'#888'};return(
+        <div key={el.n} className="compare-slot">
+          <div className="sym" style={{color:cat.color}}>{el.s}</div>
+          <div><div className="nm">{el.name}</div><div style={{fontSize:'9px',color:'var(--muted)',fontFamily:'monospace'}}>#{el.n}</div></div>
+          <button style={{background:'none',border:'none',color:'var(--muted)',cursor:'pointer',padding:'2px',marginLeft:'auto',fontSize:'13px'}} onClick={()=>onRemove(el)}>✕</button>
+        </div>
+      );})}
+      {list.length>=2&&<button className="btn accent-btn" onClick={onOpenFull} style={{fontSize:'12px'}}>View Comparison</button>}
+      <button className="btn" onClick={onClearAll} style={{fontSize:'12px'}}>Clear</button>
+    </div>
+  );
+}
+function CompareFullModal({list,onClose}){
+  if(!list||list.length<2)return null;
+  const rows=[{l:'Atomic Mass',k:'mass',u:'u'},{l:'Electronegativity',k:'en',u:''},{l:'Atomic Radius',k:'ar',u:'pm'},{l:'Density',k:'d',u:'g/cm³'},{l:'Melting Point',k:'mp',u:'K'},{l:'Boiling Point',k:'bp',u:'K'}];
+  return(
+    <div className="compare-modal-overlay" onClick={onClose}>
+      <div className="compare-modal" onClick={e=>e.stopPropagation()}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'16px'}}>
+          <div style={{fontSize:'15px',fontWeight:'700'}}>Element Comparison</div>
+          <button className="btn" onClick={onClose}>✕</button>
+        </div>
+        <table className="compare-table">
+          <thead><tr><th>Property</th>{list.map(el=>{const cat=CATEGORIES.find(c=>c.key===el.cat)||{color:'#888'};return<th key={el.n} style={{color:cat.color}}>{el.s} — {el.name}</th>;})}</tr></thead>
+          <tbody>{rows.map(row=>{
+            const vals=list.map(el=>el[row.k]);
+            const nv=vals.filter(v=>v!=null);
+            const best=nv.length?Math.max(...nv):null,worst=nv.length?Math.min(...nv):null;
+            return<tr key={row.l}><td style={{color:'var(--muted)',fontWeight:'700'}}>{row.l}</td>{vals.map((v,i)=>{let cls='';if(v!=null&&v===best&&best!==worst)cls='best';else if(v!=null&&v===worst&&best!==worst)cls='worst';return<td key={i} className={cls}>{v!=null?`${v} ${row.u}`:'—'}</td>;})}</tr>;
+          })}</tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// ─── ELEMENT CARD ─────────────────────────────────────────────────────────────
+function ElementCard({el,dimmed,heatColor,searchMatch,onClick}){
+  const cat=CATEGORIES.find(c=>c.key===el.cat)||{color:'#888'};
+  const bgColor=heatColor||`${cat.color}28`;
+  const borderColor=searchMatch?'var(--accent)':heatColor?`${heatColor}88`:'transparent';
+  return(
+    <div className={['el',dimmed?'dimmed':'',searchMatch?'search-match':''].filter(Boolean).join(' ')} style={{backgroundColor:bgColor,borderColor}} onClick={onClick}>
+      <span className="en">{el.n}</span>
+      <span className="es">{el.s}</span>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-end'}}>
+        <span className="ename">{el.name}</span>
+        <span className="emass">{el.mass}</span>
+      </div>
+    </div>
+  );
+}
+
+// ─── MAIN APP ─────────────────────────────────────────────────────────────────
+const App=()=>{
+  const [activeFilter,setActiveFilter]=React.useState(null);
+  const [heatProp,setHeatProp]=React.useState(null);
+  const [tempK,setTempK]=React.useState(298);
+  const [tempUnit,setTempUnit]=React.useState('K');
+  const [search,setSearch]=React.useState('');
+  const [selected,setSelected]=React.useState(null);
+  const [compareList,setCompareList]=React.useState([]);
+  const [showCompare,setShowCompare]=React.useState(false);
+  const [showMolar,setShowMolar]=React.useState(false);
+  const [animOn,setAnimOn]=React.useState(true);
+
+  const heatRange=React.useMemo(()=>heatProp?getRange(ELEMENTS,heatProp):null,[heatProp]);
+
+  const addCompare=el=>setCompareList(prev=>{
+    if(prev.some(c=>c.n===el.n))return prev.filter(c=>c.n!==el.n);
+    if(prev.length>=3)return prev;
+    return[...prev,el];
+  });
+
+  const getPhase=el=>{
+    if(el.mp==null)return '';
+    if(tempK<el.mp)return 'solid';
+    if(el.bp==null||tempK<el.bp)return 'liquid';
+    return 'gas';
+  };
+
+  const getPos=el=>{
+    if(el.g!=null)return{col:el.g,row:el.p};
+    if(el.cat==='lanthanide')return{col:el.n-54,row:8};
+    if(el.cat==='actinide')return{col:el.n-86,row:9};
+    return{col:1,row:1};
+  };
+
+  const phaseSummary=React.useMemo(()=>{
+    const s=ELEMENTS.filter(e=>getPhase(e)==='solid').length;
+    const l=ELEMENTS.filter(e=>getPhase(e)==='liquid').length;
+    const g=ELEMENTS.filter(e=>getPhase(e)==='gas').length;
+    return`${s} solid · ${l} liquid · ${g} gas`;
+  },[tempK]);
+
+  const displayTemp=kToUnit(tempK,tempUnit);
+  const{min:sMin,max:sMax}=unitRange(tempUnit);
+  const handleTempSlider=v=>{const k=unitToK(v,tempUnit);if(!isNaN(k))setTempK(Math.max(0,Math.min(6000,k)));};
+  const handleTempNumber=v=>{const k=unitToK(v,tempUnit);if(!isNaN(k)&&k>=0&&k<=6000)setTempK(k);};
+
+  const stateColors={liquid:'rgba(100,200,255,0.14)',gas:'rgba(255,150,80,0.14)'};
+
+  return(
+    <div style={{minHeight:'60vh',position:'relative',zIndex:1,paddingBottom:compareList.length?'80px':'0'}}>
+
+      {/* CONTROLS */}
+      <div className="controls">
+        {/* Wide search */}
+        <div className="search-wrap">
+          <span className="search-icon">⌕</span>
+          <input type="text" placeholder="Search by name, symbol or atomic number..." value={search} onChange={e=>setSearch(e.target.value)}/>
+        </div>
+
+        {/* Category filters */}
+        <div className="ctrl-group">
+          <span className="ctrl-label">Filter</span>
+          {CATEGORIES.map(cat=>(
+            <button key={cat.key} className={`filter-btn ${activeFilter===cat.key?'active':''}`}
+              style={activeFilter===cat.key?{borderColor:cat.color,color:cat.color,background:`${cat.color}18`}:{}}
+              onClick={()=>setActiveFilter(activeFilter===cat.key?null:cat.key)}>{cat.label}</button>
+          ))}
+        </div>
+
+        {/* Heatmap */}
+        <div className="ctrl-group">
+          <span className="ctrl-label">Heatmap</span>
+          <select value={heatProp||''} onChange={e=>setHeatProp(e.target.value||null)}>
+            {HEATMAP_PROPS.map(p=><option key={p.label} value={p.key||''}>{p.label}</option>)}
+          </select>
+        </div>
+
+        {/* Temperature — longer slider + number + K/C/F */}
+        <div className="ctrl-group" style={{flex:1,minWidth:'320px'}}>
+          <span className="ctrl-label">Temperature</span>
+          <div className="temp-block">
+            <div className="temp-controls">
+              <input type="range" min={sMin} max={sMax} step="1" value={displayTemp} onChange={e=>handleTempSlider(e.target.value)}/>
+              <input type="number" className="temp-number" value={displayTemp} onChange={e=>handleTempNumber(e.target.value)}/>
+              <div className="unit-toggle">
+                {['K','C','F'].map(u=><button key={u} className={tempUnit===u?'active':''} onClick={()=>setTempUnit(u)}>{u==='C'?'°C':u==='F'?'°F':'K'}</button>)}
+              </div>
+            </div>
+            <div className="phase-summary">{phaseSummary}</div>
+          </div>
+        </div>
+
+        {/* Tool buttons */}
+        <div className="ctrl-group">
+          <button className="btn" onClick={()=>setShowMolar(true)}>⚗ Calculator</button>
+          {compareList.length>=2&&<button className="btn accent-btn" onClick={()=>setShowCompare(true)}>Compare ({compareList.length})</button>}
+        </div>
+      </div>
+
+      {/* Heatmap legend */}
+      {heatProp&&heatRange&&(
+        <div className="heatmap-bar">
+          <span style={{fontFamily:'monospace',fontSize:'11px',color:'var(--accent)'}}>{HEATMAP_PROPS.find(p=>p.key===heatProp)?.label}</span>
+          <span>{heatRange.min.toFixed(1)}</span>
+          <div className="gradient"/>
+          <span>{heatRange.max.toFixed(1)}</span>
+        </div>
+      )}
+
+      {/* Category legend */}
+      <div className="legend">
+        {CATEGORIES.map(cat=><div key={cat.key} className="legend-item"><div className="legend-dot" style={{background:cat.color}}/>{cat.label}</div>)}
+        <div className="legend-item" style={{marginLeft:'8px'}}><div className="legend-dot" style={{border:'2px solid rgba(100,200,255,0.5)',background:'rgba(100,200,255,0.12)'}}/>Liquid</div>
+        <div className="legend-item"><div className="legend-dot" style={{border:'2px solid rgba(255,150,80,0.5)',background:'rgba(255,150,80,0.12)'}}/>Gas</div>
+      </div>
+
+      {/* TABLE */}
+      <div className="table-scroll">
+        <div className="pt-grid">
+          {ELEMENTS.map(el=>{
+            const pos=getPos(el);
+            const sq=search.toLowerCase().trim();
+            const isMatch=sq&&(el.name.toLowerCase().includes(sq)||el.s.toLowerCase().includes(sq)||el.n.toString().includes(sq));
+            const isDimmed=(activeFilter&&el.cat!==activeFilter)||(sq&&!isMatch);
+            const heatColor=heatProp&&heatRange?getHeatColor(el[heatProp],heatRange.min,heatRange.max):null;
+            const phase=getPhase(el);
+            const phaseBg=!isDimmed&&phase==='liquid'?stateColors.liquid:!isDimmed&&phase==='gas'?stateColors.gas:'transparent';
+            return(
+              <div key={el.n} style={{gridColumn:pos.col,gridRow:pos.row,background:phaseBg,borderRadius:'4px'}}>
+                <ElementCard el={el} dimmed={isDimmed} heatColor={heatColor} searchMatch={!!isMatch} onClick={()=>setSelected(el)}/>
+              </div>
+            );
+          })}
+          <div style={{gridColumn:'1/19',gridRow:7,height:'6px'}}/>
+          <div style={{gridColumn:'1/3',gridRow:8,display:'flex',alignItems:'center',justifyContent:'flex-end',paddingRight:'5px'}}>
+            <span style={{fontSize:'8px',color:'var(--muted)',textAlign:'right',lineHeight:'1.4',fontWeight:'700'}}>Lantha-<br/>nides</span>
+          </div>
+          <div style={{gridColumn:'1/3',gridRow:9,display:'flex',alignItems:'center',justifyContent:'flex-end',paddingRight:'5px'}}>
+            <span style={{fontSize:'8px',color:'var(--muted)',textAlign:'right',lineHeight:'1.4',fontWeight:'700'}}>Acti-<br/>nides</span>
+          </div>
+        </div>
+      </div>
+
+      {selected&&<DetailModal el={selected} onClose={()=>setSelected(null)} onCompare={addCompare} compareList={compareList} animOn={animOn} setAnimOn={setAnimOn}/>}
+      {showMolar&&<MolarCalc onClose={()=>setShowMolar(false)}/>}
+      {showCompare&&<CompareFullModal list={compareList} onClose={()=>setShowCompare(false)}/>}
+      <ComparePanel list={compareList} onRemove={el=>setCompareList(prev=>prev.filter(c=>c.n!==el.n))} onClearAll={()=>setCompareList([])} onOpenFull={()=>setShowCompare(true)}/>
+    </div>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
