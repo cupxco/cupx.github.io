@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CupX Timetable Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom Scrollbar for enhanced UI aesthetics */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* CSS @media print Directives for precise PDF formatting */
+        @media print {
+            body { background: white; margin: 0; padding: 0; font-size: 10pt; }
+           .no-print { display: none!important; }
+           .print-only { display: block!important; }
+           .print-container { width: 100%; margin: 0; padding: 0; box-shadow: none; border: none; }
+            table { width: 100%; border-collapse: collapse; page-break-inside: avoid; }
+            th, td { border: 1px solid #000; padding: 6px; text-align: center; }
+            /* Force landscape orientation for wide timetable data */
+            @page { size: landscape; margin: 10mm; }
+        }
+        
+        /* Active Tab indicator utility */
+       .tab-active { border-bottom: 2px solid #3b82f6; color: #3b82f6; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased h-screen flex flex-col overflow-hidden">
+
+    <header class="bg-white shadow-sm z-10 no-print flex-shrink-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                <h1 class="text-xl font-bold text-gray-900">CupX Timetable Pro</h1>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="App.exportConfig()" class="text-sm px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition font-medium border border-gray-300 shadow-sm">Export Config</button>
+                <label class="text-sm px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition cursor-pointer font-medium border border-gray-300 shadow-sm">
+                    Import Config
+                    <input type="file" id="importFile" class="hidden" accept=".json" onchange="App.importConfig(event)">
+                </label>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-gray-200 flex">
+            <button onclick="App.switchTab('settings')" id="tab-settings" class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 tab-active transition">1. Global Settings</button>
+            <button onclick="App.switchTab('data')" id="tab-data" class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 transition">2. Data Entry</button>
+            <button onclick="App.switchTab('generate')" id="tab-generate" class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 transition">3. Generate & View</button>
+        </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 no-print">
+        <div class="max-w-7xl mx-auto">
+            
+            <div id="section-settings" class="space-y-6 animate-fade-in">
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h2 class="text-lg font-semibold mb-4 text-gray-800">Days of the Week</h2>
+                    <div id="days-container" class="flex flex-wrap gap-2 mb-3"></div>
+                    <div class="flex gap-2 max-w-sm">
+                        <input type="text" id="new-day" placeholder="e.g., Monday" class="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                        <button onclick="App.addDay()" class="bg-blue-50 px-4 py-2 text-blue-600 rounded text-sm hover:bg-blue-100 font-medium transition">+ Add</button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h2 class="text-lg font-semibold mb-4 text-gray-800">Time Slots / Periods</h2>
+                    <div id="periods-container" class="flex flex-col gap-2 mb-3 max-w-md"></div>
+                    <div class="flex gap-2 max-w-sm">
+                        <input type="text" id="new-period" placeholder="e.g., 09:00-10:00" class="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                        <button onclick="App.addPeriod()" class="bg-blue-50 px-4 py-2 text-blue-600 rounded text-sm hover:bg-blue-100 font-medium transition">+ Add</button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h2 class="text-lg font-semibold mb-4 text-gray-800">Global Constraints & Thresholds</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Max Consecutive Periods (Teacher)</label>
+                            <input type="number" id="constraint-consecutive" min="1" value="3" onchange="App.updateConstraints()" class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                            <p class="text-xs text-gray-500 mt-2 leading-relaxed"><span class="font-bold text-gray-700">Soft Constraint 1:</span> The backtracking heuristic scoring mechanism will severely penalize placements that force a teacher to exceed this limit without a break.</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Max Total Hours Per Teacher (Weekly)</label>
+                            <input type="number" id="constraint-hours" min="1" value="25" onchange="App.updateConstraints()" class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                            <p class="text-xs text-gray-500 mt-2 leading-relaxed"><span class="font-bold text-gray-700">Hard Constraint 3:</span> Absolute limit. The system will pre-validate all mapped curriculum hours against this threshold before algorithm execution to prevent infinite loops.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="section-data" class="hidden space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 col-span-1 flex flex-col">
+                        <h2 class="text-lg font-semibold mb-4 border-b pb-2 text-gray-800">Rooms / Labs</h2>
+                        <div id="rooms-list" class="space-y-2 mb-4 flex-1 overflow-y-auto pr-2 custom-scrollbar" style="max-height: 400px;"></div>
+                        <div class="space-y-3 mt-auto bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <input type="text" id="room-name" placeholder="Name (e.g., Room 101)" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-blue-500 outline-none">
+                            <div class="flex gap-2">
+                                <input type="number" id="room-cap" placeholder="Cap" class="w-1/3 border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-blue-500 outline-none">
+                                <select id="room-type" class="w-2/3 border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-blue-500 outline-none">
+                                    <option value="Theory">Theory</option>
+                                    <option value="Computer Lab">Computer Lab</option>
+                                    <option value="Science Lab">Science Lab</option>
+                                    <option value="Workshop">Workshop</option>
+                                </select>
+                            </div>
+                            <button onclick="App.addRoom()" class="w-full bg-blue-600 text-white rounded py-2 text-sm font-medium hover:bg-blue-700 transition shadow-sm">Add Room</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 col-span-1 flex flex-col space-y-6">
+                        <div class="flex-1 flex flex-col">
+                            <h2 class="text-lg font-semibold mb-4 border-b pb-2 text-gray-800">Classes / Batches</h2>
+                            <div id="classes-list" class="flex flex-wrap gap-2 mb-4 flex-1 overflow-y-auto pr-2 custom-scrollbar"></div>
+                            <div class="flex gap-2 mt-auto">
+                                <input type="text" id="class-name" placeholder="e.g., CS-A" class="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-blue-500 outline-none">
+                                <button onclick="App.addClass()" class="bg-blue-50 px-4 py-2 text-blue-600 rounded text-sm hover:bg-blue-100 font-medium transition">Add</button>
+                            </div>
+                        </div>
+                        <div class="flex-1 flex flex-col">
+                            <h2 class="text-lg font-semibold mb-4 border-b pb-2 text-gray-800">Teachers & Instructors</h2>
+                            <div id="teachers-list" class="space-y-2 mb-4 flex-1 overflow-y-auto pr-2 custom-scrollbar"></div>
+                            <div class="flex gap-2 mt-auto">
+                                <input type="text" id="teacher-name" placeholder="e.g., Mr. Sharma" class="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-blue-500 outline-none">
+                                <button onclick="App.addTeacher()" class="bg-blue-50 px-4 py-2 text-blue-600 rounded text-sm hover:bg-blue-100 font-medium transition">Add</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 col-span-1 flex flex-col">
+                        <h2 class="text-lg font-semibold mb-4 border-b pb-2 text-gray-800">Curriculum Mapping</h2>
+                        <p class="text-xs text-gray-500 mb-4">Define strict requirements. The algorithm will dismantle these quotas into individual discrete hourly events for the constraint solver.</p>
+                        
+                        <div id="curriculum-list" class="space-y-2 mb-4 flex-1 overflow-y-auto pr-2 custom-scrollbar" style="max-height: 300px;"></div>
+                        
+                        <div class="space-y-3 mt-auto bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-inner">
+                            <select id="curr-class" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-green-500 outline-none bg-white"></select>
+                            <input type="text" id="curr-subject" placeholder="Subject (e.g., React JS)" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-green-500 outline-none">
+                            <select id="curr-teacher" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-green-500 outline-none bg-white"></select>
+                            <div class="flex gap-2">
+                                <input type="number" id="curr-hours" placeholder="Hrs/Wk" min="1" class="w-1/3 border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-green-500 outline-none">
+                                <select id="curr-roomtype" class="w-2/3 border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-green-500 outline-none bg-white">
+                                    <option value="Theory">Req: Theory</option>
+                                    <option value="Computer Lab">Req: Computer Lab</option>
+                                    <option value="Science Lab">Req: Science Lab</option>
+                                    <option value="Workshop">Req: Workshop</option>
+                                </select>
+                            </div>
+                            <button onclick="App.addCurriculum()" class="w-full bg-green-600 text-white rounded py-2 text-sm font-medium hover:bg-green-700 transition shadow-sm mt-2">Map Requirement</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="section-generate" class="hidden space-y-6">
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-800">Algorithmic Engine</h2>
+                        <p class="text-sm text-gray-500 mt-1">Constraint Satisfaction Problem (CSP) Recursive Backtracking Solver with Soft Constraint Penalty Scoring.</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="App.generateTimetables()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-md shadow flex items-center font-semibold transition ring-2 ring-blue-600 ring-offset-2 ring-offset-gray-50 focus:outline-none">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                            Execute Generation
+                        </button>
+                        <button onclick="window.print()" id="btn-print" class="hidden bg-gray-800 hover:bg-gray-900 text-white px-6 py-2.5 rounded-md shadow items-center font-semibold transition">
+                            Print PDF
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-gray-900 rounded-lg shadow-lg border border-gray-700 overflow-hidden">
+                    <div class="bg-gray-800 px-4 py-2 border-b border-gray-700 flex justify-between items-center">
+                        <span class="text-xs font-mono text-gray-400 uppercase tracking-widest">System Execution Telemetry</span>
+                        <div class="flex gap-1">
+                            <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+                        </div>
+                    </div>
+                    <div id="console-container" class="p-4 font-mono text-sm overflow-y-auto custom-scrollbar" style="max-height: 250px;">
+                        <div class="text-gray-400">> V8 Engine Ready. Awaiting CSP Execution...</div>
+                    </div>
+                </div>
+
+                <div id="timetables-output" class="space-y-12"></div>
+            </div>
+        </div>
+    </main>
+
+    <div id="print-area" class="hidden print-only p-4 bg-white"></div>
+
+    <script>
+        /**
+         * ============================================================================
+         * MODULE 1: STATE MANAGEMENT (Singleton Pattern)
+         * Purpose: Manages relational data integrity, UUIDs, and localStorage persistence.
+         * ============================================================================
+         */
+        const State = {
+            data: {
+                days:,
+                periods: ['09:00-10:00', '10:00-11:00', '11:00-12:00', '12:00-13:00', '14:00-15:00'],
+                constraints: { maxConsecutive: 3, maxHours: 25 },
+                rooms:,
+                classes:,
+                teachers:,
+                curriculum:
+            },
+            
+            init() {
+                const stored = localStorage.getItem('cupx_state');
+                if (stored) {
+                    try {
+                        this.data = JSON.parse(stored);
+                    } catch(e) {
+                        console.error("State deserialization failed. Corrupt JSON in localStorage.");
+                    }
+                }
+            },
+            
+            save() {
+                // Synchronous serialization of relational object matrix
+                localStorage.setItem('cupx_state', JSON.stringify(this.data));
+                App.renderAll(); // Trigger DOM reconciliation
+            },
+            
+            generateId() {
+                // Pseudo-random cryptographic UUID equivalent for foreign keys
+                return Math.random().toString(36).substr(2, 9);
+            }
+        };
+
+        /**
+         * ============================================================================
+         * MODULE 2: ALGORITHMIC ENGINE (CSP & Recursive Backtracking)
+         * Purpose: Resolves combinatorial complexity using Hard/Soft constraint filtering.
+         * ============================================================================
+         */
+        const Solver = {
+            logger: null,
+            variations:,
+            
+            // Telemetry output utility
+            log(msg, type='info') {
+                const color = type === 'error'? 'text-red-400 font-bold' : (type === 'success'? 'text-green-400 font-bold' : 'text-gray-300');
+                if(this.logger) this.logger.innerHTML += `<div class="${color} py-0.5">> ${msg}</div>`;
+                this.logger.scrollTop = this.logger.scrollHeight;
+            },
+
+            // Fisher-Yates Array Shuffle algorithm for domain variation
+            shuffle(array) {
+                let curr = array.length, rand;
+                while (curr!= 0) {
+                    rand = Math.floor(Math.random() * curr); curr--;
+                    [array[curr], array[rand]] = [array[rand], array[curr]];
+                }
+                return array;
+            },
+
+            // Expanding curriculum requirements into individual discrete event variables
+            buildEvents() {
+                let events =;
+                State.data.curriculum.forEach(req => {
+                    for(let i=0; i<req.hours; i++) {
+                        events.push({
+                            id: State.generateId(),
+                            reqId: req.id,
+                            classId: req.classId,
+                            teacherId: req.teacherId,
+                            subject: req.subject,
+                            roomType: req.roomType
+                        });
+                    }
+                });
+                return events;
+            },
+
+            // Primary Execution Entry Point
+            solve() {
+                this.logger = document.getElementById('console-container');
+                this.logger.innerHTML = '';
+                this.variations =;
+                
+                const events = this.buildEvents();
+                const totalSlots = State.data.days.length * State.data.periods.length * State.data.rooms.length;
+                
+                this.log(`Initiating Constraint Satisfaction solver...`);
+                this.log(`Analyzing spatial-temporal dataset: ${events.length} target hours vs ${totalSlots} maximum system capacity.`);
+                
+                // PRE-EXECUTION VALIDATION: Spatial Check
+                if (events.length > totalSlots) {
+                    this.log(` Curriculum demands (${events.length} hours) mathematically exceed total physical institutional capacity (${totalSlots} slots). Adjust days/periods/rooms.`, 'error');
+                    return null;
+                }
+
+                // PRE-EXECUTION VALIDATION: Hard Constraint 3 (Quota Fulfillment & Limits)
+                let workloadMap = {};
+                events.forEach(e => { workloadMap[e.teacherId] = (workloadMap[e.teacherId] |
+
+| 0) + 1; });
+                
+                for (let tId in workloadMap) {
+                    if (workloadMap[tId] > State.data.constraints.maxHours) {
+                        const tName = State.data.teachers.find(x => x.id === tId)?.name |
+
+| 'Unknown';
+                        // Output specific requested error formatting exactly as prompted
+                        this.log(` Failed: ${tName} is assigned ${workloadMap[tId]} hours based on Curriculum Mapping, but the global maximum limit is configured to ${State.data.constraints.maxHours} slots.`, 'error');
+                        return null;
+                    }
+                }
+
+                this.log(`Pre-execution validation passed. Commencing deep multidimensional recursion...`);
+
+                // Core Generation Loop: Attempt to find 3 statistically distinct variations
+                for(let v = 0; v < 3; v++) {
+                    let schedule = {}; // Multidimensional lookup matrix: schedule[day][period][room.id]
+                    
+                    const startTime = performance.now();
+                    let success = this.backtrack(events, 0, schedule);
+                    const endTime = performance.now();
+                    
+                    if(success) {
+                        // Deep clone the valid state to sever references
+                        this.variations.push(JSON.parse(JSON.stringify(schedule)));
+                        this.log(`Variation ${v+1} compiled successfully in ${(endTime - startTime).toFixed(2)}ms.`, 'success');
+                    } else {
+                        this.log(` Failed to resolve constraints for Variation ${v+1}. Traversed absolute dead end. Curriculum map is overly restrictive and mathematically unresolvable under current constraints.`, 'error');
+                        break; // Terminate loop early to prevent browser lockup
+                    }
+                }
+                
+                return this.variations.length > 0? this.variations : null;
+            },
+
+            // ------------------------------------------------------------------------
+            // CORE RECURSIVE BACKTRACKING ALGORITHM WITH HEURISTIC SCORING
+            // ------------------------------------------------------------------------
+            backtrack(events, index, schedule) {
+                // Base Case / Success Condition: All variables (events) placed without conflict
+                if (index === events.length) return true;
+
+                let event = events[index];
+                
+                // 1. Shuffling Domain Arrays ensures non-deterministic output generation
+                let days = this.shuffle();
+                let rooms = this.shuffle();
+                // We keep periods sequential initially so we can calculate scoring logically
+                let periodsOriginal =;
+
+                for (let d of days) {
+                    if(!schedule[d]) schedule[d] = {};
+                    
+                    for (let r of rooms) {
+                        // Hard Constraint 2: Resource Type Pruning (Early termination of invalid rooms)
+                        if (r.type!== event.roomType) continue;
+
+                        // VALUE ORDERING HEURISTIC: Score available periods for this day/room
+                        // We sort the periods array based on Soft Constraint penalties.
+                        // Lower score = better assignment choice.
+                        let scoredPeriods = periodsOriginal.map(p => {
+                            let score = 0;
+                            // Check basic hard validity first before scoring
+                            if(!this.isHardValid(event, d, p, r, schedule)) {
+                                score = 999999; // Essentially disqualify
+                            } else {
+                                // Soft Constraint 1: Penalize if adding this causes consecutive workload breach
+                                if(this.createsConsecutiveOverload(event.teacherId, d, p, schedule)) {
+                                    score += 1000;
+                                }
+                                // Soft Constraint 2: Penalize if adding this creates a "FREE" period gap for students
+                                if(this.createsStudentGap(event.classId, d, p, schedule)) {
+                                    score += 500;
+                                }
+                            }
+                            return { period: p, score: score };
+                        });
+
+                        // Sort ascending by penalty score to optimize Soft Constraints
+                        scoredPeriods.sort((a, b) => a.score - b.score);
+
+                        // Traverse the prioritized domains
+                        for (let sp of scoredPeriods) {
+                            if (sp.score >= 999999) continue; // Skip strictly invalid domains
+                            
+                            let p = sp.period;
+                            if(!schedule[d][p]) schedule[d][p] = {};
+
+                            // Make the assignment mutation
+                            schedule[d][p][r.id] = event;
+                            
+                            // Recursively descend into the tree to assign the next variable
+                            if (this.backtrack(events, index + 1, schedule)) {
+                                return true; // Propagate success upwards
+                            }
+                            
+                            // UNDO ASSIGNMENT (The Backtrack): Current branch led to a dead end
+                            delete schedule[d][p][r.id];
+                        }
+                    }
+                }
+                return false; // Absolute Failure: No valid domain combinations exist for this variable
+            },
+
+            // Hard Constraint Validation Verification
+            isHardValid(event, day, period, room, schedule) {
+                // Hard Constraint 2: Is the physical room already occupied?
+                if (schedule[day] && schedule[day][period] && schedule[day][period][room.id]) return false;
+
+                // Examine horizontal temporal domain (Are teacher or class double-booked across other rooms?)
+                if (schedule[day] && schedule[day][period]) {
+                    for (let rId in schedule[day][period]) {
+                        let scheduledEvent = schedule[day][period][rId];
+                        // Hard Constraint 1: Instructor Exclusivity (No teacher clashes)
+                        if (scheduledEvent.teacherId === event.teacherId) return false;
+                        // Hard Constraint: Cohort Exclusivity (No student cohort clashes)
+                        if (scheduledEvent.classId === event.classId) return false;
+                    }
+                }
+                return true;
+            },
+
+            // Soft Constraint 1: Teacher Consecutive Periods Threshold
+            createsConsecutiveOverload(teacherId, day, targetPeriod, schedule) {
+                let max = State.data.constraints.maxConsecutive;
+                let targetIdx = State.data.periods.indexOf(targetPeriod);
+                let consecutiveCount = 1; // Assuming we place it here, that's 1
+                
+                // Count contiguous blocks backwards
+                for(let i = targetIdx - 1; i >= 0; i--) {
+                    if(this.isTeacherActiveInPeriod(teacherId, day, State.data.periods[i], schedule)) consecutiveCount++;
+                    else break;
+                }
+                // Count contiguous blocks forwards
+                for(let i = targetIdx + 1; i < State.data.periods.length; i++) {
+                    if(this.isTeacherActiveInPeriod(teacherId, day, State.data.periods[i], schedule)) consecutiveCount++;
+                    else break;
+                }
+                
+                return consecutiveCount > max;
+            },
+
+            isTeacherActiveInPeriod(teacherId, day, period, schedule) {
+                if(!schedule[day] |
+
+|!schedule[day][period]) return false;
+                for(let rId in schedule[day][period]) {
+                    if(schedule[day][period][rId].teacherId === teacherId) return true;
+                }
+                return false;
+            },
+
+            // Soft Constraint 2: Student Cohort Gap Minimization
+            createsStudentGap(classId, day, targetPeriod, schedule) {
+                // A gap is created if placing a class here isolates it, e.g., 
+                // Class is at Index 0, we are evaluating Index 2. That leaves Index 1 "FREE".
+                let targetIdx = State.data.periods.indexOf(targetPeriod);
+                let activeIndices =;
+                
+                // Gather indices where this class is currently scheduled for the day
+                if(schedule[day]) {
+                    State.data.periods.forEach((p, idx) => {
+                        if(schedule[day][p]) {
+                            for(let rId in schedule[day][p]) {
+                                if(schedule[day][p][rId].classId === classId) {
+                                    activeIndices.push(idx);
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                if (activeIndices.length === 0) return false; // First class of the day, no gaps possible
+                
+                // Check if adding targetIdx creates a gap with the nearest existing indices
+                let minIdx = Math.min(...activeIndices);
+                let maxIdx = Math.max(...activeIndices);
+                
+                // If the target is placed at least 2 slots away from the boundaries, it creates a gap
+                if (targetIdx < minIdx - 1) return true;
+                if (targetIdx > maxIdx + 1) return true;
+                
+                return false;
+            }
+        };
+
+        /**
+         * ============================================================================
+         * MODULE 3: DOM CONTROLLER (Application Logic)
+         * Purpose: Manages UI rendering without React overhead utilizing event dispatch.
+         * ============================================================================
+         */
+        const App = {
+            init() {
+                State.init();
+                this.renderAll();
+                // Synchronize HTML form values with persistent state limits
+                document.getElementById('constraint-consecutive').value = State.data.constraints.maxConsecutive;
+                document.getElementById('constraint-hours').value = State.data.constraints.maxHours;
+            },
+
+            switchTab(tab) {
+                // Tab state manipulation using Tailwind display utilities
+                ['settings', 'data', 'generate'].forEach(t => {
+                    document.getElementById(`section-${t}`).classList.add('hidden');
+                    document.getElementById(`tab-${t}`).classList.remove('tab-active', 'border-bottom', 'border-blue-500');
+                });
+                document.getElementById(`section-${tab}`).classList.remove('hidden');
+                document.getElementById(`tab-${tab}`).classList.add('tab-active', 'border-b-2', 'border-blue-500');
+            },
+
+            renderAll() {
+                // Batch execution of independent DOM rendering functions
+                this.renderBadges('days-container', State.data.days, 'removeDay');
+                this.renderBadges('periods-container', State.data.periods, 'removePeriod');
+                this.renderRooms();
+                this.renderClasses();
+                this.renderTeachers();
+                this.renderCurriculum();
+                this.updateSelects();
+            },
+
+            // Utility template function for array rendering
+            renderBadges(containerId, dataArray, removeFn) {
+                document.getElementById(containerId).innerHTML = dataArray.map((item, i) => `
+                    <span class="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium bg-gray-100 text-gray-800 border border-gray-300 shadow-sm">
+                        ${item}
+                        <button type="button" onclick="App.${removeFn}(${i})" class="ml-2 inline-flex text-gray-400 hover:text-red-500 focus:outline-none transition">&times;</button>
+                    </span>
+                `).join('');
+            },
+
+            addDay() {
+                const v = document.getElementById('new-day').value.trim();
+                if(v &&!State.data.days.includes(v)) { State.data.days.push(v); State.save(); }
+                document.getElementById('new-day').value = '';
+            },
+            removeDay(i) { State.data.days.splice(i, 1); State.save(); },
+
+            addPeriod() {
+                const v = document.getElementById('new-period').value.trim();
+                if(v &&!State.data.periods.includes(v)) { State.data.periods.push(v); State.save(); }
+                document.getElementById('new-period').value = '';
+            },
+            removePeriod(i) { State.data.periods.splice(i, 1); State.save(); },
+
+            updateConstraints() {
+                // Real-time synchronization of numerical inputs to global singleton
+                State.data.constraints.maxConsecutive = parseInt(document.getElementById('constraint-consecutive').value) |
+
+| 3;
+                State.data.constraints.maxHours = parseInt(document.getElementById('constraint-hours').value) |
+
+| 25;
+                State.save();
+            },
+
+            // Data Entry Mutators
+            addRoom() {
+                const name = document.getElementById('room-name').value.trim();
+                const cap = document.getElementById('room-cap').value;
+                const type = document.getElementById('room-type').value;
+                if(name && cap) {
+                    State.data.rooms.push({ id: State.generateId(), name, capacity: parseInt(cap), type });
+                    State.save();
+                    document.getElementById('room-name').value = '';
+                    document.getElementById('room-cap').value = '';
+                }
+            },
+            renderRooms() {
+                document.getElementById('rooms-list').innerHTML = State.data.rooms.map(r => `
+                    <div class="flex justify-between items-center text-sm p-3 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-blue-300 transition">
+                        <span><strong class="text-gray-800">${r.name}</strong> <span class="text-gray-500">(Cap: ${r.capacity})</span> - <span class="text-xs font-semibold px-2 py-1 bg-blue-50 text-blue-700 rounded ml-1">${r.type}</span></span>
+                        <button onclick="App.deleteEntity('rooms', '${r.id}')" class="text-red-400 hover:text-red-600 transition p-1">&times;</button>
+                    </div>
+                `).join('');
+            },
+
+            addClass() {
+                const name = document.getElementById('class-name').value.trim();
+                if(name) { State.data.classes.push({ id: State.generateId(), name }); State.save(); document.getElementById('class-name').value = ''; }
+            },
+            renderClasses() { this.renderBadgesEntity('classes-list', State.data.classes, 'classes'); },
+
+            addTeacher() {
+                const name = document.getElementById('teacher-name').value.trim();
+                if(name) { State.data.teachers.push({ id: State.generateId(), name }); State.save(); document.getElementById('teacher-name').value = ''; }
+            },
+            renderTeachers() {
+                document.getElementById('teachers-list').innerHTML = State.data.teachers.map(t => {
+                    // Reactive derived calculation: Summation of teacher workload based on relational curriculum array
+                    const workload = State.data.curriculum.filter(c => c.teacherId === t.id).reduce((sum, c) => sum + parseInt(c.hours), 0);
+                    // Dynamic styling based on constraint thresholds
+                    const loadColor = workload > State.data.constraints.maxHours? 'text-red-600 bg-red-50 ring-red-200' : 'text-green-700 bg-green-50 ring-green-200';
+                    return `
+                    <div class="flex justify-between items-center text-sm p-3 bg-white border border-gray-200 rounded-lg shadow-sm">
+                        <span class="font-medium text-gray-800">${t.name}</span>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-bold px-2 py-1 rounded ring-1 ${loadColor}">${workload} hrs / wk</span>
+                            <button onclick="App.deleteEntity('teachers', '${t.id}')" class="text-red-400 hover:text-red-600 transition">&times;</button>
+                        </div>
+                    </div>`
+                }).join('');
+            },
+
+            addCurriculum() {
+                const classId = document.getElementById('curr-class').value;
+                const subject = document.getElementById('curr-subject').value.trim();
+                const teacherId = document.getElementById('curr-teacher').value;
+                const hours = parseInt(document.getElementById('curr-hours').value);
+                const roomType = document.getElementById('curr-roomtype').value;
+
+                if(classId && subject && teacherId && hours) {
+                    State.data.curriculum.push({ id: State.generateId(), classId, subject, teacherId, hours, roomType });
+                    State.save();
+                    document.getElementById('curr-subject').value = '';
+                    document.getElementById('curr-hours').value = '';
+                }
+            },
+            renderCurriculum() {
+                document.getElementById('curriculum-list').innerHTML = State.data.curriculum.map(c => {
+                    // Resolving foreign keys to string names for visual display
+                    const cls = State.data.classes.find(x=>x.id === c.classId)?.name |
+
+| 'Unknown Class';
+                    const tr = State.data.teachers.find(x=>x.id === c.teacherId)?.name |
+
+| 'Unknown Teacher';
+                    return `
+                    <div class="flex justify-between items-center text-sm p-3 bg-white border border-gray-200 rounded-lg shadow-sm border-l-4 border-l-green-500">
+                        <div>
+                            <div class="font-bold text-gray-800 mb-0.5">${cls} <span class="font-normal text-gray-500 mx-1">→</span> ${c.subject}</div>
+                            <div class="text-xs text-gray-600 font-medium">Inst: ${tr} <span class="mx-2">|</span> Load: ${c.hours} hrs <span class="mx-2">|</span> Req: ${c.roomType}</div>
+                        </div>
+                        <button onclick="App.deleteEntity('curriculum', '${c.id}')" class="text-red-400 hover:text-red-600 transition p-2 bg-red-50 rounded-md hover:bg-red-100">&times;</button>
+                    </div>`
+                }).join('');
+            },
+
+            deleteEntity(entityType, id) {
+                // Functional filter mutation
+                State.data = State.data.filter(e => e.id!== id);
+                if(entityType === 'classes' |
+
+| entityType === 'teachers') {
+                    // Referential Integrity Action: Cascade delete dependent curriculum mapping
+                    State.data.curriculum = State.data.curriculum.filter(c => c.classId!== id && c.teacherId!== id);
+                }
+                State.save();
+            },
+
+            renderBadgesEntity(containerId, arr, type) {
+                document.getElementById(containerId).innerHTML = arr.map(item => `
+                    <span class="inline-flex items-center px-3 py-1.5 rounded-md border border-gray-200 text-sm font-medium bg-white text-gray-700 shadow-sm">
+                        ${item.name}
+                        <button type="button" onclick="App.deleteEntity('${type}', '${item.id}')" class="ml-2 inline-flex text-gray-400 hover:text-red-500 focus:outline-none transition">&times;</button>
+                    </span>
+                `).join('');
+            },
+
+            updateSelects() {
+                const clsSel = document.getElementById('curr-class');
+                const trSel = document.getElementById('curr-teacher');
+                clsSel.innerHTML = '<option value="" disabled selected>-- Select Target Class --</option>' + State.data.classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                trSel.innerHTML = '<option value="" disabled selected>-- Assign Teacher --</option>' + State.data.teachers.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+            },
+
+            generateTimetables() {
+                // Delegate payload logic to Algorithm Engine
+                const variations = Solver.solve();
+                const outContainer = document.getElementById('timetables-output');
+                const printContainer = document.getElementById('print-area');
+                outContainer.innerHTML = '';
+                printContainer.innerHTML = '';
+
+                if(variations && variations.length > 0) {
+                    // Activate CSS Print functions
+                    document.getElementById('btn-print').classList.remove('hidden');
+                    variations.forEach((schedule, idx) => {
+                        const html = this.buildTableHTML(schedule, idx + 1);
+                        outContainer.innerHTML += html;
+                        printContainer.innerHTML += html;
+                    });
+                } else {
+                    document.getElementById('btn-print').classList.add('hidden');
+                }
+            },
+
+            // ------------------------------------------------------------------------
+            // HTML STRING RENDERING: Multi-dimensional Matrix to CSS Grid Translation
+            // ------------------------------------------------------------------------
+            buildTableHTML(schedule, varNum) {
+                // Structure requires nested mapping of Days -> Rooms -> Periods 
+                let html = `<div class="bg-white p-6 rounded-xl shadow-md border border-gray-200 print-container mb-8" style="page-break-after: always;">
+                    <div class="flex justify-between items-end mb-4 border-b border-gray-200 pb-3">
+                        <h3 class="text-xl font-bold text-gray-800">CupX Timetable - Variation ${varNum}</h3>
+                        <span class="text-xs text-gray-500 font-mono">Algorithm Output: Valid CSP Resolution</span>
+                    </div>
+                    <div class="overflow-x-auto custom-scrollbar pb-2">
+                        <table class="w-full text-sm text-left border-collapse">
+                            <thead class="bg-gray-800 text-white uppercase text-xs">
+                                <tr>
+                                    <th class="border border-gray-700 p-3 text-center w-32 tracking-wider">Spatial / Time</th>
+                                    ${State.data.periods.map(p => `<th class="border border-gray-700 p-3 text-center tracking-wider">${p}</th>`).join('')}
+                                </tr>
+                            </thead>
+                            <tbody>`;
+                
+                State.data.days.forEach(day => {
+                    // Day Header Row
+                    html += `<tr><td colspan="${State.data.periods.length + 1}" class="bg-blue-100 font-bold p-2 text-center text-blue-900 uppercase text-xs tracking-widest border border-gray-300">${day}</td></tr>`;
+                    
+                    State.data.rooms.forEach(room => {
+                        // Spatial Row Header
+                        html += `<tr><td class="font-semibold bg-gray-50 p-3 text-center border border-gray-300 text-gray-800 whitespace-nowrap shadow-inner">${room.name}<br><span class="text-[10px] text-gray-400 font-normal uppercase">${room.type}</span></td>`;
+                        
+                        State.data.periods.forEach(period => {
+                            let cellData = '<span class="text-gray-400 italic text-xs font-medium tracking-wide">FREE SLOT</span>';
+                            let cellClass = "bg-white"; // Default background
+                            
+                            // Matrix lookup resolution
+                            if(schedule[day] && schedule[day][period] && schedule[day][period][room.id]) {
+                                const ev = schedule[day][period][room.id];
+                                const cls = State.data.classes.find(c=>c.id===ev.classId)?.name |
+
+| 'Err';
+                                const tr = State.data.teachers.find(t=>t.id===ev.teacherId)?.name |
+
+| 'Err';
+                                
+                                cellClass = "bg-green-50"; // Highlight active assignments
+                                cellData = `
+                                    <div class="flex flex-col gap-1 items-center justify-center h-full">
+                                        <div class="font-bold text-gray-900 text-sm">${ev.subject}</div>
+                                        <div class="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-[10px] font-bold uppercase tracking-wide border border-blue-200">${cls}</div>
+                                        <div class="text-[11px] text-gray-600 font-medium">${tr}</div>
+                                    </div>`;
+                            }
+                            html += `<td class="border border-gray-300 p-2 text-center align-middle ${cellClass} transition hover:bg-gray-100 min-w-[140px]">${cellData}</td>`;
+                        });
+                        html += `</tr>`;
+                    });
+                });
+
+                html += `</tbody></table></div></div>`;
+                return html;
+            },
+
+            // ------------------------------------------------------------------------
+            // PERSISTENCE PROTOCOLS: JSON Serialization and Blob APIs
+            // ------------------------------------------------------------------------
+            exportConfig() {
+                // Encode the entire normalized relational state object into a Data URI string
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(State.data, null, 2));
+                const dlAnchorElem = document.createElement('a');
+                dlAnchorElem.setAttribute("href", dataStr);
+                dlAnchorElem.setAttribute("download", `cupx_timetable_config_${new Date().toISOString().slice(0,10)}.json`);
+                dlAnchorElem.click();
+            },
+
+            importConfig(event) {
+                const file = event.target.files;
+                if(!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        State.data = JSON.parse(e.target.result);
+                        State.save(); // Synchronize injected data back to localStorage instantly
+                        document.getElementById('importFile').value = ''; // Reset input to allow re-importing
+                        alert('System Configuration parameters imported and synchronized successfully.');
+                    } catch(err) {
+                        alert('Fatal Parse Error: The provided file does not contain valid structural JSON.');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        };
+
+        // Browser Initialization Hook: Bootstraps the application after DOM tree is constructed
+        window.addEventListener('DOMContentLoaded', () => App.init());
+    </script>
+</body>
+</html>
