@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <title>CupX Timetables | CupX Corporation</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <meta name="description" content="Generate smart, conflict-free academic timetables.">
+
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+        /* Base Theme (Matching /tools/index.html) */
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #0f172a;
+            color: #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background-color: #020617;
+            border-bottom: 1px solid #1e293b;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+        }
+        header h1 { margin: 0; font-size: 22px; }
+        header p { margin: 2px 0 0 0; font-size: 12px; color: #94a3b8; }
+        header a { color: #38bdf8; text-decoration: none; font-size: 14px; }
+
+        main {
+            flex-grow: 1;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- UI State Transitions --- */
+        .hidden { display: none !important; }
+        .opacity-0 { opacity: 0; }
+        .opacity-100 { opacity: 1; }
+        .transition-opacity { transition: opacity 0.3s ease-in-out; }
+        .flex-col { display: flex; flex-direction: column; }
+
+        /* --- Section: Home Screen --- */
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; margin-bottom: 40px; }
+        .card {
+            background-color: #020617; padding: 25px; border-radius: 10px; border: 1px solid #1e293b;
+            transition: transform 0.2s ease, border-color 0.2s; display: flex; align-items: center; gap: 15px; cursor: pointer; color: inherit; text-align: left;
+        }
+        .card:hover { transform: translateY(-5px); border-color: #38bdf8; }
+        .card-icon { background: rgba(56, 189, 248, 0.1); color: #38bdf8; padding: 12px; border-radius: 8px; display: flex; }
+        .card h3 { margin: 0 0 5px 0; font-size: 18px; color: #f8fafc; }
+        .card p { margin: 0; font-size: 13px; color: #94a3b8; }
+
+        .section-title { font-size: 14px; text-transform: uppercase; color: #94a3b8; border-bottom: 1px solid #1e293b; padding-bottom: 10px; margin-bottom: 20px; font-weight: bold; }
+        
+        /* --- Section: Setup Screen --- */
+        .setup-box { background: #020617; border-radius: 10px; border: 1px solid #1e293b; padding: 25px; flex-grow: 1; display: flex; flex-direction: column; }
+        .progress-bar { background: #1e293b; height: 8px; border-radius: 4px; margin-bottom: 20px; overflow: hidden; width: 100%; }
+        .progress-fill { background: #38bdf8; height: 100%; transition: width 0.3s; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
+        .form-group label { font-size: 14px; color: #cbd5e1; }
+        .form-group input { background: #0f172a; border: 1px solid #334155; color: white; padding: 10px 12px; border-radius: 6px; outline: none; }
+        .form-group input:focus { border-color: #38bdf8; }
+        .setup-header h2 { margin: 0 0 5px 0; font-size: 24px; color: #f8fafc; }
+        .setup-header p { margin: 0 0 25px 0; font-size: 14px; color: #94a3b8; }
+
+        /* Buttons */
+        .btn { background: #38bdf8; color: #020617; padding: 10px 18px; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; transition: opacity 0.2s; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
+        .btn:hover { opacity: 0.9; }
+        .btn-outline { background: transparent; border: 1px solid #334155; color: #cbd5e1; }
+        .btn-outline:hover { background: #1e293b; }
+        .nav-footer { display: flex; justify-content: space-between; margin-top: auto; padding-top: 20px; border-top: 1px solid #1e293b; }
+
+        /* --- Section: Loading --- */
+        .loading-screen { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .spinner { animation: spin 2s linear infinite; color: #38bdf8; width: 64px; height: 64px; margin-bottom: 20px; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .loading-screen h2 { margin: 0; color: #f8fafc; }
+        .loading-screen p { color: #94a3b8; max-width: 300px; margin: 10px auto; }
+
+        /* --- Section: Results Screen --- */
+        .results-actions { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 15px; }
+        .table-wrapper { background: #020617; border: 1px solid #1e293b; border-radius: 10px; overflow: auto; height: 60vh; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; min-width: 700px; }
+        thead th { background: #0f172a; position: sticky; top: 0; z-index: 10; padding: 12px 15px; border-bottom: 1px solid #1e293b; border-right: 1px solid #1e293b; color: #cbd5e1; }
+        thead th:first-child { left: 0; z-index: 20; }
+        tbody td { padding: 12px 15px; border-bottom: 1px solid #1e293b; border-right: 1px solid #1e293b; vertical-align: top; }
+        tbody td:first-child { background: #0f172a; position: sticky; left: 0; z-index: 10; font-weight: bold; color: #94a3b8; }
+        
+        /* Modal & Toast Base */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-box { background: #020617; border: 1px solid #1e293b; border-radius: 10px; width: 100%; max-width: 400px; overflow: hidden; }
+        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 100; display: flex; flex-direction: column; gap: 10px; }
+
+        /* ============================================================
+           COMPATIBILITY CLASSES FOR ui.js (DO NOT REMOVE)
+           These map the Tailwind classes injected by your JS modules 
+           to the CupX Dark Theme so everything renders flawlessly.
+        ============================================================ */
+        ul.flex.flex-col.gap-3 { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+        /* Draft Items */
+        .bg-white.p-4.rounded-lg.shadow-sm.border.border-gray-100 { background: #020617; padding: 15px 20px; border-radius: 8px; border: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.2s; }
+        .hover\:bg-gray-50:hover { background: #1e293b !important; }
+        .text-gray-800 { color: #f8fafc !important; }
+        .text-gray-500 { color: #94a3b8 !important; }
+        .text-xs { font-size: 12px !important; }
+        /* Tabs */
+        nav.flex.space-x-6 { display: flex; gap: 20px; border-bottom: 1px solid #1e293b; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
+        .whitespace-nowrap.py-3.px-1.border-b-2 { background: none; border: none; padding: 10px 5px; font-size: 14px; font-weight: bold; cursor: pointer; border-bottom: 2px solid transparent; }
+        .border-indigo-500 { border-bottom-color: #38bdf8 !important; }
+        .text-indigo-600 { color: #38bdf8 !important; }
+        .border-transparent { border-bottom-color: transparent !important; }
+        /* Table Cells */
+        .hover\:bg-gray-50:hover { background-color: #0f172a !important; }
+        .bg-blue-50 { background-color: rgba(56, 189, 248, 0.1) !important; }
+        .border-l-4 { border-left-width: 4px; border-left-style: solid; }
+        .border-blue-500 { border-left-color: #38bdf8 !important; }
+        .p-2 { padding: 8px; }
+        .rounded { border-radius: 4px; }
+        .text-blue-900 { color: #e5e7eb !important; font-weight: bold; margin: 0; font-size: 13px;}
+        .text-blue-700 { color: #94a3b8 !important; margin: 4px 0 0 0; font-size: 12px;}
+        .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0,0,0,0.5); }
+        /* Toast */
+        .bg-gray-800 { background: #020617; border: 1px solid #38bdf8; color: #fff; padding: 12px 20px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .translate-y-full { transform: translateY(150%); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div>
+            <h1>CupX Timetables</h1>
+            <p>Smart Timetable Generator</p>
+        </div>
+        <a href="/tools/">← Back to Tools</a>
+    </header>
+
+    <main>
+
+        <section id="homeScreen" class="flex-col transition-opacity opacity-100">
+            
+            <div class="cards">
+                <button class="card" data-action="new-timetable">
+                    <div class="card-icon">
+                        <svg class="w-6 h-6" style="width: 24px; height: 24px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3>New Timetable</h3>
+                        <p>Start from scratch</p>
+                    </div>
+                </button>
+
+                <button class="card" onclick="document.getElementById('fileImportInput').click()">
+                    <div class="card-icon">
+                        <svg class="w-6 h-6" style="width: 24px; height: 24px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3>Load Input</h3>
+                        <p>Import JSON data</p>
+                        <input type="file" id="fileImportInput" accept=".json" class="hidden">
+                    </div>
+                </button>
+            </div>
+
+            <div>
+                <h3 class="section-title">Recent Drafts</h3>
+                <div id="draftsContainer">
+                    <ul class="flex flex-col gap-3">
+                        <li class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                            <span class="text-sm text-gray-500 italic py-4">Loading drafts...</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="setupScreen" class="hidden flex-col transition-opacity opacity-0">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 33%"></div>
+            </div>
+            
+            <div class="setup-box">
+                <div class="setup-header">
+                    <h2>Step 1: Subjects & Constraints</h2>
+                    <p>Define the core requirements for your schedule.</p>
+                </div>
+
+                <form>
+                    <div class="form-group">
+                        <label>Subject Name</label>
+                        <input type="text" placeholder="e.g. Advanced Mathematics">
+                    </div>
+                </form>
+
+                <div class="nav-footer">
+                    <button class="btn btn-outline" data-action="prev-step">Back</button>
+                    <button class="btn" data-action="generate-timetable">Generate Timetable</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="generatorScreen" class="hidden loading-screen transition-opacity opacity-0">
+            <svg class="spinner" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="32" cy="32" r="28" stroke-dasharray="4 4"></circle>
+                <circle cx="32" cy="32" r="20"></circle>
+                <polyline points="32 20 32 32 40 36"></polyline>
+            </svg>
+            <h2>Compiling Timetable...</h2>
+            <p>Applying constraints and resolving conflicts. This might take a few seconds.</p>
+        </section>
+
+        <section id="resultsScreen" class="hidden flex-col transition-opacity opacity-0">
+            
+            <nav aria-label="Tabs" class="flex space-x-6">
+                </nav>
+
+            <div class="results-actions">
+                <button class="btn btn-outline" style="padding: 6px 12px;" data-action="export-pdf">
+                    <svg style="width: 16px; height: 16px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    PDF
+                </button>
+                <button class="btn btn-outline" style="padding: 6px 12px;" data-action="export-excel">
+                    Excel
+                </button>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Monday</th>
+                            <th>Tuesday</th>
+                            <th>Wednesday</th>
+                            <th>Thursday</th>
+                            <th>Friday</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="editModal" class="hidden modal-overlay transition-opacity" aria-modal="true">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Edit Entry</h3>
+                <button class="modal-close" data-action="close-modal">
+                    <svg style="width: 20px; height: 20px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body form-group">
+                <label>Subject</label>
+                <input type="text" placeholder="Update subject...">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" data-action="close-modal">Cancel</button>
+                <button class="btn" data-action="close-modal">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="/js/app.js"></script>
+    <script src="/js/ui.js"></script>
+    <script src="/js/generator.js"></script>
+    <script src="/js/storage.js"></script>
+    <script src="/js/export.js"></script>
+
+</body>
+</html>
