@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TimeMaster - Smart Timetable Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom scrollbar for a cleaner mobile experience */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col relative overflow-x-hidden">
+
+    <!-- Header -->
+    <header class="bg-indigo-600 text-white shadow-md sticky top-0 z-40">
+        <div class="w-full max-w-5xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex items-center justify-between">
+            <div>
+                <h1 class="text-xl sm:text-2xl font-bold tracking-tight">TimeMaster</h1>
+                <p class="text-indigo-200 text-xs sm:text-sm mt-0.5">Smart Timetable Generator</p>
+            </div>
+            <!-- Optional: Hamburger menu for mobile extensions -->
+            <button class="p-2 rounded-md hover:bg-indigo-500 transition-colors focus:outline-none focus:ring-2 focus:ring-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow w-full max-w-5xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex flex-col relative">
+
+        <!-- 1. Home Screen -->
+        <section id="homeScreen" class="flex flex-col gap-8 transition-opacity duration-300 ease-in-out opacity-100">
+            
+            <!-- Quick Actions -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button class="flex items-center gap-4 p-6 bg-white rounded-xl shadow-sm border border-gray-200 hover:border-indigo-500 hover:shadow-md transition-all group text-left">
+                    <div class="bg-indigo-100 text-indigo-600 p-3 rounded-lg group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-900">New Timetable</h2>
+                        <p class="text-sm text-gray-500 mt-1">Start from scratch</p>
+                    </div>
+                </button>
+
+                <button class="flex items-center gap-4 p-6 bg-white rounded-xl shadow-sm border border-gray-200 hover:border-indigo-500 hover:shadow-md transition-all group text-left">
+                    <div class="bg-emerald-100 text-emerald-600 p-3 rounded-lg group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-900">Load Input</h2>
+                        <p class="text-sm text-gray-500 mt-1">Import JSON/CSV data</p>
+                    </div>
+                </button>
+            </div>
+
+            <!-- Recent Drafts -->
+            <div>
+                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 border-b border-gray-200 pb-2">Recent Drafts</h3>
+                <ul class="flex flex-col gap-3">
+                    <!-- Placeholder Item -->
+                    <li class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
+                        <div>
+                            <p class="font-medium text-gray-800">Fall Semester 2026</p>
+                            <p class="text-xs text-gray-500 mt-1">Last edited: 2 hours ago</p>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 2. Setup Form Screen (Initially Hidden) -->
+        <section id="setupScreen" class="hidden flex-col gap-6 transition-opacity duration-300 ease-in-out opacity-0">
+            <!-- Progress Tracker -->
+            <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                <div class="bg-indigo-600 h-2 rounded-full" style="width: 33%"></div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 flex-grow">
+                <header class="mb-6">
+                    <h2 class="text-xl font-bold text-gray-900">Step 1: Subjects & Constraints</h2>
+                    <p class="text-sm text-gray-500 mt-1">Define the core requirements for your schedule.</p>
+                </header>
+
+                <form class="flex flex-col gap-4">
+                    <!-- Form fields placeholder -->
+                    <div class="flex flex-col gap-2">
+                        <label class="text-sm font-medium text-gray-700">Subject Name</label>
+                        <input type="text" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" placeholder="e.g. Advanced Mathematics">
+                    </div>
+                </form>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="flex justify-between items-center mt-auto pt-4 border-t border-gray-200">
+                <button class="px-5 py-2.5 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors">Back</button>
+                <button class="px-5 py-2.5 text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg font-medium shadow-sm transition-colors">Next Step</button>
+            </div>
+        </section>
+
+        <!-- 3. Generator Loading Screen (Initially Hidden) -->
+        <section id="generatorScreen" class="hidden flex-col items-center justify-center flex-grow py-20 transition-opacity duration-300 ease-in-out opacity-0">
+            <div class="relative w-20 h-20">
+                <div class="absolute inset-0 border-4 border-indigo-100 rounded-full"></div>
+                <div class="absolute inset-0 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin"></div>
+            </div>
+            <h2 class="mt-8 text-xl font-bold text-gray-800">Compiling Timetable...</h2>
+            <p class="text-gray-500 mt-2 text-center max-w-sm">Applying constraints and resolving conflicts. This might take a few seconds.</p>
+        </section>
+
+        <!-- 4. Results Screen (Initially Hidden) -->
+        <section id="resultsScreen" class="hidden flex-col flex-grow gap-4 transition-opacity duration-300 ease-in-out opacity-0 h-full">
+            
+            <!-- Tabs -->
+            <div class="w-full overflow-x-auto custom-scrollbar border-b border-gray-200 bg-gray-50 sticky top-[60px] sm:top-[68px] z-20 pt-2">
+                <nav class="flex space-x-6 px-2" aria-label="Tabs">
+                    <button class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm border-indigo-500 text-indigo-600">
+                        Option A (Optimal)
+                    </button>
+                    <button class="whitespace-nowrap py-3 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        Option B (Compact)
+                    </button>
+                    <button class="whitespace-nowrap py-3 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        Option C (Morning Heavy)
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Action Bar -->
+            <div class="flex justify-end gap-2 my-2">
+                <button class="px-3 py-1.5 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    Edit
+                </button>
+                <button class="px-3 py-1.5 text-sm text-white bg-indigo-600 border border-transparent rounded hover:bg-indigo-700 transition-colors flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Export
+                </button>
+            </div>
+
+            <!-- Timetable Grid (Mobile-friendly sticky headers) -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 flex-grow relative overflow-hidden flex flex-col h-[60vh]">
+                <div class="overflow-auto custom-scrollbar flex-grow">
+                    <table class="min-w-full border-collapse text-sm text-left">
+                        <thead class="bg-gray-100 sticky top-0 z-10 shadow-sm">
+                            <tr>
+                                <th class="px-4 py-3 font-semibold text-gray-700 border-b border-gray-200 border-r min-w-[80px] bg-gray-100 sticky left-0 z-20">Time</th>
+                                <th class="px-4 py-3 font-semibold text-gray-700 border-b border-gray-200 border-r min-w-[120px]">Monday</th>
+                                <th class="px-4 py-3 font-semibold text-gray-700 border-b border-gray-200 border-r min-w-[120px]">Tuesday</th>
+                                <th class="px-4 py-3 font-semibold text-gray-700 border-b border-gray-200 border-r min-w-[120px]">Wednesday</th>
+                                <th class="px-4 py-3 font-semibold text-gray-700 border-b border-gray-200 border-r min-w-[120px]">Thursday</th>
+                                <th class="px-4 py-3 font-semibold text-gray-700 border-b border-gray-200 min-w-[120px]">Friday</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <!-- Example Row -->
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-4 py-4 border-r border-gray-100 text-gray-500 font-medium bg-white sticky left-0 z-10 whitespace-nowrap">09:00 AM</td>
+                                <td class="px-4 py-4 border-r border-gray-100 align-top">
+                                    <div class="bg-blue-100 border-l-4 border-blue-500 p-2 rounded text-xs cursor-pointer hover:bg-blue-200 transition-colors">
+                                        <p class="font-bold text-blue-800">Physics 101</p>
+                                        <p class="text-blue-600 mt-1">Room 304</p>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 border-r border-gray-100"></td>
+                                <td class="px-4 py-4 border-r border-gray-100"></td>
+                                <td class="px-4 py-4 border-r border-gray-100"></td>
+                                <td class="px-4 py-4"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal Component (Edit Entry) -->
+    <div id="editModal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Background Overlay -->
+            <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" aria-hidden="true"></div>
+
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            
+            <!-- Modal Panel -->
+            <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full max-w-lg">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Edit Class Entry</h3>
+                        <button class="text-gray-400 hover:text-gray-500 focus:outline-none">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                    <div class="mt-2 flex flex-col gap-4">
+                        <!-- Form elements inside modal -->
+                        <div class="flex flex-col gap-1">
+                            <label class="text-sm font-medium text-gray-700">Subject</label>
+                            <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 flex flex-row-reverse gap-2">
+                    <button type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">Save Changes</button>
+                    <button type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none w-full max-w-xs sm:max-w-sm px-4 sm:px-0">
+        <!-- Example Toast (Hidden initially, shown dynamically) -->
+        <div class="hidden bg-gray-800 text-white px-4 py-3 rounded-lg shadow-lg flex items-center justify-between pointer-events-auto transform transition-all translate-y-full opacity-0">
+            <span class="text-sm font-medium">Timetable generated successfully!</span>
+            <button class="text-gray-400 hover:text-white focus:outline-none">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/app.js"></script>
+    <script src="/js/ui.js"></script>
+    <script src="/js/generator.js"></script>
+    <script src="/js/storage.js"></script>
+    <script src="/js/export.js"></script>
+</body>
+</html>
