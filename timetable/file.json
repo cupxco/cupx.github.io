@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "name": "Spring Semester 2026",
+  "days": [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday"
+  ],
+  "slots": [
+    "09:00 AM",
+    "10:00 AM",
+    "11:00 AM",
+    "12:00 PM",
+    "01:00 PM",
+    "02:00 PM"
+  ],
+  "constraints": {
+    "maxPeriodsPerDay": 5,
+    "breakSlots": [
+      "12:00 PM"
+    ]
+  },
+  "classes": [
+    {
+      "id": "Grade 10-A",
+      "subjects": [
+        { "id": "Mathematics", "frequency": 4 },
+        { "id": "Physics", "frequency": 3 },
+        { "id": "English", "frequency": 3 },
+        { "id": "History", "frequency": 2 }
+      ]
+    },
+    {
+      "id": "Grade 10-B",
+      "subjects": [
+        { "id": "Mathematics", "frequency": 4 },
+        { "id": "Chemistry", "frequency": 3 },
+        { "id": "English", "frequency": 3 },
+        { "id": "Geography", "frequency": 2 }
+      ]
+    }
+  ],
+  "teachers": [
+    {
+      "id": "Mr. Smith",
+      "subjects": ["Mathematics"],
+      "availability": {
+        "Monday": ["09:00 AM", "10:00 AM", "11:00 AM", "01:00 PM", "02:00 PM"],
+        "Tuesday": ["09:00 AM", "10:00 AM", "11:00 AM", "01:00 PM", "02:00 PM"],
+        "Wednesday": ["09:00 AM", "10:00 AM"],
+        "Thursday": ["09:00 AM", "10:00 AM", "11:00 AM", "01:00 PM", "02:00 PM"],
+        "Friday": ["09:00 AM", "10:00 AM", "11:00 AM", "01:00 PM", "02:00 PM"]
+      }
+    },
+    {
+      "id": "Dr. Banner",
+      "subjects": ["Physics", "Chemistry"],
+      "availability": {
+        "Monday": ["09:00 AM", "10:00 AM", "11:00 AM", "01:00 PM", "02:00 PM"],
+        "Tuesday": ["09:00 AM", "10:00 AM", "11:00 AM", "01:00 PM", "02:00 PM"],
+        "Wednesday": ["09:00 AM", "10:00 AM", "11:00 AM", "01:00 PM", "02:00 PM"],
+        "Thursday": ["09:00 AM", "10:00 AM", "11:00 AM", "01:00 PM", "02:00 PM"],
+        "Friday": ["09:00 AM", "10:00 AM", "11:00 AM", "01:00 PM", "02:00 PM"]
+      }
+    },
+    {
+      "id": "Ms. Romanoff",
+      "subjects": ["English", "History", "Geography"],
+      "availability": {
+        "Monday": ["09:00 AM", "10:00 AM", "11:00 AM", "01:00 PM", "02:00 PM"],
+        "Tuesday": ["09:00 AM", "10:00 AM", "11:00 AM", "01:00 PM", "02:00 PM"],
+        "Wednesday": ["09:00 AM", "10:00 AM", "11:00 AM", "01:00 PM", "02:00 PM"],
+        "Thursday": ["09:00 AM", "10:00 AM", "11:00 AM", "01:00 PM", "02:00 PM"],
+        "Friday": ["09:00 AM", "10:00 AM", "11:00 AM", "01:00 PM", "02:00 PM"]
+      }
+    }
+  ]
+}
+
