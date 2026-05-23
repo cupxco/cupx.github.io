@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ALHIND Identity Exchange (IDEX)</title>
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Inter,Segoe UI,sans-serif;
+}
+body{
+    background:#0b1020;
+    color:white;
+    min-height:100vh;
+    overflow-x:hidden;
+}
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background:
+    radial-gradient(circle at top left,#1f3f9c55,transparent 25%),
+    radial-gradient(circle at bottom right,#00968833,transparent 25%),
+    linear-gradient(135deg,#08111f,#0d1730,#07111d);
+    z-index:-1;
+}
+.topbar{
+    width:100%;
+    padding:18px 40px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    backdrop-filter:blur(12px);
+}
+.brand{
+    font-size:22px;
+    font-weight:700;
+    letter-spacing:1px;
+}
+.brand span{
+    color:#74b9ff;
+}
+.sub{
+    opacity:0.7;
+    font-size:13px;
+}
+.container{
+    width:100%;
+    max-width:1250px;
+    margin:auto;
+    padding:35px 20px 80px;
+    display:grid;
+    grid-template-columns:1.2fr 0.8fr;
+    gap:25px;
+}
+.panel{
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:24px;
+    padding:28px;
+    backdrop-filter:blur(16px);
+    box-shadow:0 10px 35px rgba(0,0,0,0.3);
+}
+.panel h2{
+    margin-bottom:25px;
+    font-size:24px;
+}
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+}
+.field{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+label{
+    font-size:13px;
+    opacity:0.8;
+}
+input,select,textarea{
+    background:#11192e;
+    border:1px solid rgba(255,255,255,0.08);
+    color:white;
+    padding:14px;
+    border-radius:14px;
+    outline:none;
+    transition:0.2s;
+}
+input:focus,select:focus,textarea:focus{
+    border-color:#74b9ff;
+    box-shadow:0 0 0 3px rgba(116,185,255,0.2);
+}
+textarea{
+    min-height:110px;
+    resize:none;
+}
+.full{
+    grid-column:1/-1;
+}
+button{
+    border:none;
+    cursor:pointer;
+    transition:0.2s;
+}
+.primary{
+    background:linear-gradient(135deg,#2563eb,#00b894);
+    color:white;
+    padding:15px;
+    border-radius:14px;
+    font-weight:700;
+}
+.primary:hover{
+    transform:translateY(-2px);
+}
+.secondary{
+    background:#1d2d50;
+    color:white;
+    padding:13px;
+    border-radius:12px;
+}
+.note{
+    background:#14213d;
+    border-left:4px solid #74b9ff;
+    padding:14px;
+    border-radius:12px;
+    margin-bottom:20px;
+    font-size:14px;
+    opacity:0.9;
+}
+.status{
+    margin-top:15px;
+    font-size:14px;
+    color:#7bed9f;
+}
+.hidden{
+    display:none;
+}
+.card{
+    margin-top:20px;
+    border-radius:24px;
+    overflow:hidden;
+    position:relative;
+    min-height:260px;
+    box-shadow:0 20px 45px rgba(0,0,0,0.35);
+}
+.card.gov{
+    background:linear-gradient(135deg,#0f172a,#1e3a8a,#0f172a);
+}
+.card.military{
+    background:linear-gradient(135deg,#1f2937,#3f6212,#111827);
+}
+.card.police{
+    background:linear-gradient(135deg,#0f172a,#1d4ed8,#111827);
+}
+.card.emergency{
+    background:linear-gradient(135deg,#7f1d1d,#dc2626,#450a0a);
+}
+.card.judiciary{
+    background:linear-gradient(135deg,#3b0764,#7e22ce,#2e1065);
+}
+.card.foreign{
+    background:linear-gradient(135deg,#0f172a,#0f766e,#082f49);
+}
+.card.general{
+    background:linear-gradient(135deg,#111827,#1f2937,#0f172a);
+}
+.card::before{
+    content:"ALHIND DIGITAL IDENTITY";
+    position:absolute;
+    top:20px;
+    right:-50px;
+    transform:rotate(35deg);
+    opacity:0.08;
+    font-size:36px;
+    font-weight:900;
+}
+.card-top{
+    display:flex;
+    justify-content:space-between;
+    padding:24px;
+}
+.gov-logo{
+    width:70px;
+    height:70px;
+    border-radius:18px;
+    background:rgba(255,255,255,0.12);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:26px;
+    font-weight:900;
+}
+.card-type{
+    text-align:right;
+}
+.card-type h3{
+    font-size:28px;
+}
+.card-body{
+    padding:0 24px 24px;
+    display:grid;
+    grid-template-columns:120px 1fr;
+    gap:20px;
+    align-items:center;
+}
+.avatar{
+    width:120px;
+    height:140px;
+    border-radius:18px;
+    background:rgba(255,255,255,0.12);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:46px;
+    font-weight:800;
+}
+.card-details{
+    display:grid;
+    gap:10px;
+}
+.detail-row{
+    display:flex;
+    justify-content:space-between;
+    gap:20px;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    padding-bottom:8px;
+}
+.detail-row span:first-child{
+    opacity:0.7;
+}
+.lookup-box{
+    display:flex;
+    gap:10px;
+    margin-bottom:18px;
+}
+.lookup-box input{
+    flex:1;
+}
+.footer-note{
+    margin-top:18px;
+    opacity:0.55;
+    font-size:12px;
+    line-height:1.6;
+}
+.badge{
+    display:inline-flex;
+    padding:8px 12px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.08);
+    font-size:12px;
+    margin-top:10px;
+}
+@media(max-width:980px){
+.container{
+    grid-template-columns:1fr;
+}
+.grid{
+    grid-template-columns:1fr;
+}
+.card-body{
+    grid-template-columns:1fr;
+}
+.avatar{
+    width:100%;
+}
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+<div>
+<div class="brand">gov.<span>cupx</span>.in</div>
+<div class="sub">Ministry of Identity & Entity Exchange (IDEX)</div>
+</div>
+<div class="badge">Secure National Registration Portal</div>
+</div>
+
+<div class="container">
+<div class="panel">
+<h2>IDEX Registration Application</h2>
+
+<div class="note">
+Reserved classifications such as Government, Military, Police, Judiciary and Royal require additional verification before allocation. Naturally even fictional governments love paperwork. Digital paperwork, but still paperwork.
+</div>
+
+<div class="grid">
+<div class="field">
+<label>Applicant Name</label>
+<input id="name" placeholder="Enter full name">
+</div>
+
+<div class="field">
+<label>Mobile Number</label>
+<input id="mobile" placeholder="+91 XXXXX XXXXX">
+</div>
+
+<div class="field">
+<label>State Code</label>
+<select id="state">
+<option value="DH">DH - Dehli</option>
+<option value="AR">AR - Alora</option>
+<option value="MR">MR - Mehran</option>
+<option value="TB">TB - Taban</option>
+</select>
+</div>
+
+<div class="field">
+<label>District</label>
+<select id="district">
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+<option value="5">5</option>
+<option value="6">6</option>
+<option value="7">7</option>
+<option value="8">8</option>
+</select>
+</div>
+
+<div class="field">
+<label>Entity Type</label>
+<select id="entity">
+<option value="R">R - Resident/Citizen</option>
+<option value="V">V - Vehicle</option>
+<option value="C">C - Commercial Vehicle</option>
+<option value="P">P - Property</option>
+<option value="B">B - Business</option>
+<option value="I">I - Educational Institute</option>
+<option value="H">H - Healthcare/Hospital</option>
+<option value="N">N - NGO/Non Profit</option>
+</select>
+</div>
+
+<div class="field">
+<label>Classification</label>
+<select id="classi">
+<option value="A">General Random Allocation</option>
+<option value="G">G - Government</option>
+<option value="X">X - Diplomatic</option>
+<option value="M">M - Military</option>
+<option value="L">L - Police</option>
+<option value="E">E - Emergency</option>
+<option value="T">T - Foreigner/Foreign Owned</option>
+<option value="J">J - Judiciary</option>
+<option value="R">R - Royal/Presidential</option>
+</select>
+</div>
+
+<div class="field full hidden" id="reservedBlock">
+<label>Authority / Department</label>
+<input id="authority" placeholder="Who are you representing?">
+</div>
+
+<div class="field full hidden" id="requestBlock">
+<label>Special Allocation Request</label>
+<textarea id="request" placeholder="Explain why this reserved allocation is needed"></textarea>
+</div>
+
+<div class="field full hidden" id="otpSection">
+<button class="secondary" onclick="sendOTP()">Send OTP</button>
+<div class="status" id="otpStatus"></div>
+</div>
+
+<div class="field full hidden" id="verifySection">
+<label>OTP Verification</label>
+<input id="otpInput" placeholder="Enter OTP">
+<button class="secondary" style="margin-top:10px" onclick="verifyOTP()">Verify OTP</button>
+</div>
+
+<div class="field full">
+<button class="primary" onclick="generateIDEX()">Generate IDEX Registration</button>
+</div>
+</div>
+
+<div id="result"></div>
+</div>
+
+<div class="panel">
+<h2>IDEX Verification Portal</h2>
+
+<div class="lookup-box">
+<input id="lookup" placeholder="DH-2V-M0045">
+<button class="secondary" onclick="lookupID()">Check</button>
+</div>
+
+<div class="note">
+Type a valid ALHIND IDEX number to verify registration details. Public lookups show masked citizen information for privacy and security.
+</div>
+
+<div id="lookupResult"></div>
+
+<div class="footer-note">
+This interface is designed as a simulation prototype for the ALHIND National Entity Registration System (NERS). Data persistence uses local browser storage only. Which means if the browser decides to self-destruct someday, civilization collapses locally instead of nationally.
+</div>
+</div>
+</div>
+
+<script>
+const reserved = ['G','X','M','L','E','T','J','R'];
+let otpVerified = false;
+let generatedOTP = '';
+
+const lookupInput = document.getElementById('lookup');
+lookupInput.addEventListener('input',()=>{
+let val = lookupInput.value.toUpperCase();
+if(val.length===2 && !val.includes('-')){
+val += '-';
+}
+lookupInput.value = val;
+});
+
+const classi = document.getElementById('classi');
+const entity = document.getElementById('entity');
+
+classi.addEventListener('change',()=>{
+const val = classi.value;
+
+if(val==='R'){
+alert('Royal / Presidential series cannot be requested publicly.');
+classi.value='A';
+}
+
+if(reserved.includes(val)){
+reservedBlock.classList.remove('hidden');
+requestBlock.classList.remove('hidden');
+otpSection.classList.remove('hidden');
+verifySection.classList.remove('hidden');
+}else{
+reservedBlock.classList.add('hidden');
+requestBlock.classList.add('hidden');
+otpSection.classList.add('hidden');
+verifySection.classList.add('hidden');
+otpVerified = true;
+}
+
+if(entity.value==='R' && val!=='A' && val!=='T'){
+alert('Residents cannot use reserved classifications except foreign ownership.');
+classi.value='A';
+}
+});
+
+entity.addEventListener('change',()=>{
+if(entity.value==='R' && classi.value!=='A' && classi.value!=='T'){
+alert('Citizen registrations only allow general or foreign classification.');
+classi.value='A';
+}
+});
+
+function sendOTP(){
+setTimeout(()=>{
+generatedOTP = Math.floor(100000 + Math.random()*900000).toString();
+alert('Government Verification OTP: ' + generatedOTP);
+document.getElementById('otpStatus').innerText = 'OTP dispatched through secure ministry gateway.';
+},1200);
+}
+
+function verifyOTP(){
+const entered = document.getElementById('otpInput').value;
+if(entered===generatedOTP){
+otpVerified = true;
+alert('Verification successful');
+}else{
+alert('Invalid OTP');
+}
+}
+
+function randomSeries(){
+const chars = 'ABCDEFGHIKLMNOPQRSTUVWXYZ0123456789';
+return chars[Math.floor(Math.random()*chars.length)];
+}
+
+function generateNumber(cls){
+if(cls !== 'A'){
+const reservedPool = ['0101','0222','0444','0786','1001','2002','5005','7007','9009'];
+return reservedPool[Math.floor(Math.random()*reservedPool.length)];
+}
+return Math.floor(1000 + Math.random()*8999);
+}
+
+function generateIDEX(){
+const name = document.getElementById('name').value;
+const mobile = document.getElementById('mobile').value;
+const state = document.getElementById('state').value;
+const district = document.getElementById('district').value;
+const ent = document.getElementById('entity').value;
+let cls = document.getElementById('classi').value;
+
+if(!name || !mobile){
+alert('Complete all required fields');
+return;
+}
+
+if(reserved.includes(cls) && !otpVerified){
+alert('Reserved series requires OTP verification');
+return;
+}
+
+if(cls==='A'){
+cls = randomSeries();
+}
+
+const number = generateNumber(cls);
+const idex = `${state}-${district}${ent}-${cls}${number}`;
+
+const data = {
+name,mobile,state,district,ent,cls,idex,
+address:`District ${district}, ${state}, ALHIND`
+};
+
+localStorage.setItem('lastIDEX',JSON.stringify(data));
+
+renderCard(data,true,'result');
+}
+
+function renderCard(data,full,target){
+let theme='general';
+
+if(data.cls==='G') theme='gov';
+if(data.cls==='M') theme='military';
+if(data.cls==='L') theme='police';
+if(data.cls==='E') theme='emergency';
+if(data.cls==='J') theme='judiciary';
+if(data.cls==='T') theme='foreign';
+
+let title='Registered Entity';
+
+const entityNames={
+R:'Resident Identity',
+V:'Vehicle Registration',
+C:'Commercial Vehicle',
+P:'Property Registration',
+B:'Business License',
+I:'Educational Institute',
+H:'Healthcare Registration',
+N:'NGO Registration'
+};
+
+if(entityNames[data.ent]) title=entityNames[data.ent];
+
+const html=`
+<div class="card ${theme}">
+<div class="card-top">
+<div class="gov-logo">A</div>
+<div class="card-type">
+<h3>${title}</h3>
+<div>${data.idex}</div>
+</div>
+</div>
+<div class="card-body">
+<div class="avatar">${data.name.charAt(0).toUpperCase()}</div>
+<div class="card-details">
+<div class="detail-row"><span>Name</span><span>${full ? data.name : mask(data.name)}</span></div>
+<div class="detail-row"><span>IDEX Number</span><span>${data.idex}</span></div>
+<div class="detail-row"><span>Region</span><span>${data.state} District ${data.district}</span></div>
+<div class="detail-row"><span>Address</span><span>${full ? data.address : mask(data.address)}</span></div>
+<div class="detail-row"><span>Status</span><span>Verified & Active</span></div>
+<div class="detail-row"><span>Authority</span><span>gov.cupx.in/m/identity/idex</span></div>
+</div>
+</div>
+</div>
+`;
+
+document.getElementById(target).innerHTML = html;
+}
+
+function mask(str){
+return str.substring(0,3) + '********';
+}
+
+function lookupID(){
+const val = document.getElementById('lookup').value.toUpperCase();
+
+const saved = JSON.parse(localStorage.getItem('lastIDEX'));
+
+if(saved && saved.idex===val){
+renderCard(saved,true,'lookupResult');
+return;
+}
+
+const fake = {
+name:'Citizen Registered',
+state:val.substring(0,2),
+district:val.substring(3,4),
+ent:val.substring(4,5),
+cls:val.substring(6,7),
+idex:val,
+address:'Protected National Registry'
+};
+
+renderCard(fake,false,'lookupResult');
+}
+</script>
+</body>
+</html>
