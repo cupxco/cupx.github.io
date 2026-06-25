@@ -1,131 +1,302 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OTP Dashboard</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#111827;color:#fff}
-.container{max-width:1100px;margin:auto;padding:20px}
-.card{background:#1f2937;border-radius:12px;padding:16px;margin-bottom:18px}
-h1,h2,h3{margin-top:0}
-.otp{font-size:42px;font-weight:bold;letter-spacing:.35em;color:#4ade80;margin:10px 0}
-button{padding:10px 16px;border:none;border-radius:8px;background:#2563eb;color:#fff;cursor:pointer}
-button:hover{background:#1d4ed8}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.email{padding:10px;border-bottom:1px solid #374151;cursor:pointer}
-.email:hover{background:#374151}
-pre{white-space:pre-wrap;word-break:break-word}
-small{color:#cbd5e1}
-@media(max-width:800px){.grid{grid-template-columns:1fr}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instant Auto-OTP Extractor & Viewer</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #1e293b;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+        }
+        h1 { margin-top: 0; margin-bottom: 1.5rem; color: #38bdf8; font-size: 1.8rem; }
+        .input-group { margin-bottom: 1.2rem; text-align: left; }
+        label { display: block; margin-bottom: 0.5rem; color: #94a3b8; font-size: 0.9rem; }
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 6px;
+            border: 1px solid #334155;
+            background-color: #0f172a;
+            color: #fff;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover { background-color: #1d4ed8; }
+        button:disabled { background-color: #64748b; cursor: not-allowed; }
+        .status { margin-top: 1rem; font-size: 0.9rem; color: #a855f7; min-height: 20px; }
+        .otp-display {
+            margin-top: 1.5rem;
+            padding: 1.2rem;
+            background-color: #0f172a;
+            border: 2px dashed #38bdf8;
+            border-radius: 8px;
+        }
+        .otp-title { font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+        .otp-number { font-size: 3.5rem; font-weight: bold; color: #4ade80; margin: 0.5rem 0; letter-spacing: 4px; }
+        .logs {
+            margin-top: 1rem;
+            max-height: 90px;
+            overflow-y: auto;
+            background: #0f172a;
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            text-align: left;
+            color: #64748b;
+            border: 1px solid #1e293b;
+        }
+        /* New Inbox Viewer Styles */
+        .viewer-title {
+            text-align: left;
+            font-size: 0.9rem;
+            color: #38bdf8;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        .email-viewer {
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 1rem;
+            text-align: left;
+            font-size: 0.85rem;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .email-meta {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
 </head>
 <body>
+
 <div class="container">
-<h1>OTP Dashboard</h1>
+    <h1>Auto OTP Extractor</h1>
+    
+    <div class="input-group">
+        <label for="username">Custom Username</label>
+        <input type="text" id="username" placeholder="e.g., mysecretbox789">
+    </div>
+    
+    <div class="input-group">
+        <label for="domain">Select Domain</label>
+        <select id="domain"><option>Loading free domains...</option></select>
+    </div>
+    
+    <button id="startBtn" onclick="initSystem()">Start Listening</button>
+    
+    <div class="status" id="statusText">Ready</div>
+    
+    <div class="otp-display">
+        <div class="otp-title">Latest Extracted OTP</div>
+        <div class="otp-number" id="otpBox">------</div>
+        <div id="copyNotice" style="font-size: 0.8rem; color: #64748b;">Waiting for email...</div>
+    </div>
 
-<div class="card">
-<b>Mailbox</b><br>
-<span id="mailbox">imaps@catchmail.io</span>
-</div>
+    <div class="logs" id="logBox">System ready...</div>
 
-<div class="card">
-<h2>Latest OTP</h2>
-<div id="otp" class="otp">- - - - - -</div>
-<button onclick="copyOTP()">Copy OTP</button>
-</div>
-
-<div class="grid">
-<div class="card">
-<h3>Inbox</h3>
-<div id="list">Loading...</div>
-</div>
-
-<div class="card">
-<h3 id="subject">Select an Email</h3>
-<small id="sender"></small>
-<hr>
-<pre id="body">Waiting...</pre>
-</div>
-</div>
+    <!-- Live Email Content Panel -->
+    <div class="viewer-title">📬 Last Received Email Content</div>
+    <div class="email-viewer" id="emailViewer">No emails received yet during this session.</div>
 </div>
 
 <script>
-const MAILBOX="imaps@catchmail.io";
-const API="https://api.catchmail.io/api/v1";
-let latestOTP="";
+    const API_URL = 'https://api.mail.tm';
+    let token = '';
+    let emailAddress = '';
+    let seenMessageIds = new Set();
+    let pollInterval = null;
 
-async function loadInbox(){
-    try{
-        const res=await fetch(`${API}/mailbox?address=${encodeURIComponent(MAILBOX)}`);
-        const data=await res.json();
+    async function loadDomains() {
+        try {
+            const res = await fetch(`${API_URL}/domains`);
+            const data = await res.json();
+            const select = document.getElementById('domain');
+            select.innerHTML = '';
+            data['hydra:member'].forEach(d => {
+                let opt = document.createElement('option');
+                opt.value = d.domain;
+                opt.innerText = d.domain;
+                select.appendChild(opt);
+            });
+        } catch (err) {
+            log("Error loading domains: " + err.message);
+        }
+    }
+    window.onload = loadDomains;
 
-        const list=document.getElementById("list");
-        list.innerHTML="";
+    function log(msg) {
+        const box = document.getElementById('logBox');
+        box.innerHTML += `<div>[${new Date().toLocaleTimeString()}] ${msg}</div>`;
+        box.scrollTop = box.scrollHeight;
+    }
 
-        if(!data.messages || data.messages.length===0){
-            list.innerHTML="<p>No emails found.</p>";
+    async function initSystem() {
+        const username = document.getElementById('username').value.trim();
+        const domain = document.getElementById('domain').value;
+        const statusText = document.getElementById('statusText');
+        const startBtn = document.getElementById('startBtn');
+
+        if (!username) {
+            alert('Please enter a custom username!');
             return;
         }
 
-        data.messages.forEach(msg=>{
-            const div=document.createElement("div");
-            div.className="email";
-            div.innerHTML=`<b>${escapeHtml(msg.subject)}</b><br><small>${escapeHtml(msg.from)}</small><br>${new Date(msg.date).toLocaleString()}`;
-            div.onclick=()=>loadMessage(msg.id);
-            list.appendChild(div);
-        });
+        emailAddress = `${username}@${domain}`.toLowerCase();
+        const password = "FixedSecurePassword123!"; 
+        
+        startBtn.disabled = true;
+        statusText.innerText = "Connecting to mail server...";
+        log(`Targeting email: ${emailAddress}`);
 
-        loadMessage(data.messages[0].id);
+        try {
+            let regRes = await fetch(`${API_URL}/accounts`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ address: emailAddress, password: password })
+            });
+            
+            if (regRes.status === 201) {
+                log("New custom mailbox successfully provisioned.");
+            } else if (regRes.status === 422) {
+                log("Mailbox exists. Logging into account...");
+            }
 
-    }catch(err){
-        document.getElementById("list").innerHTML="<b>Failed to load inbox.</b><br>"+err;
-    }
-}
+            let tokenRes = await fetch(`${API_URL}/token`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ address: emailAddress, password: password })
+            });
+            
+            if (!tokenRes.ok) throw new Error("Auth failed.");
+            const tokenData = await tokenRes.json();
+            token = tokenData.token;
+            
+            statusText.innerText = "Listening in Background...";
+            statusText.style.color = "#4ade80";
+            log("Monitoring inbox every 3 seconds.");
 
-async function loadMessage(id){
-    try{
-        const res=await fetch(`${API}/message/${id}?mailbox=${encodeURIComponent(MAILBOX)}`);
-        const mail=await res.json();
+            // Clear historical cache
+            await checkMessages(true);
 
-        document.getElementById("subject").textContent=mail.subject;
-        document.getElementById("sender").textContent=mail.from;
+            if(pollInterval) clearInterval(pollInterval);
+            pollInterval = setInterval(() => checkMessages(false), 3000);
 
-        const text=(mail.body && mail.body.text) || "";
-        document.getElementById("body").textContent=text;
-
-        const match=text.match(/\b\d{6}\b/g);
-        if(match){
-            latestOTP=match[0];
-            document.getElementById("otp").textContent=latestOTP.split("").join(" ");
-        }else{
-            latestOTP="";
-            document.getElementById("otp").textContent="- - - - - -";
+        } catch (error) {
+            statusText.innerText = "Error connecting.";
+            statusText.style.color = "#ef4444";
+            startBtn.disabled = false;
+            log(`Error: ${error.message}`);
         }
-
-    }catch(err){
-        console.error(err);
     }
-}
 
-function copyOTP(){
-    if(!latestOTP){
-        alert("No OTP found.");
-        return;
+    async function checkMessages(isInitial = false) {
+        try {
+            const res = await fetch(`${API_URL}/messages`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) return;
+            const data = await res.json();
+            const messages = data['hydra:member'];
+
+            for (let msg of messages) {
+                if (!seenMessageIds.has(msg.id)) {
+                    seenMessageIds.add(msg.id);
+                    
+                    if (!isInitial) {
+                        log(`Incoming mail from: ${msg.from.address}`);
+                        await fetchAndExtractOTP(msg.id);
+                    }
+                }
+            }
+        } catch (err) {
+            log("Inbox error: " + err.message);
+        }
     }
-    navigator.clipboard.writeText(latestOTP);
-    alert("OTP copied!");
-}
 
-function escapeHtml(str){
-    const d=document.createElement("div");
-    d.textContent=str||"";
-    return d.innerHTML;
-}
+    async function fetchAndExtractOTP(id) {
+        try {
+            const res = await fetch(`${API_URL}/messages/${id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const msgData = await res.json();
+            
+            const sender = msgData.from.address;
+            const subject = msgData.subject || "(No Subject)";
+            const bodyText = msgData.text || msgData.intro || "";
+            
+            // Render the text directly into the live viewer panel
+            const viewer = document.getElementById('emailViewer');
+            viewer.innerHTML = `<div class="email-meta"><strong>From:</strong> ${sender}<br><strong>Subject:</strong> ${subject}</div><div>${escapeHtml(bodyText)}</div>`;
 
-loadInbox();
-setInterval(loadInbox,3000);
+            // Smart Regex: Looks for exactly 6 digits not immediately touched by another digit
+            // This safely bypasses HTML brackets, periods, colons, or start/end limits.
+            const otpMatch = bodyText.match(/(?<!\d)(\d{6})(?!\d)/);
+            
+            if (otpMatch && otpMatch[1]) {
+                const otp = otpMatch[1];
+                
+                document.getElementById('otpBox').innerText = otp;
+                document.getElementById('copyNotice').innerText = "Copied to your clipboard!";
+                
+                navigator.clipboard.writeText(otp).catch(() => {});
+                log(`🎯 OTP Found & Extracted: ${otp}`);
+            } else {
+                log("Email rendered below, but regex couldn't isolate a unique 6-digit number.");
+            }
+        } catch (err) {
+            log("Failed to process message details: " + err.message);
+        }
+    }
+
+    // Helper function to safely display plain text without breaking HTML layouts
+    function escapeHtml(text) {
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
 </script>
 </body>
 </html>
