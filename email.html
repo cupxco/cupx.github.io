@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OTP Dashboard</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#111827;color:#fff}
+.container{max-width:1100px;margin:auto;padding:20px}
+.card{background:#1f2937;border-radius:12px;padding:16px;margin-bottom:18px}
+h1,h2,h3{margin-top:0}
+.otp{font-size:42px;font-weight:bold;letter-spacing:.35em;color:#4ade80;margin:10px 0}
+button{padding:10px 16px;border:none;border-radius:8px;background:#2563eb;color:#fff;cursor:pointer}
+button:hover{background:#1d4ed8}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.email{padding:10px;border-bottom:1px solid #374151;cursor:pointer}
+.email:hover{background:#374151}
+pre{white-space:pre-wrap;word-break:break-word}
+small{color:#cbd5e1}
+@media(max-width:800px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>OTP Dashboard</h1>
+
+<div class="card">
+<b>Mailbox</b><br>
+<span id="mailbox">imaps@catchmail.io</span>
+</div>
+
+<div class="card">
+<h2>Latest OTP</h2>
+<div id="otp" class="otp">- - - - - -</div>
+<button onclick="copyOTP()">Copy OTP</button>
+</div>
+
+<div class="grid">
+<div class="card">
+<h3>Inbox</h3>
+<div id="list">Loading...</div>
+</div>
+
+<div class="card">
+<h3 id="subject">Select an Email</h3>
+<small id="sender"></small>
+<hr>
+<pre id="body">Waiting...</pre>
+</div>
+</div>
+</div>
+
+<script>
+const MAILBOX="imaps@catchmail.io";
+const API="https://api.catchmail.io/api/v1";
+let latestOTP="";
+
+async function loadInbox(){
+    try{
+        const res=await fetch(`${API}/mailbox?address=${encodeURIComponent(MAILBOX)}`);
+        const data=await res.json();
+
+        const list=document.getElementById("list");
+        list.innerHTML="";
+
+        if(!data.messages || data.messages.length===0){
+            list.innerHTML="<p>No emails found.</p>";
+            return;
+        }
+
+        data.messages.forEach(msg=>{
+            const div=document.createElement("div");
+            div.className="email";
+            div.innerHTML=`<b>${escapeHtml(msg.subject)}</b><br><small>${escapeHtml(msg.from)}</small><br>${new Date(msg.date).toLocaleString()}`;
+            div.onclick=()=>loadMessage(msg.id);
+            list.appendChild(div);
+        });
+
+        loadMessage(data.messages[0].id);
+
+    }catch(err){
+        document.getElementById("list").innerHTML="<b>Failed to load inbox.</b><br>"+err;
+    }
+}
+
+async function loadMessage(id){
+    try{
+        const res=await fetch(`${API}/message/${id}?mailbox=${encodeURIComponent(MAILBOX)}`);
+        const mail=await res.json();
+
+        document.getElementById("subject").textContent=mail.subject;
+        document.getElementById("sender").textContent=mail.from;
+
+        const text=(mail.body && mail.body.text) || "";
+        document.getElementById("body").textContent=text;
+
+        const match=text.match(/\b\d{6}\b/g);
+        if(match){
+            latestOTP=match[0];
+            document.getElementById("otp").textContent=latestOTP.split("").join(" ");
+        }else{
+            latestOTP="";
+            document.getElementById("otp").textContent="- - - - - -";
+        }
+
+    }catch(err){
+        console.error(err);
+    }
+}
+
+function copyOTP(){
+    if(!latestOTP){
+        alert("No OTP found.");
+        return;
+    }
+    navigator.clipboard.writeText(latestOTP);
+    alert("OTP copied!");
+}
+
+function escapeHtml(str){
+    const d=document.createElement("div");
+    d.textContent=str||"";
+    return d.innerHTML;
+}
+
+loadInbox();
+setInterval(loadInbox,3000);
+</script>
+</body>
+</html>
