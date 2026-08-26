@@ -1,67 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
-  <url>
-    <loc>https://cupx.in/</loc>
-    <lastmod>2026-03-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>1.0</priority>
-  </url>
+    <url>
+        <loc>https://cupx.in/</loc>
+    </url>
 
-  <url>
-    <loc>https://cupx.in/tools/</loc>
-    <lastmod>2026-03-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
+    <url>
+        <loc>https://cupx.in/about/</loc>
+    </url>
 
-  <url>
-    <loc>https://cupx.in/tools/calculator</loc>
-    <lastmod>2026-03-05</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.8</priority>
-  </url>
+    <url>
+        <loc>https://cupx.in/bio/</loc>
+    </url>
 
-  <url>
-    <loc>https://cupx.in/tools/attendance</loc>
-    <lastmod>2026-03-05</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.8</priority>
-  </url>
+    <url>
+        <loc>https://cupx.in/contact/</loc>
+    </url>
 
-  <url>
-    <loc>https://cupx.in/tools/json</loc>
-    <lastmod>2026-03-05</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.8</priority>
-  </url>
+    <url>
+        <loc>https://cupx.in/llm/</loc>
+    </url>
 
-  <url>
-    <loc>https://cupx.in/about/</loc>
-    <lastmod>2026-03-05</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.6</priority>
-  </url>
-
-  <url>
-    <loc>https://cupx.in/contact/</loc>
-    <lastmod>2026-03-05</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.6</priority>
-  </url>
-
-  <url>
-    <loc>https://library.cupx.in/</loc>
-    <lastmod>2026-03-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://auth.cupx.in/</loc>
-    <lastmod>2026-03-05</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.4</priority>
-  </url>
+    <url>
+        <loc>https://cupx.in/privacy/</loc>
+    </url>
 
 </urlset>
