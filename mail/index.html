@@ -1,302 +1,343 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instant Auto-OTP Extractor & Viewer</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0f172a;
-            color: #e2e8f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .container {
-            background-color: #1e293b;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            text-align: center;
-            width: 100%;
-            max-width: 500px;
-        }
-        h1 { margin-top: 0; margin-bottom: 1.5rem; color: #38bdf8; font-size: 1.8rem; }
-        .input-group { margin-bottom: 1.2rem; text-align: left; }
-        label { display: block; margin-bottom: 0.5rem; color: #94a3b8; font-size: 0.9rem; }
-        input, select {
-            width: 100%;
-            padding: 0.75rem;
-            border-radius: 6px;
-            border: 1px solid #334155;
-            background-color: #0f172a;
-            color: #fff;
-            box-sizing: border-box;
-            font-size: 1rem;
-        }
-        button {
-            width: 100%;
-            padding: 0.75rem;
-            background-color: #2563eb;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        button:hover { background-color: #1d4ed8; }
-        button:disabled { background-color: #64748b; cursor: not-allowed; }
-        .status { margin-top: 1rem; font-size: 0.9rem; color: #a855f7; min-height: 20px; }
-        .otp-display {
-            margin-top: 1.5rem;
-            padding: 1.2rem;
-            background-color: #0f172a;
-            border: 2px dashed #38bdf8;
-            border-radius: 8px;
-        }
-        .otp-title { font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
-        .otp-number { font-size: 3.5rem; font-weight: bold; color: #4ade80; margin: 0.5rem 0; letter-spacing: 4px; }
-        .logs {
-            margin-top: 1rem;
-            max-height: 90px;
-            overflow-y: auto;
-            background: #0f172a;
-            padding: 0.5rem;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 0.8rem;
-            text-align: left;
-            color: #64748b;
-            border: 1px solid #1e293b;
-        }
-        /* New Inbox Viewer Styles */
-        .viewer-title {
-            text-align: left;
-            font-size: 0.9rem;
-            color: #38bdf8;
-            margin-top: 1.5rem;
-            margin-bottom: 0.5rem;
-            font-weight: bold;
-        }
-        .email-viewer {
-            background-color: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 6px;
-            padding: 1rem;
-            text-align: left;
-            font-size: 0.85rem;
-            max-height: 200px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-        .email-meta {
-            font-size: 0.8rem;
-            color: #94a3b8;
-            border-bottom: 1px solid #334155;
-            padding-bottom: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0a1020">
+<title>CupMail — Temporary OTP Inbox</title>
+<style>
+:root{color-scheme:dark;--bg:#0a1020;--panel:#121c31;--line:#2a3855;--muted:#9eacc5;--blue:#315fa8;--green:#75e0b5;--red:#ff8585}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at top,#142342 0,#0a1020 55%);color:#edf3ff;font:15px/1.5 system-ui,Segoe UI,Arial,sans-serif;min-height:100vh}
+main{max-width:1000px;margin:36px auto;padding:0 18px 40px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+h1{margin:0;font-size:clamp(25px,4vw,34px);letter-spacing:-.7px}
+.subtitle,.muted{color:var(--muted)}
+.subtitle{margin-top:4px}
+.small{font-size:12px}
+.pill{border:1px solid var(--line);border-radius:30px;padding:5px 11px;color:var(--muted);font-size:12px}
+.panel{background:linear-gradient(145deg,rgba(18,28,49,.97),rgba(14,23,41,.97));border:1px solid var(--line);border-radius:17px;padding:20px;margin-top:18px;box-shadow:0 14px 40px #0002}
+.row{display:flex;gap:11px;align-items:end;flex-wrap:wrap}
+.field{flex:1;min-width:190px}
+label{display:block;color:var(--muted);font-size:13px;margin-bottom:6px}
+input,select,button{font:inherit;color:inherit;border:1px solid var(--line);border-radius:10px;padding:12px 13px}
+input,select{width:100%;background:#0b1428;outline:none}
+input:focus,select:focus{border-color:#6595e8;box-shadow:0 0 0 3px #315fa833}
+button{background:var(--blue);border-color:#456eae;cursor:pointer;font-weight:650;transition:.15s}
+button:hover{filter:brightness(1.13)}
+button:disabled{opacity:.5;cursor:wait}
+button.secondary{background:#182640;border-color:#354765}
+.status{min-height:24px;margin-top:13px;color:var(--muted);overflow-wrap:anywhere}
+.address{font-weight:750;font-size:17px;overflow-wrap:anywhere;margin-top:12px}
+.otpbox{background:linear-gradient(135deg,#102b2b,#102322);border:1px solid #2d6258;border-radius:14px;padding:20px;margin-top:16px}
+.otp{font-size:clamp(36px,8vw,58px);font-weight:850;letter-spacing:5px;color:var(--green);overflow-wrap:anywhere;line-height:1.2;margin:8px 0}
+.mail{border-top:1px solid var(--line);padding:16px 0}
+.mailhead{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.subject{font-weight:750;overflow-wrap:anywhere}
+.body{white-space:pre-wrap;overflow-wrap:anywhere;background:#0a1428;color:#cbd5e1;padding:14px;border-radius:9px;max-height:440px;overflow:auto;font:13px/1.6 system-ui;margin-top:10px}
+.mail-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.mail-actions button{font-size:12px;padding:7px 10px}
+a{color:#9ec1ff}
+.footer{margin:18px 3px;color:var(--muted);font-size:12px}
+.hidden{display:none!important}
+@media(max-width:600px){main{margin:22px auto;padding:0 12px 30px}.panel{padding:15px}.field{min-width:100%}.row>button{width:100%}}
+</style>
 </head>
 <body>
-
-<div class="container">
-    <h1>Auto OTP Extractor</h1>
-    
-    <div class="input-group">
-        <label for="username">Custom Username</label>
-        <input type="text" id="username" placeholder="e.g., mysecretbox789">
+<main>
+  <header class="top">
+    <div>
+      <h1>CupMail</h1>
+      <div class="subtitle">A simple temporary inbox for verification emails and testing.</div>
     </div>
-    
-    <div class="input-group">
-        <label for="domain">Select Domain</label>
-        <select id="domain"><option>Loading free domains...</option></select>
-    </div>
-    
-    <button id="startBtn" onclick="initSystem()">Start Listening</button>
-    
-    <div class="status" id="statusText">Ready</div>
-    
-    <div class="otp-display">
-        <div class="otp-title">Latest Extracted OTP</div>
-        <div class="otp-number" id="otpBox">------</div>
-        <div id="copyNotice" style="font-size: 0.8rem; color: #64748b;">Waiting for email...</div>
-    </div>
+    <span class="pill" id="state">Loading domains…</span>
+  </header>
 
-    <div class="logs" id="logBox">System ready...</div>
+  <section class="panel">
+    <div class="row">
+      <div class="field">
+        <label for="username">Username</label>
+        <input id="username" placeholder="e.g. temp001" autocomplete="off" maxlength="64">
+      </div>
+      <div class="field">
+        <label for="domain">Available domain</label>
+        <select id="domain"><option value="">Loading…</option></select>
+      </div>
+      <button id="start" disabled>Start inbox</button>
+    </div>
+    <div class="status" id="status" role="status">Loading available domains…</div>
+    <div class="address" id="address"></div>
+    <div class="small muted" style="margin-top:8px">Anyone who enters the same address can access the same shared inbox. Do not use it for private or sensitive messages.</div>
+  </section>
 
-    <!-- Live Email Content Panel -->
-    <div class="viewer-title">📬 Last Received Email Content</div>
-    <div class="email-viewer" id="emailViewer">No emails received yet during this session.</div>
-</div>
+  <section class="panel">
+    <div class="top">
+      <div><strong>Latest OTP</strong><div class="muted small" id="otpFrom">Waiting for inbox connection…</div></div>
+      <span class="pill" id="lastCheck">Not checked</span>
+    </div>
+    <div class="otpbox">
+      <div class="small muted">Detected verification code</div>
+      <div class="otp" id="otp">— — —</div>
+      <div class="top">
+        <div class="small muted" id="otpNote">Start an inbox to listen for messages.</div>
+        <button class="secondary" id="copyOtp" disabled>Copy OTP</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="top"><strong>Inbox messages</strong><span class="pill" id="count">0 messages</span></div>
+    <div id="emails" class="muted" style="margin-top:12px">Start an inbox to see incoming messages.</div>
+  </section>
+
+  <div class="footer">Powered by <a href="https://mail.tm/" target="_blank" rel="noopener">Mail.tm</a>. Public shared inboxes are visible to anyone using the same email address.</div>
+</main>
 
 <script>
-    const API_URL = 'https://api.mail.tm';
-    let token = '';
-    let emailAddress = '';
-    let seenMessageIds = new Set();
-    let pollInterval = null;
+const API_BASE = "https://tm.hqfm.workers.dev";
 
-    async function loadDomains() {
-        try {
-            const res = await fetch(`${API_URL}/domains`);
-            const data = await res.json();
-            const select = document.getElementById('domain');
-            select.innerHTML = '';
-            data['hydra:member'].forEach(d => {
-                let opt = document.createElement('option');
-                opt.value = d.domain;
-                opt.innerText = d.domain;
-                select.appendChild(opt);
-            });
-        } catch (err) {
-            log("Error loading domains: " + err.message);
-        }
+const $ = id => document.getElementById(id);
+let token = null;                 // Kept in this tab's memory only.
+let connectedAddress = null;
+let timer = null;
+let busy = false;
+let renderedMessageIds = new Set();
+let currentOtp = "";
+
+async function api(path, options = {}) {
+  if (API_BASE.includes("YOUR-WORKER-NAME")) {
+    throw new Error("Set your Cloudflare Worker URL in index.html first.");
+  }
+  const headers = new Headers(options.headers || {});
+  headers.set("Accept", "application/json");
+  if (token) headers.set("Authorization", "Bearer " + token);
+  const response = await fetch(API_BASE.replace(/\/$/, "") + path, {
+    ...options, headers
+  });
+  const data = await response.json().catch(() => ({error:"Worker returned an invalid response."}));
+  if (!response.ok) throw new Error(data.error || data.detail || `Request failed (${response.status})`);
+  return data;
+}
+
+async function loadDomains() {
+  $("start").disabled = true;
+  try {
+    const data = await api("/domains");
+    const domains = (data["hydra:member"] || data.domains || [])
+      .filter(d => d && d.domain && d.isActive !== false && d.isPrivate !== true);
+    $("domain").replaceChildren();
+    if (!domains.length) {
+      $("domain").add(new Option("No active public domains", ""));
+      $("status").textContent = "The provider returned no active public domains.";
+      $("state").textContent = "No domains";
+      return;
     }
-    window.onload = loadDomains;
+    for (const d of domains) $("domain").add(new Option(d.domain, d.domain));
+    $("status").textContent = `Loaded ${domains.length} available domain(s).`;
+    $("state").textContent = `${domains.length} domain(s) available`;
+    $("start").disabled = false;
+  } catch (error) {
+    $("domain").replaceChildren(new Option("Could not load domains", ""));
+    $("status").textContent = "Domain loading failed: " + error.message;
+    $("state").textContent = "Backend error";
+  }
+}
 
-    function log(msg) {
-        const box = document.getElementById('logBox');
-        box.innerHTML += `<div>[${new Date().toLocaleTimeString()}] ${msg}</div>`;
-        box.scrollTop = box.scrollHeight;
+function extractOtp(text) {
+  const s = String(text || "").replace(/\s+/g, " ");
+  const patterns = [
+    /(?:otp|one[- ]time (?:password|code)|verification code|verify(?:ication)? code|security code|login code|passcode|confirmation code)[^\dA-Z]{0,35}([A-Z0-9]{4,9})/i,
+    /([A-Z0-9]{4,9})[^\w]{0,25}(?:is your|is the)?\s*(?:otp|verification code|security code|login code)/i
+  ];
+  for (const re of patterns) {
+    const m = s.match(re);
+    if (m) return m[1];
+  }
+  if (/otp|verification|verify|security code|login code|passcode/i.test(s)) {
+    const m = s.match(/\b\d{4,9}\b/);
+    if (m) return m[0];
+  }
+  return null;
+}
+
+function htmlToText(value) {
+  const doc = new DOMParser().parseFromString(value || "", "text/html");
+  doc.querySelectorAll("script,style,iframe,object").forEach(n => n.remove());
+  return doc.body.textContent || "";
+}
+
+function createEmailElement(message) {
+  const html = Array.isArray(message.html) ? message.html.join("\n") : (message.html || "");
+  const textBody = message.text || htmlToText(html);
+  const code = message.detectedOtp || extractOtp([message.subject || "", textBody].join("\n"));
+  const article = document.createElement("article");
+  article.className = "mail";
+
+  const head = document.createElement("div");
+  head.className = "mailhead";
+  const left = document.createElement("div");
+  const subject = document.createElement("div");
+  subject.className = "subject";
+  subject.textContent = message.subject || "(No subject)";
+  const from = document.createElement("div");
+  from.className = "small muted";
+  from.textContent = "From: " + (message.from?.name ? message.from.name + " " : "") + (message.from?.address || "unknown");
+  left.append(subject, from);
+  const date = document.createElement("span");
+  date.className = "small muted";
+  date.textContent = message.createdAt ? new Date(message.createdAt).toLocaleString() : "";
+  head.append(left, date);
+  article.append(head);
+
+  if (code) {
+    const badge = document.createElement("div");
+    badge.className = "pill";
+    badge.style.display = "inline-block";
+    badge.style.marginTop = "8px";
+    badge.textContent = "Detected OTP: " + code;
+    article.append(badge);
+  }
+  const body = document.createElement("pre");
+  body.className = "body";
+  body.textContent = textBody || "(No readable text body)";
+  article.append(body);
+
+  if (code) {
+    const copy = document.createElement("button");
+    copy.className = "secondary";
+    copy.textContent = "Copy code";
+    copy.onclick = async () => {
+      await navigator.clipboard.writeText(code);
+      copy.textContent = "Copied";
+      setTimeout(() => copy.textContent = "Copy code", 1400);
+    };
+    article.append(copy);
+  }
+  return {article, code, message};
+}
+
+async function startInbox() {
+  const username = $("username").value.trim();
+  const domain = $("domain").value;
+  if (!/^[a-zA-Z0-9._-]{1,64}$/.test(username)) {
+    $("status").textContent = "Use 1–64 letters, numbers, dots, underscores or hyphens.";
+    return;
+  }
+  if (!domain) {
+    $("status").textContent = "Select an available domain first.";
+    return;
+  }
+
+  $("start").disabled = true;
+  $("status").textContent = "Creating account or signing in…";
+  try {
+    if (timer) clearInterval(timer);
+    token = null;
+    const result = await api("/start", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({username, domain})
+    });
+    if (!result.token || !result.address) throw new Error("Worker did not return an authentication token and address.");
+
+    token = result.token;
+    connectedAddress = result.address;
+    renderedMessageIds = new Set();
+    currentOtp = "";
+    $("otp").textContent = "— — —";
+    $("otpFrom").textContent = "Listening to " + connectedAddress;
+    $("otpNote").textContent = "Waiting for a verification code.";
+    $("copyOtp").disabled = true;
+    $("lastCheck").textContent = "Not checked";
+    $("count").textContent = "0 messages";
+    $("emails").textContent = "Loading inbox…";
+    $("address").textContent = connectedAddress;
+    $("state").textContent = result.mode === "created" ? "New inbox connected" : "Existing inbox connected";
+    $("status").textContent = result.mode === "created" ? "Mailbox created and connected." : "Existing mailbox signed in.";
+    await refreshInbox();
+    timer = setInterval(refreshInbox, 5000);
+  } catch (error) {
+    token = null;
+    connectedAddress = null;
+    $("state").textContent = "Not connected";
+    $("status").textContent = "Could not start inbox: " + error.message;
+  } finally {
+    $("start").disabled = false;
+  }
+}
+
+async function refreshInbox() {
+  if (!token || busy) return;
+  busy = true;
+  try {
+    const data = await api("/messages");
+    const messages = data["hydra:member"] || data.messages || [];
+    const fresh = messages.filter(m => m.id && !renderedMessageIds.has(String(m.id))).reverse();
+    const fragment = document.createDocumentFragment();
+    let added = 0;
+    let newestOtp = null;
+    let newestSource = "";
+
+    for (const item of fresh) {
+      let message;
+      try {
+        message = await api("/messages/" + encodeURIComponent(item.id));
+      } catch (_) {
+        continue;
+      }
+      const result = createEmailElement(message);
+      fragment.append(result.article);
+      renderedMessageIds.add(String(item.id));
+      added++;
+      if (result.code) {
+        newestOtp = result.code;
+        newestSource = (message.subject || "No subject") + " — " + (message.from?.address || "unknown sender");
+      }
     }
 
-    async function initSystem() {
-        const username = document.getElementById('username').value.trim();
-        const domain = document.getElementById('domain').value;
-        const statusText = document.getElementById('statusText');
-        const startBtn = document.getElementById('startBtn');
-
-        if (!username) {
-            alert('Please enter a custom username!');
-            return;
-        }
-
-        emailAddress = `${username}@${domain}`.toLowerCase();
-        const password = "FixedSecurePassword123!"; 
-        
-        startBtn.disabled = true;
-        statusText.innerText = "Connecting to mail server...";
-        log(`Targeting email: ${emailAddress}`);
-
-        try {
-            let regRes = await fetch(`${API_URL}/accounts`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ address: emailAddress, password: password })
-            });
-            
-            if (regRes.status === 201) {
-                log("New custom mailbox successfully provisioned.");
-            } else if (regRes.status === 422) {
-                log("Mailbox exists. Logging into account...");
-            }
-
-            let tokenRes = await fetch(`${API_URL}/token`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ address: emailAddress, password: password })
-            });
-            
-            if (!tokenRes.ok) throw new Error("Auth failed.");
-            const tokenData = await tokenRes.json();
-            token = tokenData.token;
-            
-            statusText.innerText = "Listening in Background...";
-            statusText.style.color = "#4ade80";
-            log("Monitoring inbox every 3 seconds.");
-
-            // Clear historical cache
-            await checkMessages(true);
-
-            if(pollInterval) clearInterval(pollInterval);
-            pollInterval = setInterval(() => checkMessages(false), 3000);
-
-        } catch (error) {
-            statusText.innerText = "Error connecting.";
-            statusText.style.color = "#ef4444";
-            startBtn.disabled = false;
-            log(`Error: ${error.message}`);
-        }
+    if (added) {
+      if (renderedMessageIds.size === added) $("emails").replaceChildren();
+      $("emails").append(fragment);
     }
 
-    async function checkMessages(isInitial = false) {
-        try {
-            const res = await fetch(`${API_URL}/messages`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (!res.ok) return;
-            const data = await res.json();
-            const messages = data['hydra:member'];
-
-            for (let msg of messages) {
-                if (!seenMessageIds.has(msg.id)) {
-                    seenMessageIds.add(msg.id);
-                    
-                    if (!isInitial) {
-                        log(`Incoming mail from: ${msg.from.address}`);
-                        await fetchAndExtractOTP(msg.id);
-                    }
-                }
-            }
-        } catch (err) {
-            log("Inbox error: " + err.message);
-        }
+    const total = renderedMessageIds.size;
+    $("count").textContent = `${total} message${total === 1 ? "" : "s"}`;
+    if (!total) {
+      $("emails").textContent = "Inbox is empty. Waiting for incoming email…";
+      $("otp").textContent = "— — —";
+      $("otpFrom").textContent = "No emails received yet.";
+    } else if (newestOtp) {
+      currentOtp = newestOtp;
+      $("otp").textContent = newestOtp;
+      $("otpFrom").textContent = "Found in: " + newestSource;
+      $("otpNote").textContent = "Detected in a newly received email.";
+      $("copyOtp").disabled = false;
+    } else if ($("otp").textContent === "— — —") {
+      $("otp").textContent = "Not found";
+      $("otpFrom").textContent = "No recognizable OTP in current messages.";
     }
-
-    async function fetchAndExtractOTP(id) {
-        try {
-            const res = await fetch(`${API_URL}/messages/${id}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const msgData = await res.json();
-            
-            const sender = msgData.from.address;
-            const subject = msgData.subject || "(No Subject)";
-            const bodyText = msgData.text || msgData.intro || "";
-            
-            // Render the text directly into the live viewer panel
-            const viewer = document.getElementById('emailViewer');
-            viewer.innerHTML = `<div class="email-meta"><strong>From:</strong> ${sender}<br><strong>Subject:</strong> ${subject}</div><div>${escapeHtml(bodyText)}</div>`;
-
-            // Smart Regex: Looks for exactly 6 digits not immediately touched by another digit
-            // This safely bypasses HTML brackets, periods, colons, or start/end limits.
-            const otpMatch = bodyText.match(/(?<!\d)(\d{6})(?!\d)/);
-            
-            if (otpMatch && otpMatch[1]) {
-                const otp = otpMatch[1];
-                
-                document.getElementById('otpBox').innerText = otp;
-                document.getElementById('copyNotice').innerText = "Copied to your clipboard!";
-                
-                navigator.clipboard.writeText(otp).catch(() => {});
-                log(`🎯 OTP Found & Extracted: ${otp}`);
-            } else {
-                log("Email rendered below, but regex couldn't isolate a unique 6-digit number.");
-            }
-        } catch (err) {
-            log("Failed to process message details: " + err.message);
-        }
+    $("lastCheck").textContent = "Checked " + new Date().toLocaleTimeString();
+    if (added) $("status").textContent = `${added} new email(s) received in ${connectedAddress}.`;
+  } catch (error) {
+    $("status").textContent = "Inbox refresh error: " + error.message;
+    if (/401|unauthorized|token/i.test(error.message)) {
+      clearInterval(timer);
+      token = null;
+      $("state").textContent = "Session expired";
     }
+  } finally {
+    busy = false;
+  }
+}
 
-    // Helper function to safely display plain text without breaking HTML layouts
-    function escapeHtml(text) {
-        return text
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
+$("start").addEventListener("click", startInbox);
+$("copyOtp").addEventListener("click", async () => {
+  if (!currentOtp) return;
+  await navigator.clipboard.writeText(currentOtp);
+  $("copyOtp").textContent = "Copied!";
+  setTimeout(() => $("copyOtp").textContent = "Copy OTP", 1300);
+});
+loadDomains();
 </script>
 </body>
 </html>
